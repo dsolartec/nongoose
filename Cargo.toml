@@ -1,0 +1,31 @@
+[package]
+name = "nongoose"
+version = "0.1.0-beta.1"
+authors = [
+  "Daniel Solarte <contact@danielsolarte.com>"
+]
+license = "GPL-3.0"
+description = "MongoDB ODM for Rust based on Mongoose"
+edition = "2018"
+
+[workspace]
+members = ["./derive/"]
+
+[dependencies]
+async-trait = "0.1"
+futures = "0.3"
+mongodb = { version = "2.0.0-beta.2" }
+once_cell = "1"
+nongoose-derive = { optional = true, path = "./derive/", version = "0.1.0"}
+serde = { features = ["derive"], version = "1" }
+thiserror = "1"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros"] }
+
+[[example]]
+name = "many-to-one"
+
+[features]
+default = ["derive"]
+derive = ["nongoose-derive"]
