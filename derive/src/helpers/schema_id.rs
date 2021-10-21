@@ -7,11 +7,11 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData<'a>) -> TokenStream {
   let id_field_ident = schema_data.id.ident.as_ref().unwrap();
 
   if let Some(lit) = schema_data.convert.get(id_field_ident) {
+    let nongoose = crate::utils::crates::get_nongoose_crate_name();
     let convert_ident = format_ident!("{}", lit.value());
-    let mongodb = crate::utils::crates::get_mongodb_crate_name();
 
     quote! {
-      type __SchemaId = #mongodb::bson::Bson;
+      type __SchemaId = #nongoose::mongodb::bson::Bson;
 
       fn __get_id(&self) -> Self::__SchemaId {
         #convert_ident(self.#id_field_ident.clone())

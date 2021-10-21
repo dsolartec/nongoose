@@ -4,7 +4,6 @@ use quote::{format_ident, quote};
 use crate::schema::data::SchemaData;
 
 pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
-  let mongodb = crate::utils::crates::get_mongodb_crate_name();
   let nongoose = crate::utils::crates::get_nongoose_crate_name();
 
   if schema_data.unique.len() > 0 {
@@ -19,7 +18,7 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
         let convert_ident = format_ident!("{}", lit.value());
         idents.extend(quote! {
           (
-            #mongodb::bson::doc! { #ident_str: #convert_ident(#value.clone()) },
+            #nongoose::re_exportsmongodb::bson::doc! { #ident_str: #convert_ident(#value.clone()) },
             #ident_str,
             #value.clone().to_string(),
           ),
@@ -27,7 +26,7 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
       } else {
         idents.extend(quote! {
           (
-            #mongodb::bson::doc! { #ident_str: #value.clone() },
+            #nongoose::re_exports::mongodb::bson::doc! { #ident_str: #value.clone() },
             #ident_str,
             #value.clone().to_string(),
           ),
@@ -36,13 +35,12 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
     }
 
     quote! {
-      async fn __check_unique_fields(&self, database: &#mongodb::Database) -> #nongoose::errors::Result<()> {
+      fn __check_unique_fields(&self, database: &#nongoose::re_exports::mongodb::sync::Database) -> #nongoose::errors::Result<()> {
         let data = vec![#idents];
         for (document, field, value) in data {
           if database
-            .collection::<#mongodb::bson::Document>(Self::__get_collection_name().as_str())
-            .find_one(document, None)
-            .await?
+            .collection::<#nongoose::re_exports::mongodb::bson::Document>(Self::__get_collection_name().as_str())
+            .find_one(document, None)?
             .is_some()
           {
             return Err(#nongoose::errors::Error::DuplicatedSchemaField(field.to_string(), value.to_string()));
@@ -54,7 +52,7 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
     }
   } else {
     quote! {
-      async fn __check_unique_fields(&self, _database: &#mongodb::Database) -> #nongoose::errors::Result<()> {
+      fn __check_unique_fields(&self, _database: &#nongoose::re_exports::mongodb::sync::Database) -> #nongoose::errors::Result<()> {
         Ok(())
       }
     }

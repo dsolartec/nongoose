@@ -1,3 +1,4 @@
+pub(crate) mod attributes;
 pub(crate) mod data;
 
 use proc_macro::TokenStream;
@@ -14,21 +15,21 @@ pub(crate) fn parse(input: &DeriveInput) -> TokenStream {
   let nongoose = crate::utils::crates::get_nongoose_crate_name();
 
   // Helpers
+  let instance_getter = crate::helpers::instance::getter();
   let schema_id_getter = crate::helpers::schema_id::getter(&schema_data);
   let unique_fields_getter = crate::helpers::unique_fields::getter(&schema_data);
-  let document_getter = crate::helpers::document::getter(&schema_data);
   let relations_getter = crate::helpers::relations::getter(&schema_data);
 
   let traits = quote! {
-    #[#nongoose::re_exports::async_trait]
+    #[cfg_attr(feature = "async", #nongoose::re_exports::async_trait)]
     impl #nongoose::Schema for #ident {
       fn __get_collection_name() -> String {
         #collection_name.to_string()
       }
 
+      #instance_getter
       #schema_id_getter
       #unique_fields_getter
-      #document_getter
       #relations_getter
     }
   };

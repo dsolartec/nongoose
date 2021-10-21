@@ -5,7 +5,7 @@ MongoDB ODM for Rust based on Mongoose
 ## Basic usage
 
 ```rust
-use mongodb::{bson::oid::ObjectId, Client};
+use mongodb::{bson::oid::ObjectId, sync::Client};
 use nongoose::Schema;
 use serde::{Deserialize, Serialize};
 
@@ -30,7 +30,9 @@ async fn main() {
   };
 
   // Nongoose instance.
-  let nongoose = nongoose::Nongoose::build(client.database("nextchat")).finish();
+  let nongoose = nongoose::Nongoose::build(client.database("nextchat"))
+    .add_schema::<User>()
+    .finish();
 
   let user = User {
     id: ObjectId::new(),
@@ -48,6 +50,7 @@ async fn main() {
 ## Attributes
 
 ```rust
+#[schema_relations] // <-- this is a macro attribute
 #[derive(Clone, Debug, Deserialize, Schema, Serialize)]
 #[schema(name = "users")]   // <-- this is a container attribute
 struct User {
@@ -56,6 +59,12 @@ struct User {
   id: ObjectId;
 }
 ```
+
+### Macro attributes
+
+- `#[schema_relations]`
+
+  Add relations `{field_name}_id` fields to the `Struct`.
 
 ### Container attributes
 
@@ -90,6 +99,10 @@ struct User {
 1. [Many to One relation](./examples/schema-relations.rs)
 
 ```sh
+# Sync execution
+$ DATABASE_URL=mongodb://localhost:27017 cargo run --example many-to-one --no-default-features --features derive
+
+# Async execution
 $ DATABASE_URL=mongodb://localhost:27017 cargo run --example many-to-one
 ```
 

@@ -1,5 +1,5 @@
-use mongodb::{bson::oid::ObjectId, Client};
-use nongoose::{FindByIdOptions, Schema};
+use mongodb::{bson::oid::ObjectId, sync::Client};
+use nongoose::{schema_relations, Nongoose, Schema};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Schema, Serialize)]
@@ -12,6 +12,7 @@ struct User {
   pub username: String,
 }
 
+#[schema_relations]
 #[derive(Clone, Debug, Deserialize, Schema, Serialize)]
 struct UserFriend {
   #[schema(id)]
@@ -27,8 +28,7 @@ struct UserFriend {
   pub to: Option<User>,
 }
 
-#[tokio::main]
-async fn main() {
+fn get_instance() -> Nongoose {
   // Get database url.
   let url = match std::env::var("DATABASE_URL") {
     Ok(url) => url,
@@ -38,58 +38,115 @@ async fn main() {
   };
 
   // Get MongoDB connection.
-  let client = match Client::with_uri_str(&url).await {
+  let client = match Client::with_uri_str(&url) {
     Ok(client) => client,
     Err(e) => {
       panic!("Error connecting to the database: {}", e);
     }
   };
 
-  let nongoose = nongoose::Nongoose::build(client.database("nextchat")).finish();
+  Nongoose::build(client.database("nongoose"))
+    .add_schema::<User>()
+    .add_schema::<UserFriend>()
+    .finish()
+}
 
-  let user_friend_id = ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap();
-  let user_friends = nongoose
-    .find_by_id::<UserFriend>(
-      user_friend_id,
-      Some(FindByIdOptions::build().with_relations(true)),
-    )
-    .await;
+#[cfg(not(feature = "async"))]
+fn run_sync(nongoose: Nongoose, user_friend_id: &ObjectId) -> nongoose::errors::Result<UserFriend> {
+  let user_friends = nongoose.find_by_id::<UserFriend>(user_friend_id);
 
-  if let Err(e) = user_friends.clone() {
-    println!("Error finding the user friends: {}", e);
+  match user_friends {
+    Err(e) => {
+      println!("Error finding the user friends: {}", e);
 
-    let user_one = User {
-      id: ObjectId::new(),
-      username: String::from("nongoose"),
-    };
+      let user_one = User {
+        id: ObjectId::new(),
+        username: String::from("nongoose"),
+      };
 
-    if let Err(e) = nongoose.create(&user_one).await {
-      eprintln!("Error creating user one: {}", e);
-      return;
+      nongoose.create(&user_one)?;
+
+      let user_two = User {
+        id: ObjectId::new(),
+        username: String::from("nongoose2"),
+      };
+
+      nongoose.create(&user_two)?;
+
+      let user_friend = UserFriend {
+        id: user_friend_id.clone(),
+        from: Some(user_one.clone()),
+        from_id: user_one.id,
+        to: Some(user_two.clone()),
+        to_id: user_two.id,
+      };
+
+      nongoose.create(&user_friend)?;
+      Ok(user_friend)
     }
-
-    let user_two = User {
-      id: ObjectId::new(),
-      username: String::from("nongoose2"),
-    };
-
-    if let Err(e) = nongoose.create(&user_two).await {
-      eprintln!("Error creating user two: {}", e);
-      return;
-    }
-
-    let user_friend = UserFriend {
-      id: user_friend_id,
-      from: Some(user_one),
-      to: Some(user_two),
-    };
-
-    if let Err(e) = nongoose.create(&user_friend).await {
-      eprintln!("Error creating user friends: {}", e);
-      return;
-    }
+    Ok(user_friends) => Ok(user_friends.populate("from")?.populate("to")?),
   }
+}
 
-  let data = user_friends.unwrap();
+#[cfg(feature = "async")]
+async fn run_async(
+  nongoose: Nongoose,
+  user_friend_id: ObjectId,
+) -> nongoose::errors::Result<UserFriend> {
+  let user_friends = nongoose.find_by_id::<UserFriend>(&user_friend_id).await;
+
+  match user_friends {
+    Err(e) => {
+      println!("Error finding the user friends: {}", e);
+
+      let user_one = User {
+        id: ObjectId::new(),
+        username: String::from("nongoose"),
+      };
+
+      nongoose.create(&user_one).await?;
+
+      let user_two = User {
+        id: ObjectId::new(),
+        username: String::from("nongoose2"),
+      };
+
+      nongoose.create(&user_two).await?;
+
+      let user_friend = UserFriend {
+        id: user_friend_id.clone(),
+        from: Some(user_one.clone()),
+        from_id: user_one.id,
+        to: Some(user_two.clone()),
+        to_id: user_two.id,
+      };
+
+      nongoose.create(&user_friend).await?;
+      Ok(user_friend)
+    }
+    Ok(user_friends) => Ok(user_friends.populate("from").await?.populate("to").await?),
+  }
+}
+
+#[cfg(not(feature = "async"))]
+fn main() -> nongoose::errors::Result<()> {
+  let user_friend_id = ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap();
+  let nongoose = get_instance();
+
+  let data = run_sync(nongoose, &user_friend_id)?;
   println!("User friend: {:?}", data);
+
+  Ok(())
+}
+
+#[cfg(feature = "async")]
+#[cfg_attr(feature = "async", tokio::main)]
+async fn main() -> nongoose::errors::Result<()> {
+  let user_friend_id = ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap();
+  let nongoose = get_instance();
+
+  let data = run_async(nongoose, user_friend_id).await?;
+  println!("User friend: {:?}", data);
+
+  Ok(())
 }

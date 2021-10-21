@@ -6,5 +6,5 @@ mod schema;
 
 pub use nongoose::*;
 #[cfg(feature = "derive")]
-pub use nongoose_derive::Schema;
-pub use schema::Schema;
+pub use nongoose_derive::{schema_relations, Schema};
+pub use schema::{types, Schema};
