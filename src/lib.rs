@@ -4,6 +4,7 @@ mod nongoose;
 pub mod re_exports;
 mod schema;
 
+pub use mongodb;
 pub use nongoose::*;
 #[cfg(feature = "derive")]
 pub use nongoose_derive::{schema_relations, Schema};

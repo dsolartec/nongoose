@@ -18,7 +18,7 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
         let convert_ident = format_ident!("{}", lit.value());
         idents.extend(quote! {
           (
-            #nongoose::re_exportsmongodb::bson::doc! { #ident_str: #convert_ident(#value.clone()) },
+            #nongoose::mongodb::bson::doc! { #ident_str: #convert_ident(#value.clone()) },
             #ident_str,
             #value.clone().to_string(),
           ),
@@ -26,7 +26,7 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
       } else {
         idents.extend(quote! {
           (
-            #nongoose::re_exports::mongodb::bson::doc! { #ident_str: #value.clone() },
+            #nongoose::mongodb::bson::doc! { #ident_str: #value.clone() },
             #ident_str,
             #value.clone().to_string(),
           ),
@@ -35,11 +35,11 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
     }
 
     quote! {
-      fn __check_unique_fields(&self, database: &#nongoose::re_exports::mongodb::sync::Database) -> #nongoose::errors::Result<()> {
+      fn __check_unique_fields(&self, database: &#nongoose::mongodb::sync::Database) -> #nongoose::errors::Result<()> {
         let data = vec![#idents];
         for (document, field, value) in data {
           if database
-            .collection::<#nongoose::re_exports::mongodb::bson::Document>(Self::__get_collection_name().as_str())
+            .collection::<#nongoose::mongodb::bson::Document>(Self::__get_collection_name().as_str())
             .find_one(document, None)?
             .is_some()
           {
@@ -52,7 +52,7 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
     }
   } else {
     quote! {
-      fn __check_unique_fields(&self, _database: &#nongoose::re_exports::mongodb::sync::Database) -> #nongoose::errors::Result<()> {
+      fn __check_unique_fields(&self, _database: &#nongoose::mongodb::sync::Database) -> #nongoose::errors::Result<()> {
         Ok(())
       }
     }

@@ -55,8 +55,8 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
           }
         }
 
-        fn __set_relations(&mut self, field: &str, new_value: #nongoose::re_exports::mongodb::bson::Bson) -> #nongoose::errors::Result<()> {
-          let new_value = #nongoose::re_exports::mongodb::bson::from_bson(new_value)?;
+        fn __set_relations(&mut self, field: &str, new_value: #nongoose::mongodb::bson::Bson) -> #nongoose::errors::Result<()> {
+          let new_value = #nongoose::mongodb::bson::from_bson(new_value)?;
           #set_relations
           Ok(())
         }
@@ -69,7 +69,7 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
       None
     }
 
-    fn __set_relations(&mut self, _field: &str, _new_value: #nongoose::re_exports::mongodb::bson::Bson) -> #nongoose::errors::Result<()> {
+    fn __set_relations(&mut self, _field: &str, _new_value: #nongoose::mongodb::bson::Bson) -> #nongoose::errors::Result<()> {
       Ok(())
     }
   }

@@ -1,5 +1,7 @@
-use mongodb::{bson::oid::ObjectId, sync::Client};
-use nongoose::{schema_relations, Nongoose, Schema};
+use nongoose::{
+  mongodb::{bson::oid::ObjectId, sync::Client},
+  schema_relations, Nongoose, Schema,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Schema, Serialize)]
