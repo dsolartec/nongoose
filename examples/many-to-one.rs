@@ -58,9 +58,7 @@ fn run_sync(nongoose: Nongoose, user_friend_id: &ObjectId) -> nongoose::errors::
   let user_friends = nongoose.find_by_id::<UserFriend>(user_friend_id);
 
   match user_friends {
-    Err(e) => {
-      println!("Error finding the user friends: {}", e);
-
+    Ok(None) | Err(_) => {
       let user_one = User {
         id: ObjectId::new(),
         username: String::from("nongoose"),
@@ -86,21 +84,19 @@ fn run_sync(nongoose: Nongoose, user_friend_id: &ObjectId) -> nongoose::errors::
       nongoose.create(&user_friend)?;
       Ok(user_friend)
     }
-    Ok(user_friends) => Ok(user_friends.populate("from")?.populate("to")?),
+    Ok(Some(user_friends)) => Ok(user_friends.populate("from")?.populate("to")?),
   }
 }
 
 #[cfg(feature = "async")]
 async fn run_async(
   nongoose: Nongoose,
-  user_friend_id: ObjectId,
+  user_friend_id: &ObjectId,
 ) -> nongoose::errors::Result<UserFriend> {
-  let user_friends = nongoose.find_by_id::<UserFriend>(&user_friend_id).await;
+  let user_friends = nongoose.find_by_id::<UserFriend>(user_friend_id).await;
 
   match user_friends {
-    Err(e) => {
-      println!("Error finding the user friends: {}", e);
-
+    Ok(None) | Err(_) => {
       let user_one = User {
         id: ObjectId::new(),
         username: String::from("nongoose"),
@@ -126,7 +122,7 @@ async fn run_async(
       nongoose.create(&user_friend).await?;
       Ok(user_friend)
     }
-    Ok(user_friends) => Ok(user_friends.populate("from").await?.populate("to").await?),
+    Ok(Some(user_friends)) => Ok(user_friends.populate("from").await?.populate("to").await?),
   }
 }
 
@@ -147,7 +143,7 @@ async fn main() -> nongoose::errors::Result<()> {
   let user_friend_id = ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap();
   let nongoose = get_instance();
 
-  let data = run_async(nongoose, user_friend_id).await?;
+  let data = run_async(nongoose, &user_friend_id).await?;
   println!("User friend: {:?}", data);
 
   Ok(())

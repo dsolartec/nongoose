@@ -28,18 +28,14 @@ impl Nongoose {
   /// # Example
   /// ```rust,no_run
   /// // Find one `User` document by `_id`
-  /// match nongoose.find_by_id::<User>(&ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap())
-  /// {
-  ///   Ok(user) => {
-  ///     println!("User found: {}", user.id);
-  ///   },
-  ///   Err(error) => {
-  ///     eprintln!("Error finding user: {}", error);
-  ///   },
+  /// match nongoose.find_by_id::<User>(&ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap()) {
+  ///   Ok(Some(user)) => println!("User found: {}", user.id),
+  ///   Ok(None) => eprintln!("Cannot find the user"),
+  ///   Err(error) => eprintln!("Error finding user: {}", error),
   /// }
   /// ```
   #[cfg(not(feature = "async"))]
-  pub fn find_by_id<T>(&self, id: &T::__SchemaId) -> Result<T>
+  pub fn find_by_id<T>(&self, id: &T::__SchemaId) -> Result<Option<T>>
   where
     T: core::fmt::Debug + Schema,
   {
@@ -54,18 +50,14 @@ impl Nongoose {
   /// # Example
   /// ```rust,no_run
   /// // Find one `User` document by `_id`
-  /// match nongoose.find_by_id::<User>(&ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap()).await
-  /// {
-  ///   Ok(user) => {
-  ///     println!("User found: {}", user.id);
-  ///   },
-  ///   Err(error) => {
-  ///     eprintln!("Error finding user: {}", error);
-  ///   },
+  /// match nongoose.find_by_id::<User>(&ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap()).await {
+  ///   Ok(Some(user)) => println!("User found: {}", user.id),
+  ///   Ok(None) => eprintln!("Cannot find the user"),
+  ///   Err(error) => eprintln!("Error finding user: {}", error),
   /// }
   /// ```
   #[cfg(feature = "async")]
-  pub async fn find_by_id<T>(&self, id: &T::__SchemaId) -> Result<T>
+  pub async fn find_by_id<T>(&self, id: &T::__SchemaId) -> Result<Option<T>>
   where
     T: core::fmt::Debug + Schema + 'static,
   {

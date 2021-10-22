@@ -4,10 +4,7 @@ use mongodb::{
   sync::Database,
 };
 
-use crate::{
-  errors::{Error, Result},
-  Nongoose, Schema,
-};
+use crate::{errors::Result, Nongoose, Schema};
 
 #[derive(Clone, Debug)]
 pub struct NongooseBuilder {
@@ -42,7 +39,7 @@ impl NongooseBuilder {
   }
 
   // Internals
-  pub(crate) fn find_by_id_sync<T>(&self, id: T::__SchemaId) -> Result<T>
+  pub(crate) fn find_by_id_sync<T>(&self, id: T::__SchemaId) -> Result<Option<T>>
   where
     T: core::fmt::Debug + Schema,
   {
@@ -55,15 +52,16 @@ impl NongooseBuilder {
       );
     }
 
-    if let Some(document) = self
-      .database
-      .collection::<Document>(collection_name.as_str())
-      .find_one(Some(doc! { "_id": id.into() }), None)?
-    {
-      return Ok(from_bson(Bson::Document(document.clone()))?);
-    }
-
-    Err(Error::NoImplemented)
+    Ok(
+      match self
+        .database
+        .collection::<Document>(collection_name.as_str())
+        .find_one(Some(doc! { "_id": id.into() }), None)?
+      {
+        Some(document) => from_bson(Bson::Document(document.clone()))?,
+        None => None,
+      },
+    )
   }
 
   pub(crate) fn create_sync<T>(&self, data: T) -> Result<InsertOneResult>
