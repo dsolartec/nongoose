@@ -1,7 +1,11 @@
 mod builder;
 
 pub use builder::NongooseBuilder;
-use mongodb::{results::InsertOneResult, sync::Database};
+use mongodb::{
+  bson::{doc, Document},
+  results::InsertOneResult,
+  sync::Database,
+};
 #[cfg(feature = "async")]
 use tokio::task::spawn_blocking;
 
@@ -20,10 +24,50 @@ impl Nongoose {
     }
   }
 
-  /// Finds a single document by its `_id` field. `Nongoose.find_by_id(id)` is almost equivalent to `MongoDB.find_one(doc! { "_id": id })`. If
+  /// Finds one document.
+  ///
+  /// # Example
+  /// ```rust,no_run
+  /// // Find one user whose `username` is `nongoose`
+  /// match nongoose.find_one::<User>(doc! { "username": "nongoose" }) {
+  ///   Ok(Some(user)) => println!("User found: {}", user.id),
+  ///   Ok(None) => eprintln!("Cannot find the user"),
+  ///   Err(error) => eprintln!("Error finding user: {}", error),
+  /// }
+  /// ```
+  #[cfg(not(feature = "async"))]
+  pub fn find_one<T>(&self, conditions: Document) -> Result<Option<T>>
+  where
+    T: core::fmt::Debug + Schema,
+  {
+    self.builder.find_one_sync(conditions)
+  }
+
+  /// Finds one document.
+  ///
+  /// # Example
+  /// ```rust,no_run
+  /// // Find one user whose `username` is `nongoose`
+  /// match nongoose.find_one::<User>(doc! { "username": "nongoose" }).await {
+  ///   Ok(Some(user)) => println!("User found: {}", user.id),
+  ///   Ok(None) => eprintln!("Cannot find the user"),
+  ///   Err(error) => eprintln!("Error finding user: {}", error),
+  /// }
+  /// ```
+  #[cfg(feature = "async")]
+  pub async fn find_one<T>(&self, conditions: Document) -> Result<Option<T>>
+  where
+    T: core::fmt::Debug + Schema + 'static,
+  {
+    let builder = self.builder.clone();
+
+    spawn_blocking(move || builder.find_one_sync(conditions)).await?
+  }
+
+  /// Finds a single document by its `_id` field. `Nongoose.find_by_id(id)` is almost equivalent to `Nongoose.find_one(doc! { "_id": id })`. If
   /// you want to query by a document's `_id`, use `Nongoose.find_by_id()` instead of `Nongoose.find_one()`.
   ///
-  /// This function triggers `MongoDB.find_one()`.
+  /// This function triggers `Nongoose.find_one()`.
   ///
   /// # Example
   /// ```rust,no_run
@@ -39,13 +83,13 @@ impl Nongoose {
   where
     T: core::fmt::Debug + Schema,
   {
-    self.builder.find_by_id_sync(id.clone())
+    self.find_one(doc! { "_id": id.clone().into() })
   }
 
-  /// Finds a single document by its `_id` field. `Nongoose.find_by_id(id)` is almost equivalent to `MongoDB.find_one(doc! { "_id": id })`. If
+  /// Finds a single document by its `_id` field. `Nongoose.find_by_id(id)` is almost equivalent to `Nongoose.find_one(doc! { "_id": id })`. If
   /// you want to query by a document's `_id`, use `Nongoose.find_by_id()` instead of `Nongoose.find_one()`.
   ///
-  /// This function triggers `MongoDB.find_one()`.
+  /// This function triggers `Nongoose.find_one()`.
   ///
   /// # Example
   /// ```rust,no_run
@@ -61,10 +105,7 @@ impl Nongoose {
   where
     T: core::fmt::Debug + Schema + 'static,
   {
-    let builder = self.builder.clone();
-    let id = id.clone();
-
-    spawn_blocking(move || builder.find_by_id_sync(id)).await?
+    self.find_one(doc! { "_id": id.clone().into() }).await
   }
 
   /// Save one document to the database.

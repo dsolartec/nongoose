@@ -1,5 +1,5 @@
 use mongodb::{
-  bson::{doc, from_bson, Bson, Document},
+  bson::{from_bson, Bson, Document},
   results::InsertOneResult,
   sync::Database,
 };
@@ -39,7 +39,7 @@ impl NongooseBuilder {
   }
 
   // Internals
-  pub(crate) fn find_by_id_sync<T>(&self, id: T::__SchemaId) -> Result<Option<T>>
+  pub(crate) fn find_one_sync<T>(&self, conditions: Document) -> Result<Option<T>>
   where
     T: core::fmt::Debug + Schema,
   {
@@ -56,7 +56,7 @@ impl NongooseBuilder {
       match self
         .database
         .collection::<Document>(collection_name.as_str())
-        .find_one(Some(doc! { "_id": id.into() }), None)?
+        .find_one(Some(conditions), None)?
       {
         Some(document) => from_bson(Bson::Document(document.clone()))?,
         None => None,
