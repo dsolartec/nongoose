@@ -23,6 +23,9 @@ tokio = { features = ["macros"], optional = true, version = "1" }
 [[example]]
 name = "many-to-one"
 
+[[example]]
+name = "one-to-many"
+
 [features]
 default = ["async", "derive"]
 async = ["async-trait", "tokio"]

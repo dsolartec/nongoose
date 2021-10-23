@@ -4,12 +4,12 @@ use mongodb::{
   sync::Database,
 };
 
-use crate::{errors::Result, Nongoose, Schema};
+use crate::{errors::Result, schema::SchemaData, Nongoose, Schema};
 
 #[derive(Clone, Debug)]
 pub struct NongooseBuilder {
   pub database: Database,
-  pub schemas: Vec<String>,
+  pub schemas: Vec<SchemaData>,
 }
 
 impl NongooseBuilder {
@@ -19,12 +19,20 @@ impl NongooseBuilder {
   {
     let collection_name = T::__get_collection_name();
 
-    if !self.schemas.contains(&collection_name) {
-      self.schemas.push(collection_name);
-      T::__get_instance(Some(self.clone()));
+    if !self.has_schema(&collection_name) {
+      let schema = SchemaData::new::<T>();
+
+      super::globals::add_schema(&schema);
+      self.schemas.push(schema);
+
+      T::__get_database(Some(self.database.clone()));
     }
 
     self
+  }
+
+  pub fn has_schema(&self, name: &String) -> bool {
+    self.schemas.iter().any(|e| &e.get_name() == name)
   }
 
   pub fn finish(&self) -> Nongoose {
@@ -45,7 +53,7 @@ impl NongooseBuilder {
   {
     let collection_name = T::__get_collection_name();
 
-    if !self.schemas.contains(&collection_name) {
+    if !self.has_schema(&collection_name) {
       panic!(
         "Schema is not associated to a Nongoose instance ({})",
         collection_name
@@ -70,7 +78,7 @@ impl NongooseBuilder {
   {
     let collection_name = T::__get_collection_name();
 
-    if !self.schemas.contains(&collection_name) {
+    if !self.has_schema(&collection_name) {
       panic!(
         "Schema is not associated to a Nongoose instance ({})",
         collection_name

@@ -1,16 +1,18 @@
+mod data;
 pub mod types;
 
-use std::sync::Mutex;
-
+pub use data::SchemaData;
 use mongodb::{
-  bson::{doc, to_bson, Bson, Document},
+  bson::{bson, doc, to_bson, Bson, Document},
   sync::Database,
 };
 use serde::{de::DeserializeOwned, Serialize};
 #[cfg(feature = "async")]
 use tokio::task::spawn_blocking;
 
-use crate::{errors::Result, NongooseBuilder};
+use crate::errors::Result;
+
+use self::types::SchemaRelationType;
 
 /// Schema
 ///
@@ -19,7 +21,7 @@ use crate::{errors::Result, NongooseBuilder};
 pub trait Schema: DeserializeOwned + Serialize + Send {
   type __SchemaId: Into<Bson> + Clone + Send;
 
-  fn __get_instance(instance: Option<NongooseBuilder>) -> &'static Mutex<NongooseBuilder>;
+  fn __get_database(database: Option<Database>) -> &'static Database;
 
   fn __get_collection_name() -> String;
 
@@ -38,22 +40,56 @@ pub trait Schema: DeserializeOwned + Serialize + Send {
 
   fn __check_unique_fields(&self, database: &Database) -> Result<()>;
 
+  fn __relations() -> Vec<types::SchemaRelation>;
+
   fn __get_relations(&self) -> Option<Vec<types::SchemaRelation>>;
 
   fn __set_relations(&mut self, field: &str, new_value: Bson) -> Result<()>;
 
   fn __populate_sync(mut self, field: &str) -> Result<Self> {
+    let database = Self::__get_database(None);
+
     if let Some(relations) = self.__get_relations() {
       for relation in relations.iter() {
         if relation.field_ident == field {
-          if let Some(data) = Self::__get_instance(None)
-            .lock()
-            .unwrap()
-            .database
-            .collection::<Document>(relation.schema_name.as_str())
-            .find_one(Some(doc! { "_id": relation.field_value.clone() }), None)?
+          let collection_name = &relation.schema_name;
+
+          if relation.relation_type == SchemaRelationType::OneToOne
+            || relation.relation_type == SchemaRelationType::ManyToOne
           {
-            self.__set_relations(field, Bson::Document(data))?;
+            if let Some(data) = database
+              .collection::<Document>(collection_name.as_str())
+              .find_one(Some(doc! { "_id": relation.field_value.clone() }), None)?
+            {
+              self.__set_relations(field, Bson::Document(data))?;
+            }
+          } else if relation.relation_type == SchemaRelationType::OneToMany {
+            if let Some(schema) = crate::nongoose::globals::get_schema(collection_name) {
+              for schema_relation in schema.get_relations().iter() {
+                if schema_relation.relation_type != SchemaRelationType::ManyToOne {
+                  continue;
+                }
+
+                if schema_relation.schema_name == Self::__get_collection_name() {
+                  let documents: Vec<mongodb::error::Result<Document>> = database
+                    .collection::<Document>(collection_name.as_str())
+                    .find(
+                      Some(doc! { schema_relation.field_id(): self.__get_id().into() }),
+                      None,
+                    )?
+                    .collect();
+
+                  let mut data = Vec::new();
+                  for doc in documents {
+                    let doc = doc?;
+                    data.push(doc);
+                  }
+
+                  self.__set_relations(field, bson!(data))?;
+                  break;
+                }
+              }
+            }
           }
         }
       }

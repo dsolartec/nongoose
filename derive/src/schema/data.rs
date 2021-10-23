@@ -46,7 +46,10 @@ pub(crate) fn parse_fields<'a>(fields: &'a FieldsNamed) -> SchemaData<'a> {
               if let Lit::Str(lit) = nv.lit {
                 convert.insert(field_ident, lit);
               }
-            } else if nv.path.is_ident("one_to_one") || nv.path.is_ident("many_to_one") {
+            } else if nv.path.is_ident("one_to_one")
+              || nv.path.is_ident("many_to_one")
+              || nv.path.is_ident("one_to_many")
+            {
               if let Lit::Str(lit) = nv.lit {
                 relations.push((
                   field_ident,

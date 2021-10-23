@@ -1,4 +1,5 @@
 mod builder;
+pub(crate) mod globals;
 
 pub use builder::NongooseBuilder;
 use mongodb::{

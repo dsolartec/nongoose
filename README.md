@@ -94,9 +94,17 @@ struct User {
 
   One to one relation.
 
+- `#[schema(one_to_many = "Schema")]`
+
+  One to many relation.
+
+- `#[schema(optional)]`
+
+  Optional relation id(s) field(s).
+
 ## Examples
 
-1. [Many to One relation](./examples/schema-relations.rs)
+1. [Many to One relation](./examples/many-to-one.rs)
 
 ```sh
 # Sync execution
@@ -104,6 +112,13 @@ $ DATABASE_URL=mongodb://localhost:27017 cargo run --example many-to-one --no-de
 
 # Async execution
 $ DATABASE_URL=mongodb://localhost:27017 cargo run --example many-to-one
+```
+
+2. [One to Many relation](./examples/one-to-many.rs)
+
+```sh
+# Async execution
+$ DATABASE_URL=mongodb://localhost:27017 cargo run --example one-to-many
 ```
 
 ## License

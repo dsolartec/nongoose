@@ -5,25 +5,18 @@ pub(crate) fn getter<'a>() -> TokenStream {
   let nongoose = crate::utils::crates::get_nongoose_crate_name();
 
   quote! {
-    fn __get_instance(instance: Option<#nongoose::NongooseBuilder>) -> &'static ::std::sync::Mutex<#nongoose::NongooseBuilder> {
-      use ::std::sync::Mutex;
-      use #nongoose::{re_exports::OnceCell, NongooseBuilder};
+    fn __get_database(database: Option<#nongoose::mongodb::sync::Database>) -> &'static #nongoose::mongodb::sync::Database {
+      use #nongoose::re_exports::OnceCell;
 
       let collection_name = Self::__get_collection_name();
 
-      static INSTANCE: OnceCell<Mutex<NongooseBuilder>> = OnceCell::new();
+      static DATABASE: OnceCell<#nongoose::mongodb::sync::Database> = OnceCell::new();
 
-      if let Some(instance_mut) = INSTANCE.get() {
-        let mut instance_ctx = instance_mut.lock().unwrap();
-        if instance_ctx.schemas.contains(&collection_name) {
-          return instance_mut;
-        } else if let Some(instance) = instance {
-          instance_ctx.replace_with(instance);
-          return instance_mut;
-        }
-      } else if let Some(instance) = instance {
-        INSTANCE.set(Mutex::new(instance)).unwrap();
-        return INSTANCE.get().unwrap();
+      if let Some(database) = DATABASE.get() {
+        return database;
+      } else if let Some(database) = database {
+        DATABASE.set(database).unwrap();
+        return DATABASE.get().unwrap();
       }
 
       panic!(
