@@ -3,7 +3,7 @@ pub mod types;
 
 pub use data::SchemaData;
 use mongodb::{
-  bson::{bson, doc, to_bson, Bson, Document},
+  bson::{bson, doc, Bson, Document},
   sync::Database,
 };
 use serde::{de::DeserializeOwned, Serialize};
@@ -18,7 +18,7 @@ use self::types::SchemaRelationType;
 ///
 /// This trait is defined through the [`async-trait`](https://crates.io/crates/async-trait) macro.
 #[cfg_attr(feature = "async", async_trait::async_trait)]
-pub trait Schema: DeserializeOwned + Serialize + Send {
+pub trait Schema: DeserializeOwned + Serialize + Send + Into<Bson> + Clone {
   type __SchemaId: Into<Bson> + Clone + Send;
 
   fn __get_database(database: Option<Database>) -> &'static Database;
@@ -32,9 +32,11 @@ pub trait Schema: DeserializeOwned + Serialize + Send {
   }
 
   fn __to_document(&self) -> Result<Document> {
-    match to_bson(self)? {
-      Bson::Document(document) => Ok(document),
-      _ => unreachable!(),
+    let bson: Bson = self.into();
+
+    match bson.as_document() {
+      Some(doc) => Ok(doc.clone()),
+      None => unreachable!(),
     }
   }
 

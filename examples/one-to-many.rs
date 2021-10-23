@@ -1,5 +1,5 @@
 use mongodb::{
-  bson::{doc, oid::ObjectId, Bson, Document},
+  bson::{doc, oid::ObjectId},
   sync::Client,
 };
 use nongoose::{schema_relations, Nongoose, Schema};
@@ -32,18 +32,6 @@ struct Post {
   #[schema(many_to_one = "Author", optional)]
   #[serde(skip_serializing)]
   pub author: Option<Author>,
-}
-
-impl Into<Bson> for Post {
-  fn into(self) -> Bson {
-    let mut document = Document::new();
-
-    document.insert("id", Bson::ObjectId(self.id));
-    document.insert("title", Bson::String(self.title));
-    document.insert("author_id", self.author_id);
-
-    Bson::Document(document)
-  }
 }
 
 fn get_instance() -> Nongoose {
