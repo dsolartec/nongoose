@@ -20,18 +20,23 @@ use self::types::SchemaRelationType;
 /// This trait is defined through the [`async-trait`](https://crates.io/crates/async-trait) macro.
 #[cfg_attr(feature = "async", async_trait::async_trait)]
 pub trait Schema: DeserializeOwned + Serialize + Send + Into<Bson> + Clone {
-  type __SchemaId: Into<Bson> + Clone + Send;
+  type Id: Into<Bson> + Clone + Send;
 
+  #[doc(hidden)]
   fn __get_database(database: Option<Database>) -> &'static Database;
 
+  #[doc(hidden)]
   fn __get_collection_name() -> String;
 
-  fn __get_id(&self) -> Self::__SchemaId;
+  #[doc(hidden)]
+  fn __get_id(&self) -> Self::Id;
 
+  #[doc(hidden)]
   fn __get_id_query(&self) -> Document {
     doc! { "_id": self.__get_id().into() }
   }
 
+  #[doc(hidden)]
   fn __to_document(&self) -> Result<Document> {
     let bson: Bson = self.into();
 
@@ -41,14 +46,19 @@ pub trait Schema: DeserializeOwned + Serialize + Send + Into<Bson> + Clone {
     }
   }
 
+  #[doc(hidden)]
   fn __check_unique_fields(&self) -> Result<()>;
 
+  #[doc(hidden)]
   fn __relations() -> Vec<types::SchemaRelation>;
 
+  #[doc(hidden)]
   fn __get_relations(&self) -> Option<Vec<types::SchemaRelation>>;
 
+  #[doc(hidden)]
   fn __set_relations(&mut self, field: &str, new_value: Bson) -> Result<()>;
 
+  #[doc(hidden)]
   fn __populate_sync(mut self, field: &str) -> Result<Self> {
     let database = Self::__get_database(None);
 
@@ -114,6 +124,7 @@ pub trait Schema: DeserializeOwned + Serialize + Send + Into<Bson> + Clone {
     spawn_blocking(move || self.__populate_sync(field)).await?
   }
 
+  #[doc(hidden)]
   fn __save_sync(self) -> Result<Self> {
     let database = Self::__get_database(None);
     let collection = database.collection::<Document>(Self::__get_collection_name().as_str());

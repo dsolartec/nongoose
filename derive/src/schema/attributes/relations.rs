@@ -51,9 +51,9 @@ pub(crate) fn parse(input: &mut DeriveInput) -> TokenStream {
               let mut quote_data = quote!(pub #local_field_ident: );
 
               if optional_relation_fields.contains(relation_field) {
-                quote_data.extend(quote!(Option<<#schema_ident as #nongoose::Schema>::__SchemaId>));
+                quote_data.extend(quote!(Option<<#schema_ident as #nongoose::Schema>::Id>));
               } else {
-                quote_data.extend(quote!(<#schema_ident as #nongoose::Schema>::__SchemaId));
+                quote_data.extend(quote!(<#schema_ident as #nongoose::Schema>::Id));
               }
 
               match Field::parse_named.parse2(quote_data) {

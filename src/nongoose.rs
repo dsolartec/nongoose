@@ -79,7 +79,7 @@ impl Nongoose {
   /// }
   /// ```
   #[cfg(not(feature = "async"))]
-  pub fn find_by_id<T>(&self, id: &T::__SchemaId) -> Result<Option<T>>
+  pub fn find_by_id<T>(&self, id: &T::Id) -> Result<Option<T>>
   where
     T: core::fmt::Debug + Schema,
   {
@@ -101,7 +101,7 @@ impl Nongoose {
   /// }
   /// ```
   #[cfg(feature = "async")]
-  pub async fn find_by_id<T>(&self, id: &T::__SchemaId) -> Result<Option<T>>
+  pub async fn find_by_id<T>(&self, id: &T::Id) -> Result<Option<T>>
   where
     T: core::fmt::Debug + Schema + 'static,
   {
