@@ -8,4 +8,4 @@ pub use crate::nongoose::{Nongoose, NongooseBuilder};
 pub use mongodb;
 #[cfg(feature = "derive")]
 pub use nongoose_derive::{schema_relations, Schema};
-pub use schema::{types, Schema};
+pub use schema::{types, Schema, SchemaBefore};

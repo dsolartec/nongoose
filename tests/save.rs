@@ -1,5 +1,5 @@
 use mongodb::{bson::oid::ObjectId, sync::Client};
-use nongoose::{Nongoose, Schema};
+use nongoose::{Nongoose, Schema, SchemaBefore};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
@@ -19,6 +19,9 @@ pub struct Animal {
   #[schema(unique)]
   pub name: String,
 }
+
+#[cfg_attr(feature = "async", async_trait::async_trait)]
+impl SchemaBefore for Animal {}
 
 impl Animal {
   pub fn new(animal_type: AnimalType, name: &str) -> Self {

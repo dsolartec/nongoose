@@ -2,7 +2,7 @@ use mongodb::{
   bson::{doc, oid::ObjectId},
   sync::Client,
 };
-use nongoose::{schema_relations, Nongoose, Schema};
+use nongoose::{schema_relations, Nongoose, Schema, SchemaBefore};
 use serde::{Deserialize, Serialize};
 
 #[schema_relations]
@@ -20,6 +20,9 @@ struct Author {
   pub posts: Vec<Post>,
 }
 
+#[cfg_attr(feature = "async", async_trait::async_trait)]
+impl SchemaBefore for Author {}
+
 #[schema_relations]
 #[derive(Clone, Debug, Deserialize, Schema, Serialize)]
 struct Post {
@@ -33,6 +36,9 @@ struct Post {
   #[serde(skip_serializing)]
   pub author: Option<Author>,
 }
+
+#[cfg_attr(feature = "async", async_trait::async_trait)]
+impl SchemaBefore for Post {}
 
 fn get_instance() -> Nongoose {
   // Get database url.

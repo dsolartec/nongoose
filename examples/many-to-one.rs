@@ -1,6 +1,6 @@
 use nongoose::{
   mongodb::{bson::oid::ObjectId, sync::Client},
-  schema_relations, Nongoose, Schema,
+  schema_relations, Nongoose, Schema, SchemaBefore,
 };
 use serde::{Deserialize, Serialize};
 
@@ -13,6 +13,9 @@ struct User {
   #[schema(unique)]
   pub username: String,
 }
+
+#[cfg_attr(feature = "async", async_trait::async_trait)]
+impl SchemaBefore for User {}
 
 #[schema_relations]
 #[derive(Clone, Debug, Deserialize, Schema, Serialize)]
@@ -29,6 +32,9 @@ struct UserFriend {
   #[serde(skip_serializing)]
   pub to: Option<User>,
 }
+
+#[cfg_attr(feature = "async", async_trait::async_trait)]
+impl SchemaBefore for UserFriend {}
 
 fn get_instance() -> Nongoose {
   // Get database url.
