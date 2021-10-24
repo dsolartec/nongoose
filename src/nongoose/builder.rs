@@ -85,7 +85,7 @@ impl NongooseBuilder {
       );
     }
 
-    data.__check_unique_fields(&self.database)?;
+    data.__check_unique_fields()?;
 
     Ok(
       self

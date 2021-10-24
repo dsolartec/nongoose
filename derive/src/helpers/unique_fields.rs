@@ -35,15 +35,17 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
     }
 
     quote! {
-      fn __check_unique_fields(&self, database: &#nongoose::mongodb::sync::Database) -> #nongoose::errors::Result<()> {
+      fn __check_unique_fields(&self) -> #nongoose::errors::Result<()> {
         let data = vec![#idents];
         for (document, field, value) in data {
-          if database
+          if let Some(doc) = Self::__get_database(None)
             .collection::<#nongoose::mongodb::bson::Document>(Self::__get_collection_name().as_str())
             .find_one(document, None)?
-            .is_some()
           {
-            return Err(#nongoose::errors::Error::DuplicatedSchemaField(field.to_string(), value.to_string()));
+            let data: Self = #nongoose::mongodb::bson::from_bson(#nongoose::mongodb::bson::Bson::Document(doc))?;
+            if self.__get_id() != data.__get_id() {
+              return Err(#nongoose::errors::Error::DuplicatedSchemaField(field.to_string(), value.to_string()));
+            }
           }
         }
 
@@ -52,7 +54,7 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
     }
   } else {
     quote! {
-      fn __check_unique_fields(&self, _database: &#nongoose::mongodb::sync::Database) -> #nongoose::errors::Result<()> {
+      fn __check_unique_fields(&self) -> #nongoose::errors::Result<()> {
         Ok(())
       }
     }

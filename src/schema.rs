@@ -4,6 +4,7 @@ pub mod types;
 pub use data::SchemaData;
 use mongodb::{
   bson::{bson, doc, Bson, Document},
+  options::ReplaceOptions,
   sync::Database,
 };
 use serde::{de::DeserializeOwned, Serialize};
@@ -40,7 +41,7 @@ pub trait Schema: DeserializeOwned + Serialize + Send + Into<Bson> + Clone {
     }
   }
 
-  fn __check_unique_fields(&self, database: &Database) -> Result<()>;
+  fn __check_unique_fields(&self) -> Result<()>;
 
   fn __relations() -> Vec<types::SchemaRelation>;
 
@@ -111,5 +112,40 @@ pub trait Schema: DeserializeOwned + Serialize + Send + Into<Bson> + Clone {
     Self: 'static,
   {
     spawn_blocking(move || self.__populate_sync(field)).await?
+  }
+
+  fn __save_sync(self) -> Result<Self> {
+    let database = Self::__get_database(None);
+    let collection = database.collection::<Document>(Self::__get_collection_name().as_str());
+
+    self.__check_unique_fields()?;
+
+    if collection
+      .find_one(Some(self.__get_id_query()), None)?
+      .is_some()
+    {
+      collection.replace_one(
+        self.__get_id_query(),
+        self.__to_document()?,
+        Some(ReplaceOptions::builder().upsert(true).build()),
+      )?;
+    } else {
+      collection.insert_one(self.__to_document()?, None)?;
+    }
+
+    Ok(self)
+  }
+
+  #[cfg(not(feature = "async"))]
+  fn save(self) -> Result<Self> {
+    self.__save_sync()
+  }
+
+  #[cfg(feature = "async")]
+  async fn save(self) -> Result<Self>
+  where
+    Self: 'static,
+  {
+    spawn_blocking(|| self.__save_sync()).await?
   }
 }

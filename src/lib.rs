@@ -4,8 +4,8 @@ mod nongoose;
 pub mod re_exports;
 mod schema;
 
+pub use crate::nongoose::{Nongoose, NongooseBuilder};
 pub use mongodb;
-pub use nongoose::*;
 #[cfg(feature = "derive")]
 pub use nongoose_derive::{schema_relations, Schema};
 pub use schema::{types, Schema};

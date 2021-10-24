@@ -107,18 +107,28 @@ struct User {
 1. [Many to One relation](./examples/many-to-one.rs)
 
 ```sh
-# Sync execution
+# Sync example
 $ DATABASE_URL=mongodb://localhost:27017 cargo run --example many-to-one --no-default-features --features derive
 
-# Async execution
+# Async example
 $ DATABASE_URL=mongodb://localhost:27017 cargo run --example many-to-one
 ```
 
 2. [One to Many relation](./examples/one-to-many.rs)
 
 ```sh
-# Async execution
+# Async example
 $ DATABASE_URL=mongodb://localhost:27017 cargo run --example one-to-many
+```
+
+## Tests
+
+```sh
+# Sync tests
+$ DATABASE_URL=mongodb://localhost:27017 cargo test --no-default-features --features derive
+
+# Async tests
+$ DATABASE_URL=mongodb://localhost:27017 cargo test
 ```
 
 ## License

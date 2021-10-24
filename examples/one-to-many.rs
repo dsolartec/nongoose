@@ -59,7 +59,7 @@ fn get_instance() -> Nongoose {
 }
 
 #[cfg(not(feature = "async"))]
-async fn main() {
+fn main() {
   println!("Not implemented");
 }
 
