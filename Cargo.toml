@@ -7,6 +7,10 @@ authors = [
 license = "GPL-3.0"
 description = "MongoDB ODM for Rust based on Mongoose"
 edition = "2018"
+documentation = "https://docs.rs/nongoose"
+repository = "https://github.com/NextChatORG/nongoose"
+categories = ["database"]
+keywords = ["async", "odm", "mongodb", "tokio"]
 
 [workspace]
 members = ["./derive/"]
