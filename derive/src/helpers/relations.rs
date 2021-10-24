@@ -66,7 +66,8 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
 
       set_relations.extend(quote! {
         if field == #field_ident_name {
-          self.#field_ident = new_value;
+          self.#field_ident = #nongoose::mongodb::bson::from_bson(new_value)?;
+          return Ok(());
         }
       });
     }
@@ -87,9 +88,8 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
         }
 
         fn __set_relations(&mut self, field: &str, new_value: #nongoose::mongodb::bson::Bson) -> #nongoose::errors::Result<()> {
-          let new_value = #nongoose::mongodb::bson::from_bson(new_value)?;
           #set_relations
-          Ok(())
+          Err(#nongoose::errors::Error::NoImplemented)
         }
       };
     }
