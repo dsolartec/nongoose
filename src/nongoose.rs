@@ -4,7 +4,6 @@ pub(crate) mod globals;
 pub use builder::NongooseBuilder;
 use mongodb::{
   bson::{doc, Document},
-  results::InsertOneResult,
   sync::Database,
 };
 #[cfg(feature = "async")]
@@ -115,8 +114,8 @@ impl Nongoose {
   /// ```rust,no_run,ignore
   /// // Insert one new `User` document
   /// match nongoose.create::<User>(&user) {
-  ///   Ok(result) => {
-  ///     println!("User saved: {}", result.inserted_id);
+  ///   Ok(user) => {
+  ///     println!("User saved: {}", user.id);
   ///   },
   ///   Err(error) => {
   ///     eprintln!("Error saving the user: {}", error);
@@ -124,11 +123,11 @@ impl Nongoose {
   /// }
   /// ```
   #[cfg(not(feature = "async"))]
-  pub fn create<T>(&self, data: &T) -> Result<InsertOneResult>
+  pub fn create<T>(&self, data: &T) -> Result<T>
   where
     T: Schema + Clone,
   {
-    self.builder.create_sync(data.clone())
+    data.clone().save()
   }
 
   /// Save one document to the database.
@@ -137,8 +136,8 @@ impl Nongoose {
   /// ```rust,no_run,ignore
   /// // Insert one new `User` document
   /// match nongoose.create::<User>(&user).await {
-  ///   Ok(result) => {
-  ///     println!("User saved: {}", result.inserted_id);
+  ///   Ok(user) => {
+  ///     println!("User saved: {}", user.id);
   ///   },
   ///   Err(error) => {
   ///     eprintln!("Error saving the user: {}", error);
@@ -146,13 +145,10 @@ impl Nongoose {
   /// }
   /// ```
   #[cfg(feature = "async")]
-  pub async fn create<T>(&self, data: &T) -> Result<InsertOneResult>
+  pub async fn create<T>(&self, data: &T) -> Result<T>
   where
     T: Schema + Clone + Send + 'static,
   {
-    let builder = self.builder.clone();
-    let data = data.clone();
-
-    spawn_blocking(move || builder.create_sync(data)).await?
+    data.clone().save().await
   }
 }

@@ -1,6 +1,5 @@
 use mongodb::{
   bson::{from_bson, Bson, Document},
-  results::InsertOneResult,
   sync::Database,
 };
 
@@ -69,29 +68,6 @@ impl NongooseBuilder {
         Some(document) => from_bson(Bson::Document(document.clone()))?,
         None => None,
       },
-    )
-  }
-
-  pub(crate) fn create_sync<T>(&self, data: T) -> Result<InsertOneResult>
-  where
-    T: Schema,
-  {
-    let collection_name = T::__get_collection_name();
-
-    if !self.has_schema(&collection_name) {
-      panic!(
-        "Schema is not associated to a Nongoose instance ({})",
-        collection_name
-      );
-    }
-
-    data.__check_unique_fields()?;
-
-    Ok(
-      self
-        .database
-        .collection(collection_name.as_str())
-        .insert_one(data.__to_document()?, None)?,
     )
   }
 }
