@@ -28,7 +28,7 @@ impl Nongoose {
   /// Finds one document.
   ///
   /// # Example
-  /// ```rust,no_run
+  /// ```rust,no_run,ignore
   /// // Find one user whose `username` is `nongoose`
   /// match nongoose.find_one::<User>(doc! { "username": "nongoose" }) {
   ///   Ok(Some(user)) => println!("User found: {}", user.id),
@@ -47,7 +47,7 @@ impl Nongoose {
   /// Finds one document.
   ///
   /// # Example
-  /// ```rust,no_run
+  /// ```rust,no_run,ignore
   /// // Find one user whose `username` is `nongoose`
   /// match nongoose.find_one::<User>(doc! { "username": "nongoose" }).await {
   ///   Ok(Some(user)) => println!("User found: {}", user.id),
@@ -71,7 +71,7 @@ impl Nongoose {
   /// This function triggers `Nongoose.find_one()`.
   ///
   /// # Example
-  /// ```rust,no_run
+  /// ```rust,no_run,ignore
   /// // Find one `User` document by `_id`
   /// match nongoose.find_by_id::<User>(&ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap()) {
   ///   Ok(Some(user)) => println!("User found: {}", user.id),
@@ -93,7 +93,7 @@ impl Nongoose {
   /// This function triggers `Nongoose.find_one()`.
   ///
   /// # Example
-  /// ```rust,no_run
+  /// ```rust,no_run,ignore
   /// // Find one `User` document by `_id`
   /// match nongoose.find_by_id::<User>(&ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap()).await {
   ///   Ok(Some(user)) => println!("User found: {}", user.id),
@@ -112,7 +112,7 @@ impl Nongoose {
   /// Save one document to the database.
   ///
   /// # Example
-  /// ```rust,no_run
+  /// ```rust,no_run,ignore
   /// // Insert one new `User` document
   /// match nongoose.create::<User>(&user) {
   ///   Ok(result) => {
@@ -134,7 +134,7 @@ impl Nongoose {
   /// Save one document to the database.
   ///
   /// # Example
-  /// ```rust,no_run
+  /// ```rust,no_run,ignore
   /// // Insert one new `User` document
   /// match nongoose.create::<User>(&user).await {
   ///   Ok(result) => {
