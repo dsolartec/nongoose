@@ -1,5 +1,7 @@
 # Nongoose
 
+![Crates.io version](https://img.shields.io/crates/v/nongoose?label=version) ![Crates.io downloads](https://img.shields.io/crates/d/nongoose?label=downloads) ![License](https://img.shields.io/github/license/nextchatorg/nongoose) ![GitHub repository stars](https://img.shields.io/github/stars/nextchatorg/nongoose?style=social)
+
 MongoDB ODM for Rust based on Mongoose
 
 ## Basic usage
@@ -24,9 +26,7 @@ async fn main() {
   // Get MongoDB connection.
   let client = match Client::with_uri_str("mongodb://localhost:27017").await {
     Ok(client) => client,
-    Err(e) => {
-      panic!("Error connecting to the database: {}", e);
-    }
+    Err(e) => panic!("Error connecting to the database: {}", e),
   };
 
   // Nongoose instance.
@@ -39,68 +39,13 @@ async fn main() {
     username: String::from("nongoose"),
   };
 
-  if let Err(error) = nongoose.create(&user).await {
+  if let Err(error) = user.save().await {
     panic!("Cannot create the user: {}", error);
   }
 
   println!("User created in the database: {}", user.id);
 }
 ```
-
-## Attributes
-
-```rust
-#[schema_relations] // <-- this is a macro attribute
-#[derive(Clone, Debug, Deserialize, Schema, Serialize)]
-#[schema(name = "users")]   // <-- this is a container attribute
-struct User {
-  #[schema(id)] // <-- this is a field attribute
-  #[serde(rename = "_id")]
-  id: ObjectId;
-}
-```
-
-### Macro attributes
-
-- `#[schema_relations]`
-
-  Add relations `{field_name}_id` fields to the `Struct`.
-
-### Container attributes
-
-- `#[schema(name = "name")]`
-
-  Set the collection name with the given name instead of its Rust name.
-
-### Field attributes
-
-- `#[schema(id)]` _Required_
-
-  Represents the id of the document (`_id` in MongoDB).
-
-- `#[schema(unique)]`
-
-  Unique this field: the field value cannot be duplicated in the document.
-
-- `#[schema(convert = "path")]`
-
-  Call a function to convert the field type to a BSON type.
-
-- `#[schema(many_to_one = "Schema")]`
-
-  Many to one relation.
-
-- `#[schema(one_to_one = "Schema")]`
-
-  One to one relation.
-
-- `#[schema(one_to_many = "Schema")]`
-
-  One to many relation.
-
-- `#[schema(optional)]`
-
-  Optional relation id(s) field(s).
 
 ## Examples
 
@@ -117,6 +62,9 @@ $ DATABASE_URL=mongodb://localhost:27017 cargo run --example many-to-one
 2. [One to Many relation](./examples/one-to-many.rs)
 
 ```sh
+# Sync example
+$ DATABASE_URL=mongodb://localhost:27017 cargo run --example one-to-many --no-default-features --features derive
+
 # Async example
 $ DATABASE_URL=mongodb://localhost:27017 cargo run --example one-to-many
 ```
@@ -139,6 +87,6 @@ Check the [COPYING](./COPYING) file for more information.
 
 Thanks to this amazing people for make Nongoose better:
 
-- [@danielsolartech](https://github.com/danielsolartech) `NextChat Founder`
+- [@danielsolartech](https://github.com/danielsolartech) - `NextChat Founder`
 
 > If you help to Nongoose feel free to add here.
