@@ -20,6 +20,16 @@ struct Author {
   pub posts: Vec<Post>,
 }
 
+impl Author {
+  pub fn new(username: &str) -> Self {
+    Self {
+      id: ObjectId::new(),
+      username: String::from(username),
+      posts: Vec::new(),
+    }
+  }
+}
+
 #[cfg_attr(feature = "async", async_trait::async_trait)]
 impl SchemaBefore for Author {}
 
@@ -35,6 +45,26 @@ struct Post {
   #[schema(many_to_one = "Author", optional)]
   #[serde(skip_serializing)]
   pub author: Option<Author>,
+}
+
+impl Post {
+  pub fn new(title: &str) -> Self {
+    Self {
+      id: ObjectId::new(),
+      title: String::from(title),
+      author_id: None,
+      author: None,
+    }
+  }
+
+  pub fn new_with_author(title: &str, author: &Author) -> Self {
+    Self {
+      id: ObjectId::new(),
+      title: String::from(title),
+      author: Some(author.clone()),
+      author_id: Some(author.id),
+    }
+  }
 }
 
 #[cfg_attr(feature = "async", async_trait::async_trait)]
@@ -60,13 +90,33 @@ fn get_instance() -> Nongoose {
   Nongoose::build(client.database("nongoose"))
     .add_schema::<Author>()
     .add_schema::<Post>()
-    .add_schema::<Post>()
     .finish()
 }
 
 #[cfg(not(feature = "async"))]
-fn main() {
-  println!("Not implemented");
+fn main() -> nongoose::errors::Result<()> {
+  let nongoose = get_instance();
+
+  if let Some(author) = nongoose.find_one::<Author>(doc! { "username": "nongoose" })? {
+    // Get author posts.
+    let author = author.populate("posts")?;
+    println!("Author posts: {:?}", author.posts);
+  } else {
+    // Authors
+    let author = Author::new("nongoose").save()?;
+
+    // Posts
+    Post::new("Nongoose example 1").save()?;
+    Post::new_with_author("Nongoose example 2", &author).save()?;
+    Post::new_with_author("Nongoose example 3", &author).save()?;
+    Post::new_with_author("Nongoose example 4", &author).save()?;
+
+    // Get author posts
+    let author = author.populate("posts")?;
+    println!("Author posts: {:?}", author.posts);
+  }
+
+  Ok(())
 }
 
 #[cfg(feature = "async")]
@@ -80,56 +130,25 @@ async fn main() -> nongoose::errors::Result<()> {
   {
     // Get author posts.
     let author = author.populate("posts").await?;
-
     println!("Author posts: {:?}", author.posts);
   } else {
-    let author = Author {
-      id: ObjectId::new(),
-      username: String::from("nongoose"),
-      posts: Vec::new(),
-    };
+    // Authors
+    let author = Author::new("nongoose").save().await?;
 
-    nongoose.create(&author).await?;
-
-    let post_one = Post {
-      id: ObjectId::new(),
-      title: String::from("Nongoose example 1"),
-      author: None,
-      author_id: None,
-    };
-
-    nongoose.create(&post_one).await?;
-
-    let post_two = Post {
-      id: ObjectId::new(),
-      title: String::from("Nongoose example 2"),
-      author: Some(author.clone()),
-      author_id: Some(author.id),
-    };
-
-    nongoose.create(&post_two).await?;
-
-    let post_three = Post {
-      id: ObjectId::new(),
-      title: String::from("Nongoose example 3"),
-      author: Some(author.clone()),
-      author_id: Some(author.id),
-    };
-
-    nongoose.create(&post_three).await?;
-
-    let post_four = Post {
-      id: ObjectId::new(),
-      title: String::from("Nongoose example 4"),
-      author: Some(author.clone()),
-      author_id: Some(author.id),
-    };
-
-    nongoose.create(&post_four).await?;
+    // Posts
+    Post::new("Nongoose example 1").save().await?;
+    Post::new_with_author("Nongoose example 2", &author)
+      .save()
+      .await?;
+    Post::new_with_author("Nongoose example 3", &author)
+      .save()
+      .await?;
+    Post::new_with_author("Nongoose example 4", &author)
+      .save()
+      .await?;
 
     // Get author posts
     let author = author.populate("posts").await?;
-
     println!("Author posts: {:?}", author.posts);
   }
 
