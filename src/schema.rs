@@ -60,7 +60,7 @@ pub trait Schema: SchemaBefore {
   fn __set_relations(&mut self, field: &str, new_value: Bson) -> Result<()>;
 
   #[doc(hidden)]
-  fn __populate_sync(mut self, field: &str) -> Result<Self> {
+  fn __populate_sync(&mut self, field: &str) -> Result<Self> {
     let database = Self::__get_database(None);
 
     if let Some(relations) = self.__get_relations() {
@@ -109,14 +109,34 @@ pub trait Schema: SchemaBefore {
       }
     }
 
-    Ok(self)
+    Ok(self.clone())
   }
 
+  /// Populates fields on an existing schema.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// // Populate the role of the user
+  /// match user.clone().populate("role") {
+  ///   Ok(u) => user = u,
+  ///   Err(error) => eprintln!("Error populating user: {}", error),
+  /// }
+  /// ```
   #[cfg(not(feature = "async"))]
-  fn populate(self, field: &str) -> Result<Self> {
+  fn populate(mut self, field: &str) -> Result<Self> {
     self.__populate_sync(field)
   }
 
+  /// Populates fields on an existing schema.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// // Populate the role of the user
+  /// match user.clone().populate("role").await {
+  ///   Ok(u) => user = u,
+  ///   Err(error) => eprintln!("Error populating user: {}", error),
+  /// }
+  /// ```
   #[cfg(feature = "async")]
   async fn populate(mut self, field: &'static str) -> Result<Self>
   where
@@ -125,8 +145,20 @@ pub trait Schema: SchemaBefore {
     spawn_blocking(move || self.__populate_sync(field)).await?
   }
 
+  /// Saves this document by inserting a new document into the database if it does not exist before, or sends an `replace_one` operation with the modifications to the database.
+  ///
+  /// If the document needs to be inserted to the database, the `SchemaBefore.before_create()` method is called before insert the document;
+  /// otherwise, `SchemaBefore.before_update()` is called before replace the document.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// match user.save() {
+  ///   Ok(u) => user = u,
+  ///   Err(error) => eprintln!("Error saving user: {}", error),
+  /// }
+  /// ```
   #[cfg(not(feature = "async"))]
-  fn save(mut self) -> Result<Self> {
+  fn save(&mut self) -> Result<Self> {
     let db = Self::__get_database(None);
     let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
 
@@ -153,14 +185,23 @@ pub trait Schema: SchemaBefore {
       collection.insert_one(document, None)?;
     }
 
-    Ok(self)
+    Ok(self.clone())
   }
 
+  /// Saves this document by inserting a new document into the database if it does not exist before, or sends an `replace_one` operation with the modifications to the database.
+  ///
+  /// If the document needs to be inserted to the database, the `SchemaBefore.before_create()` method is called before insert the document;
+  /// otherwise, `SchemaBefore.before_update()` is called before replace the document.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// match user.save().await {
+  ///   Ok(u) => user = u,
+  ///   Err(error) => eprintln!("Error saving user: {}", error),
+  /// }
+  /// ```
   #[cfg(feature = "async")]
-  async fn save(mut self) -> Result<Self>
-  where
-    Self: 'static,
-  {
+  async fn save(&mut self) -> Result<Self> {
     let db = Self::__get_database(None);
     let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
 
@@ -190,6 +231,6 @@ pub trait Schema: SchemaBefore {
       spawn_blocking(move || collection.insert_one(document, None)).await??;
     }
 
-    Ok(self)
+    Ok(self.clone())
   }
 }

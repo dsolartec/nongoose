@@ -60,14 +60,13 @@ impl Nongoose {
     T: core::fmt::Debug + Schema + 'static,
   {
     let builder = self.builder.clone();
-
     spawn_blocking(move || builder.find_one_sync(conditions)).await?
   }
 
-  /// Finds a single document by its `_id` field. `Nongoose.find_by_id(id)` is almost equivalent to `Nongoose.find_one(doc! { "_id": id })`. If
-  /// you want to query by a document's `_id`, use `Nongoose.find_by_id()` instead of `Nongoose.find_one()`.
+  /// Finds a single document by its `_id` field. `find_by_id(id)`is almost equivalent to `find_one(doc! { "_id": id })`.
+  /// If you want to query by a document's `_id`, use `find_by_id()`instead of `find_one()`.
   ///
-  /// This function triggers `Nongoose.find_one()`.
+  /// This function triggers `find_one()`.
   ///
   /// # Example
   /// ```rust,no_run,ignore
@@ -86,10 +85,10 @@ impl Nongoose {
     self.find_one(doc! { "_id": id.clone().into() })
   }
 
-  /// Finds a single document by its `_id` field. `Nongoose.find_by_id(id)` is almost equivalent to `Nongoose.find_one(doc! { "_id": id })`. If
-  /// you want to query by a document's `_id`, use `Nongoose.find_by_id()` instead of `Nongoose.find_one()`.
+  /// Finds a single document by its `_id` field. `find_by_id(id)`is almost equivalent to `find_one(doc! { "_id": id })`.
+  /// If you want to query by a document's `_id`, use `find_by_id()`instead of `find_one()`.
   ///
-  /// This function triggers `Nongoose.find_one()`.
+  /// This function triggers `find_one()`.
   ///
   /// # Example
   /// ```rust,no_run,ignore
@@ -108,7 +107,9 @@ impl Nongoose {
     self.find_one(doc! { "_id": id.clone().into() }).await
   }
 
-  /// Save one document to the database.
+  /// Shortcut for saving one document to the database. `Nongoose.create(doc)` does `doc.save()`.
+  ///
+  /// This function triggers `save()`.
   ///
   /// # Example
   /// ```rust,no_run,ignore
@@ -130,7 +131,9 @@ impl Nongoose {
     data.clone().save()
   }
 
-  /// Save one document to the database.
+  /// Shortcut for saving one document to the database. `Nongoose.create(doc)` does `doc.save()`.
+  ///
+  /// This function triggers `save()`.
   ///
   /// # Example
   /// ```rust,no_run,ignore
