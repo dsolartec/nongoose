@@ -83,7 +83,9 @@ fn get_instance() -> Nongoose {
 fn before_create() {
   let nongoose = get_instance();
 
-  let user = User::new("nongoose", "password").save();
+  let mut user = User::new("nongoose", "password");
+
+  let user = user.save();
   assert!(user.is_ok());
 
   let user = user.unwrap();
@@ -104,7 +106,9 @@ fn before_create() {
 async fn before_create() {
   let nongoose = get_instance();
 
-  let user = User::new("nongoose", "password").save().await;
+  let mut user = User::new("nongoose", "password");
+
+  let user = user.save().await;
   assert!(user.is_ok());
 
   let user = user.unwrap();

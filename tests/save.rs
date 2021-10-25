@@ -61,9 +61,9 @@ fn get_instance() -> Nongoose {
 fn save() {
   let _nongoose = get_instance();
 
-  let dog = Animal::new(AnimalType::Dog, "dog");
+  let mut dog = Animal::new(AnimalType::Dog, "dog");
 
-  let dog_saved = dog.clone().save();
+  let dog_saved = dog.save();
   assert!(dog_saved.is_ok());
 
   let mut dog_saved = dog_saved.unwrap();
@@ -77,14 +77,14 @@ fn save() {
   );
 
   dog_saved.name = String::from("dog1");
-  assert!(dog_saved.clone().save().is_ok());
+  assert!(dog_saved.save().is_ok());
 
   dog_saved.name = String::from("dog1");
   assert!(dog_saved.save().is_ok());
 
-  let cat = Animal::new(AnimalType::Cat, "cat");
+  let mut cat = Animal::new(AnimalType::Cat, "cat");
 
-  let cat_saved = cat.clone().save();
+  let cat_saved = cat.save();
   assert!(cat_saved.is_ok());
   assert_eq!(cat, cat_saved.unwrap());
 }
@@ -94,9 +94,9 @@ fn save() {
 async fn save() {
   let _nongoose = get_instance();
 
-  let dog = Animal::new(AnimalType::Dog, "dog");
+  let mut dog = Animal::new(AnimalType::Dog, "dog");
 
-  let dog_saved = dog.clone().save().await;
+  let dog_saved = dog.save().await;
   assert!(dog_saved.is_ok());
 
   let mut dog_saved = dog_saved.unwrap();
@@ -110,13 +110,13 @@ async fn save() {
   );
 
   dog_saved.name = String::from("dog1");
-  assert!(dog_saved.clone().save().await.is_ok());
+  assert!(dog_saved.save().await.is_ok());
 
   dog_saved.name = String::from("dog1");
   assert!(dog_saved.save().await.is_ok());
 
-  let cat = Animal::new(AnimalType::Cat, "cat");
-  let cat_saved = cat.clone().save().await;
+  let mut cat = Animal::new(AnimalType::Cat, "cat");
+  let cat_saved = cat.save().await;
 
   assert!(cat_saved.is_ok());
   assert_eq!(cat, cat_saved.unwrap());
