@@ -208,7 +208,7 @@ pub trait Schema: SchemaBefore {
     self.__check_unique_fields()?;
 
     if collection
-      .find_one(Some(self.__get_id_query().clone()), None)?
+      .find_one(Some(self.__get_id_query()), None)?
       .is_some()
     {
       self.before_update(db).await?;

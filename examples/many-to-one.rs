@@ -80,7 +80,7 @@ fn run_sync(nongoose: Nongoose, user_friend_id: &ObjectId) -> nongoose::errors::
       nongoose.create(&user_two)?;
 
       let user_friend = UserFriend {
-        id: user_friend_id.clone(),
+        id: *user_friend_id,
         from: Some(user_one.clone()),
         from_id: user_one.id,
         to: Some(user_two.clone()),
@@ -118,7 +118,7 @@ async fn run_async(
       nongoose.create(&user_two).await?;
 
       let user_friend = UserFriend {
-        id: user_friend_id.clone(),
+        id: *user_friend_id,
         from: Some(user_one.clone()),
         from_id: user_one.id,
         to: Some(user_two.clone()),

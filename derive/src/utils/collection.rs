@@ -31,13 +31,13 @@ pub(crate) fn get_name(input: &DeriveInput) -> String {
 
     for letter in ident.as_bytes().iter() {
       if letter.is_ascii_uppercase() {
-        if new_ident.len() > 0 {
+        if !new_ident.is_empty() {
           new_ident.push('_');
         }
 
         new_ident.push(letter.to_ascii_lowercase() as char);
       } else {
-        new_ident.push(letter.clone() as char);
+        new_ident.push(*letter as char);
       }
     }
 

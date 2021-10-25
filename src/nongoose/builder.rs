@@ -30,8 +30,8 @@ impl NongooseBuilder {
     self
   }
 
-  pub fn has_schema(&self, name: &String) -> bool {
-    self.schemas.iter().any(|e| &e.get_name() == name)
+  pub fn has_schema(&self, name: &str) -> bool {
+    self.schemas.iter().any(|e| e.get_name().as_str() == name)
   }
 
   pub fn finish(&self) -> Nongoose {
@@ -65,7 +65,7 @@ impl NongooseBuilder {
         .collection::<Document>(collection_name.as_str())
         .find_one(Some(conditions), None)?
       {
-        Some(document) => from_bson(Bson::Document(document.clone()))?,
+        Some(document) => from_bson(Bson::Document(document))?,
         None => None,
       },
     )

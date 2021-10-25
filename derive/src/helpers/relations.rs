@@ -3,10 +3,10 @@ use quote::{format_ident, quote};
 
 use crate::schema::data::SchemaData;
 
-pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
+pub(crate) fn getter(schema_data: &SchemaData) -> TokenStream {
   let nongoose = crate::utils::crates::get_nongoose_crate_name();
 
-  if schema_data.relations.len() > 0 {
+  if !schema_data.relations.is_empty() {
     let mut static_relations = quote!();
     let mut get_relations = quote!();
     let mut set_relations = quote!();
@@ -15,7 +15,7 @@ pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
       let field_ident_name = format!("{}", quote!(#field_ident));
       let field_id_ident = format_ident!("{}_id", field_ident_name);
 
-      let schema_ident_name = format!("{}", schema_ident.value());
+      let schema_ident_name = schema_ident.value().to_string();
       let schema_ident = format_ident!("{}", schema_ident_name);
 
       static_relations.extend(quote! {
