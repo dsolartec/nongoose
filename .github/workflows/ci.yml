@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    paths:
+      - 'derive/**'
+      - 'examples/**'
+      - 'scripts/**'
+      - 'src/**'
+      - 'tests/**'
+      - '.rustfmt.toml'
+      - 'Cargo.toml'
+  pull_request:
+
+jobs:
+  build:
+    name: CI Workflow
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      matrix:
+        os:
+          - windows
+          - ubuntu
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy,rustfmt
+          toolchain: stable
+
+      - name: Create a MongoDB instance
+        uses: supercharge/mongodb-github-action@1.6.0
+        with:
+          mongodb-version: '4.4'
+
+      - name: Install gnupg
+        run: |
+          sudo apt-get install gnupg -y
+          wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+
+      - name: Install mongosh
+        run: |
+          echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+          sudo apt-get update -y
+          sudo apt-get install -y mongodb-mongosh
+
+      - name: Version output
+        run: |
+          rustc --version
+          cargo --version
+          mongosh --version
+
+      - name: Check format files
+        run: cargo fmt --all -- --check
+
+      - name: Check cargo-clippy
+        run: |
+          cargo clippy --all-targets -- -D warnings
+          cargo clippy --all-targets --no-default-features --features derive -- -D warnings
+
+      - name: Check tests
+        env:
+          DATABASE_URL: 'mongodb://localhost:27017/'
+        run: |
+          cargo test
+          ./scripts/drop-database
+          cargo test --no-default-features --features derive
+          ./scripts/drop-database
+          cargo test --no-default-features --features derive,async
+          ./scripts/drop-database
+
+      - name: Run examples
+        env:
+          DATABASE_URL: 'mongodb://localhost:27017/'
+        run: |
+          ./scripts/run-sync-examples
+          ./scripts/run-async-examples

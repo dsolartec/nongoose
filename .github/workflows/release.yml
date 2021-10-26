@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        if: |
+          startsWith(github.ref, 'refs/tags/v') &&
+          github.repository == 'NextChatORG/nongoose'
+        with:
+          toolchain: stable
+
+      - name: Create a MongoDB instance
+        uses: supercharge/mongodb-github-action@1.6.0
+        if: |
+          startsWith(github.ref, 'refs/tags/v') &&
+          github.repository == 'NextChatORG/nongoose'
+        with:
+          mongodb-version: '4.4'
+
+      - name: Install gnupg
+        if: |
+          startsWith(github.ref, 'refs/tags/v') &&
+          github.repository == 'NextChatORG/nongoose'
+        run: |
+          sudo apt-get install gnupg -y
+          wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+
+      - name: Install mongosh
+        if: |
+          startsWith(github.ref, 'refs/tags/v') &&
+          github.repository == 'NextChatORG/nongoose'
+        run: |
+          echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+          sudo apt-get update -y
+          sudo apt-get install -y mongodb-mongosh
+
+      - name: Version output
+        if: |
+          startsWith(github.ref, 'refs/tags/v') &&
+          github.repository == 'NextChatORG/nongoose'
+        run: |
+          rustc --version
+          cargo --version
+          rustup --version
+          mongosh --version
+
+      - name: Check tests
+        if: |
+          startsWith(github.ref, 'refs/tags/v') &&
+          github.repository == 'NextChatORG/nongoose'
+        env:
+          DATABASE_URL: 'mongodb://localhost:27017/'
+        run: |
+          cargo test
+          ./scripts/drop-database
+          cargo test --no-default-features --features derive
+          ./scripts/drop-database
+          cargo test --no-default-features --features derive,async
+          ./scripts/drop-database
+
+      - name: Build zip file
+        if: |
+          startsWith(github.ref, 'refs/tags/v') &&
+          github.repository == 'NextChatORG/nongoose'
+        run: zip -r source_code.zip derive examples src tests .gitignore .rustfmt.toml Cargo.toml COPYING README.md
+
+      - name: Create release body using conventional commits
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v3
+        if: |
+          startsWith(github.ref, 'refs/tags/v') &&
+          github.repository == 'NextChatORG/nongoose'
+        with:
+          github-token: ${{ secrets.github_token }}
+          output-file: 'false'
+          tag-prefix: 'v'
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: |
+          startsWith(github.ref, 'refs/tags/v') &&
+          github.repository == 'NextChatORG/nongoose'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          body: ${{ steps.changelog.outputs.clean_changelog }}
+          draft: true
+          files: source_code.zip
+          release_name: ${{ steps.changelog.outputs.tag }}
+
+      - name: Publish to Crates.io
+        if: |
+          startsWith(github.ref, 'refs/tags/v') &&
+          github.repository == 'NextChatORG/nongoose'
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish

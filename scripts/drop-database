@@ -1,0 +1,3 @@
+#!/bin/bash
+
+mongosh --nodb --quiet --eval "let conn = new Mongo(process.env.DATABASE_URL); let db = conn.getDB('nongoose'); db.dropDatabase();"
