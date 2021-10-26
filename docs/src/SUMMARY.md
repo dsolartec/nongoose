@@ -8,7 +8,7 @@
     - [Macro Attributes](./schema/attributes/macro.md)
     - [Container Attributes](./schema/attributes/container.md)
     - [Field Attributes](./schema/attributes/field.md)
-- [SchemaBefore](./schema-before.md)
+- [SchemaBefore Trait](./schema-before.md)
 - [Building your first instance](./building-your-first-instance.md)
 - [Examples](./examples/README.md)
   - [One to Many relation](./examples/one-to-many-relation.md)
