@@ -12,4 +12,4 @@
 - [Building your first instance](./building-your-first-instance.md)
 - [Examples](./examples/README.md)
   - [One to Many relation](./examples/one-to-many-relation.md)
-- [Feature flags](./nongoose/feature-flags.md)
+- [Feature flags](./feature-flags.md)
