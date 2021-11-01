@@ -64,13 +64,13 @@ impl NongooseBuilder {
       );
     }
 
-    let mut cursor = self
+    let cursor = self
       .database
       .collection::<Document>(collection_name.as_str())
       .find(Some(conditions), options)?;
 
     let mut documents = Vec::new();
-    while let Some(doc) = cursor.next() {
+    for doc in cursor.collect::<Vec<mongodb::error::Result<Document>>>() {
       documents.push(from_bson(Bson::Document(doc?))?);
     }
 
