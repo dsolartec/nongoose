@@ -1,8 +1,14 @@
-use mongodb::{
-  bson::{doc, oid::ObjectId},
-  sync::Client,
+# One to Many relation
+
+```rust
+use async_trait::async_trait;
+use nongoose::{
+  mongodb::bson::{oid::ObjectId},
+  schema_relations,
+  Nongoose,
+  Schema,
+  SchemaBefore,
 };
-use nongoose::{schema_relations, Nongoose, Schema, SchemaBefore};
 use serde::{Deserialize, Serialize};
 
 #[schema_relations]
@@ -30,7 +36,7 @@ impl Author {
   }
 }
 
-#[cfg_attr(feature = "async", async_trait::async_trait)]
+#[async_trait]
 impl SchemaBefore for Author {}
 
 #[schema_relations]
@@ -67,7 +73,7 @@ impl Post {
   }
 }
 
-#[cfg_attr(feature = "async", async_trait::async_trait)]
+#[async_trait]
 impl SchemaBefore for Post {}
 
 fn get_instance() -> Nongoose {
@@ -93,39 +99,12 @@ fn get_instance() -> Nongoose {
     .finish()
 }
 
-#[cfg(not(feature = "async"))]
-fn main() -> nongoose::errors::Result<()> {
-  let nongoose = get_instance();
-
-  if let Some(author) = nongoose.find_one::<Author>(doc! { "username": "nongoose" }, None)? {
-    // Get author posts.
-    let author = author.populate("posts")?;
-    println!("Author posts: {:?}", author.posts);
-  } else {
-    // Authors
-    let author = Author::new("nongoose").save()?;
-
-    // Posts
-    Post::new("Nongoose example 1").save()?;
-    Post::new_with_author("Nongoose example 2", &author).save()?;
-    Post::new_with_author("Nongoose example 3", &author).save()?;
-    Post::new_with_author("Nongoose example 4", &author).save()?;
-
-    // Get author posts
-    let author = author.populate("posts")?;
-    println!("Author posts: {:?}", author.posts);
-  }
-
-  Ok(())
-}
-
-#[cfg(feature = "async")]
-#[cfg_attr(feature = "async", tokio::main)]
+#[tokio::main]
 async fn main() -> nongoose::errors::Result<()> {
   let nongoose = get_instance();
 
   if let Some(author) = nongoose
-    .find_one::<Author>(doc! { "username": "nongoose" }, None)
+    .find_one::<Author>(doc! { "username": "nongoose" })
     .await?
   {
     // Get author posts.
@@ -137,15 +116,9 @@ async fn main() -> nongoose::errors::Result<()> {
 
     // Posts
     Post::new("Nongoose example 1").save().await?;
-    Post::new_with_author("Nongoose example 2", &author)
-      .save()
-      .await?;
-    Post::new_with_author("Nongoose example 3", &author)
-      .save()
-      .await?;
-    Post::new_with_author("Nongoose example 4", &author)
-      .save()
-      .await?;
+    Post::new_with_author("Nongoose example 2", &author).save().await?;
+    Post::new_with_author("Nongoose example 3", &author).save().await?;
+    Post::new_with_author("Nongoose example 4", &author).save().await?;
 
     // Get author posts
     let author = author.populate("posts").await?;
@@ -154,3 +127,4 @@ async fn main() -> nongoose::errors::Result<()> {
 
   Ok(())
 }
+```

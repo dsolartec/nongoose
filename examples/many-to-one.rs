@@ -14,6 +14,15 @@ struct User {
   pub username: String,
 }
 
+impl User {
+  pub fn new(username: &str) -> Self {
+    Self {
+      id: ObjectId::new(),
+      username: String::from(username),
+    }
+  }
+}
+
 #[cfg_attr(feature = "async", async_trait::async_trait)]
 impl SchemaBefore for User {}
 
@@ -65,29 +74,18 @@ fn run_sync(nongoose: Nongoose, user_friend_id: &ObjectId) -> nongoose::errors::
 
   match user_friends {
     Ok(None) | Err(_) => {
-      let user_one = User {
-        id: ObjectId::new(),
-        username: String::from("nongoose"),
-      };
-
-      nongoose.create(&user_one)?;
-
-      let user_two = User {
-        id: ObjectId::new(),
-        username: String::from("nongoose2"),
-      };
-
-      nongoose.create(&user_two)?;
+      let user_one = User::new("nongoose").save()?;
+      let user_two = User::new("nongoose2").save()?;
 
       let user_friend = UserFriend {
-        id: user_friend_id.clone(),
+        id: *user_friend_id,
         from: Some(user_one.clone()),
         from_id: user_one.id,
         to: Some(user_two.clone()),
         to_id: user_two.id,
-      };
+      }
+      .save()?;
 
-      nongoose.create(&user_friend)?;
       Ok(user_friend)
     }
     Ok(Some(user_friends)) => Ok(user_friends.populate("from")?.populate("to")?),
@@ -103,29 +101,19 @@ async fn run_async(
 
   match user_friends {
     Ok(None) | Err(_) => {
-      let user_one = User {
-        id: ObjectId::new(),
-        username: String::from("nongoose"),
-      };
-
-      nongoose.create(&user_one).await?;
-
-      let user_two = User {
-        id: ObjectId::new(),
-        username: String::from("nongoose2"),
-      };
-
-      nongoose.create(&user_two).await?;
+      let user_one = User::new("nongoose").save().await?;
+      let user_two = User::new("nongoose2").save().await?;
 
       let user_friend = UserFriend {
-        id: user_friend_id.clone(),
+        id: *user_friend_id,
         from: Some(user_one.clone()),
         from_id: user_one.id,
         to: Some(user_two.clone()),
         to_id: user_two.id,
-      };
+      }
+      .save()
+      .await?;
 
-      nongoose.create(&user_friend).await?;
       Ok(user_friend)
     }
     Ok(Some(user_friends)) => Ok(user_friends.populate("from").await?.populate("to").await?),

@@ -3,7 +3,7 @@ use quote::{format_ident, quote};
 
 use crate::schema::data::SchemaData;
 
-pub(crate) fn getter<'a>(schema_data: &'a SchemaData<'a>) -> TokenStream {
+pub(crate) fn getter(schema_data: &SchemaData<'_>) -> TokenStream {
   let id_field_ident = schema_data.id.ident.as_ref().unwrap();
 
   if let Some(lit) = schema_data.convert.get(id_field_ident) {

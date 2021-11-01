@@ -15,12 +15,12 @@ pub(crate) fn add_schema(schema: &SchemaData) {
   }
 }
 
-pub(crate) fn get_schema(name: &String) -> Option<SchemaData> {
+pub(crate) fn get_schema(name: &str) -> Option<SchemaData> {
   if let Some(schemas) = SCHEMAS.get() {
     let schemas = schemas.lock().unwrap();
 
     for schema in schemas.iter() {
-      if &schema.get_name() == name {
+      if schema.get_name().as_str() == name {
         return Some(schema.clone());
       }
     }

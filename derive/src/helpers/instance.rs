@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub(crate) fn getter<'a>() -> TokenStream {
+pub(crate) fn getter() -> TokenStream {
   let nongoose = crate::utils::crates::get_nongoose_crate_name();
 
   quote! {

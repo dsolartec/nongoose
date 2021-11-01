@@ -10,7 +10,7 @@ pub(crate) struct SchemaData<'a> {
   pub relations: Vec<(&'a Ident, String, LitStr)>,
 }
 
-pub(crate) fn parse_fields<'a>(fields: &'a FieldsNamed) -> SchemaData<'a> {
+pub(crate) fn parse_fields(fields: &FieldsNamed) -> SchemaData<'_> {
   let mut convert = HashMap::new();
   let mut id = None;
   let mut unique = Vec::new();
@@ -33,10 +33,8 @@ pub(crate) fn parse_fields<'a>(fields: &'a FieldsNamed) -> SchemaData<'a> {
                 id = Some(field);
                 unique.push(field);
               }
-            } else if path.is_ident("unique") {
-              if !unique.contains(&field) {
-                unique.push(field);
-              }
+            } else if path.is_ident("unique") && !unique.contains(&field) {
+              unique.push(field);
             }
           }
           NestedMeta::Meta(Meta::NameValue(nv)) => {

@@ -3,10 +3,10 @@ use quote::{format_ident, quote};
 
 use crate::schema::data::SchemaData;
 
-pub(crate) fn getter<'a>(schema_data: &'a SchemaData) -> TokenStream {
+pub(crate) fn getter(schema_data: &SchemaData) -> TokenStream {
   let nongoose = crate::utils::crates::get_nongoose_crate_name();
 
-  if schema_data.unique.len() > 0 {
+  if !schema_data.unique.is_empty() {
     let mut idents = quote!();
     for field in schema_data.unique.iter() {
       let ident = field.ident.as_ref().unwrap();

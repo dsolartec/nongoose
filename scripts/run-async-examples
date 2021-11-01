@@ -1,0 +1,15 @@
+#!/bin/bash
+
+drop_database () {
+  ./scripts/drop-database || exit 1
+}
+
+run () {
+  cargo run --example $1 --no-default-features --features derive,async || exit 1
+}
+
+run many-to-one
+drop_database
+
+run one-to-many
+drop_database
