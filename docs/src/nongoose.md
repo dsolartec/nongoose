@@ -62,6 +62,45 @@ match nongoose.create::<User>(&user).await {
 }
 ```
 
+## `Nongoose.find()`
+
+**Generics**
+
+- T `Debug + Schema` value of schema to query by
+
+**Arguments**
+
+- conditions `bson::Document`
+- options `mongodb::options::FindOptions`
+
+**Returns**
+
+- `nongoose::errors::Result<Vec<T>>`
+
+Finds documents.
+
+**Example**
+
+```rust,no_run
+// Sync method
+match nongoose.find::<User>(
+  doc! { "age": { "$gte": 18 } },
+  Some(Findptions::builder().sort(doc! { "username": 1 }).build())
+) {
+  Ok(users) => println!("Found {} users!", users.len()),
+  Err(error) => eprintln!("Error finding users: {}", error),
+}
+
+// Async method
+match nongoose.find::<User>(
+  doc! { "age": { "$gte": 18 } },
+  Some(FindOptions::builder().sort(doc! { "username": 1 }).build())
+).await {
+  Ok(users) => println!("Found {} users!", users.len()),
+  Err(error) => eprintln!("Error finding users: {}", error),
+}
+```
+
 ## `Nongoose.find_by_id()`
 
 **Generics**
@@ -112,27 +151,38 @@ match nongoose.find_by_id::<User>(
 **Arguments**
 
 - conditions `bson::Document`
-
-Finds one document.
+- options `mongodb::options::FindOneOptions`
 
 **Returns**
 
 - `nongoose::errors::Result<Option<T>>`
 
+Finds one document.
+
 **Example**
 
 ```rust,no_run
 // Find one user whose `username` is `nongoose` (Sync method)
-match nongoose.find_one::<User>(doc! { "username": "nongoose" }) {
+match nongoose.find_one::<User>(doc! { "username": "nongoose" }, None) {
   Ok(Some(user)) => println!("User found: {}", user.id),
   Ok(None) => eprintln!("Cannot find the user"),
   Err(error) => eprintln!("Error finding user: {}", error),
 }
 
 // Find one user whose `username` is `nongoose` (Async method)
-match nongoose.find_one::<User>(doc! { "username": "nongoose" }).await {
+match nongoose.find_one::<User>(doc! { "username": "nongoose" }, None).await {
   Ok(Some(user)) => println!("User found: {}", user.id),
   Ok(None) => eprintln!("Cannot find the user"),
+  Err(error) => eprintln!("Error finding user: {}", error),
+}
+
+// Passing options
+match nongoose.find_one::<User>(
+  doc! { "age": { "$gte": 18 } },
+  Some(FindOneOptions::builder().sort(doc! { "username": 1 }).build())
+) {
+  Ok(Some(user)) => println!("User found: {}", user.id),
+  Ok(None) => eprintln!("No users over 18 years old"),
   Err(error) => eprintln!("Error finding user: {}", error),
 }
 ```

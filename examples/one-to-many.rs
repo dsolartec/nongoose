@@ -97,7 +97,7 @@ fn get_instance() -> Nongoose {
 fn main() -> nongoose::errors::Result<()> {
   let nongoose = get_instance();
 
-  if let Some(author) = nongoose.find_one::<Author>(doc! { "username": "nongoose" })? {
+  if let Some(author) = nongoose.find_one::<Author>(doc! { "username": "nongoose" }, None)? {
     // Get author posts.
     let author = author.populate("posts")?;
     println!("Author posts: {:?}", author.posts);
@@ -125,7 +125,7 @@ async fn main() -> nongoose::errors::Result<()> {
   let nongoose = get_instance();
 
   if let Some(author) = nongoose
-    .find_one::<Author>(doc! { "username": "nongoose" })
+    .find_one::<Author>(doc! { "username": "nongoose" }, None)
     .await?
   {
     // Get author posts.
