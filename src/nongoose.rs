@@ -71,28 +71,80 @@ impl Nongoose {
   /// # Options
   /// ```rust,no_run,ignore
   /// FindOptions::builder()
-  ///   .allow_disk_use(...) // Optional (bool)
-  ///   .allow_partial_results(...) // Optional (bool)
-  ///   .batch_size(...) // Optional (u32)
-  ///   .comment(...) // Optional (String)
-  ///   .cursor_type(...) // Optional (mongodb::options::CursorType)
-  ///   .hint(...) // Optional (mongodb::options::Hint)
-  ///   .limit(...) // Optional (i64)
-  ///   .max(...) // Optional (mongodb::bson::Document)
-  ///   .max_await_time(...) // Optional (std::time::Duration)
-  ///   .max_scan(...) // Optional (u64)
-  ///   .max_time(...) // Optional (std::time::Duration)
-  ///   .min(...) // Optional (mongodb::bson::Document)
-  ///   .no_cursor_timeout(...) // Optional (bool)
-  ///   .projection(...) // Optional (mongodb::bson::Document)
-  ///   .read_concern(...) // Optional (mongodb::options::ReadConcern)
-  ///   .return_key(...) // Optional (bool)
-  ///   .selection_criteria(...) // Optional (mongodb::options::SelectionCriteria)
-  ///   .show_record_id(...) // Optional (bool)
-  ///   .skip(...) // Optional (u64)
-  ///   .sort(...) // Optional (mongodb::bson::Document)
-  ///   .collation(...) // Optional (mongodb::options::Collation)
-  ///   .build() // Required to create the instance of `FindOptions`
+  ///   // Optional (bool)
+  ///   // Enables writing to temporary files by the server. When set to true, the find operation can write data to the _tmp subdirectory in the dbPath directory.
+  ///   // Only supported in server versions 4.4+.
+  ///   .allow_disk_use(...)
+  ///   // Optional (bool)
+  ///   // If true, partial results will be returned from a mongos rather than an error being returned if one or more shards is down.
+  ///   .allow_partial_results(...)
+  ///   // Optional (u32)
+  ///   // The number of documents the server should return per cursor batch.
+  ///   // Note that this does not have any affect on the documents that are returned by a cursor, only the number of documents kept in memory at a given time
+  ///   // (and by extension, the number of round trips needed to return the entire set of documents returned by the query.
+  ///   .batch_size(...)
+  ///   // Optional (String)
+  ///   // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  ///   .comment(...)
+  ///   // Optional (mongodb::options::CursorType)
+  ///   // The type of cursor to return.
+  ///   .cursor_type(...)
+  ///   // Optional (mongodb::options::Hint)
+  ///   // The index to use for the operation.
+  ///   .hint(...)
+  ///   // Optional (i64)
+  ///   // The maximum number of documents to query. If a negative number is specified, the documents will be returned in a single batch limited in number
+  ///   // by the positive value of the specified limit.
+  ///   .limit(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The exclusive upper bound for a specific index.
+  ///   .max(...)
+  ///   // Optional (std::time::Duration)
+  ///   // The maximum amount of time for the server to wait on new documents to satisfy a tailable cursor query. If the cursor is not tailable, this option is ignored.
+  ///   .max_await_time(...)
+  ///   // Optional (u64)
+  ///   // Maximum number of documents or index keys to scan when executing the query.
+  ///   // Note: this option is deprecated starting in MongoDB version 4.0 and removed in MongoDB 4.2. Use the maxTimeMS option instead.
+  ///   .max_scan(...)
+  ///   // Optional (std::time::Duration)
+  ///   // The maximum amount of time to allow the query to run.
+  ///   // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  ///   .max_time(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The inclusive lower bound for a specific index.
+  ///   .min(...)
+  ///   // Optional (bool)
+  ///   // Whether the server should close the cursor after a period of inactivity.
+  ///   .no_cursor_timeout(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // Limits the fields of the document being returned.
+  ///   .projection(...)
+  ///   // Optional (mongodb::options::ReadConcern)
+  ///   // The read concern to use for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .read_concern(...)
+  ///   // Optional (bool)
+  ///   // Whether to return only the index keys in the documents.
+  ///   .return_key(...)
+  ///   // Optional (mongodb::options::SelectionCriteria)
+  ///   // The criteria used to select a server for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .selection_criteria(...)
+  ///   // Optional (bool)
+  ///   // Whether to return the record identifier for each document.
+  ///   .show_record_id(...)
+  ///   // Optional (u64)
+  ///   // The number of documents to skip before counting.
+  ///   .skip(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The order of the documents for the purposes of the operation.
+  ///   .sort(...)
+  ///   // Optional (mongodb::options::Collation)
+  ///   // The collation to use for the operation.
+  ///   // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  ///   .collation(...)
+  ///   // Required to create the instance of `FindOptions`
+  ///   .build()
   /// ```
   ///
   /// # Example
@@ -125,28 +177,80 @@ impl Nongoose {
   /// # Options
   /// ```rust,no_run,ignore
   /// FindOptions::builder()
-  ///   .allow_disk_use(...) // Optional (bool)
-  ///   .allow_partial_results(...) // Optional (bool)
-  ///   .batch_size(...) // Optional (u32)
-  ///   .comment(...) // Optional (String)
-  ///   .cursor_type(...) // Optional (mongodb::options::CursorType)
-  ///   .hint(...) // Optional (mongodb::options::Hint)
-  ///   .limit(...) // Optional (i64)
-  ///   .max(...) // Optional (mongodb::bson::Document)
-  ///   .max_await_time(...) // Optional (std::time::Duration)
-  ///   .max_scan(...) // Optional (u64)
-  ///   .max_time(...) // Optional (std::time::Duration)
-  ///   .min(...) // Optional (mongodb::bson::Document)
-  ///   .no_cursor_timeout(...) // Optional (bool)
-  ///   .projection(...) // Optional (mongodb::bson::Document)
-  ///   .read_concern(...) // Optional (mongodb::options::ReadConcern)
-  ///   .return_key(...) // Optional (bool)
-  ///   .selection_criteria(...) // Optional (mongodb::options::SelectionCriteria)
-  ///   .show_record_id(...) // Optional (bool)
-  ///   .skip(...) // Optional (u64)
-  ///   .sort(...) // Optional (mongodb::bson::Document)
-  ///   .collation(...) // Optional (mongodb::options::Collation)
-  ///   .build() // Required to create the instance of `FindOptions`
+  ///   // Optional (bool)
+  ///   // Enables writing to temporary files by the server. When set to true, the find operation can write data to the _tmp subdirectory in the dbPath directory.
+  ///   // Only supported in server versions 4.4+.
+  ///   .allow_disk_use(...)
+  ///   // Optional (bool)
+  ///   // If true, partial results will be returned from a mongos rather than an error being returned if one or more shards is down.
+  ///   .allow_partial_results(...)
+  ///   // Optional (u32)
+  ///   // The number of documents the server should return per cursor batch.
+  ///   // Note that this does not have any affect on the documents that are returned by a cursor, only the number of documents kept in memory at a given time
+  ///   // (and by extension, the number of round trips needed to return the entire set of documents returned by the query.
+  ///   .batch_size(...)
+  ///   // Optional (String)
+  ///   // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  ///   .comment(...)
+  ///   // Optional (mongodb::options::CursorType)
+  ///   // The type of cursor to return.
+  ///   .cursor_type(...)
+  ///   // Optional (mongodb::options::Hint)
+  ///   // The index to use for the operation.
+  ///   .hint(...)
+  ///   // Optional (i64)
+  ///   // The maximum number of documents to query. If a negative number is specified, the documents will be returned in a single batch limited in number
+  ///   // by the positive value of the specified limit.
+  ///   .limit(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The exclusive upper bound for a specific index.
+  ///   .max(...)
+  ///   // Optional (std::time::Duration)
+  ///   // The maximum amount of time for the server to wait on new documents to satisfy a tailable cursor query. If the cursor is not tailable, this option is ignored.
+  ///   .max_await_time(...)
+  ///   // Optional (u64)
+  ///   // Maximum number of documents or index keys to scan when executing the query.
+  ///   // Note: this option is deprecated starting in MongoDB version 4.0 and removed in MongoDB 4.2. Use the maxTimeMS option instead.
+  ///   .max_scan(...)
+  ///   // Optional (std::time::Duration)
+  ///   // The maximum amount of time to allow the query to run.
+  ///   // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  ///   .max_time(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The inclusive lower bound for a specific index.
+  ///   .min(...)
+  ///   // Optional (bool)
+  ///   // Whether the server should close the cursor after a period of inactivity.
+  ///   .no_cursor_timeout(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // Limits the fields of the document being returned.
+  ///   .projection(...)
+  ///   // Optional (mongodb::options::ReadConcern)
+  ///   // The read concern to use for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .read_concern(...)
+  ///   // Optional (bool)
+  ///   // Whether to return only the index keys in the documents.
+  ///   .return_key(...)
+  ///   // Optional (mongodb::options::SelectionCriteria)
+  ///   // The criteria used to select a server for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .selection_criteria(...)
+  ///   // Optional (bool)
+  ///   // Whether to return the record identifier for each document.
+  ///   .show_record_id(...)
+  ///   // Optional (u64)
+  ///   // The number of documents to skip before counting.
+  ///   .skip(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The order of the documents for the purposes of the operation.
+  ///   .sort(...)
+  ///   // Optional (mongodb::options::Collation)
+  ///   // The collation to use for the operation.
+  ///   // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  ///   .collation(...)
+  ///   // Required to create the instance of `FindOptions`
+  ///   .build()
   /// ```
   ///
   /// See more [here](https://docs.rs/mongodb/2.0.1/mongodb/options/struct.FindOptions.html)
@@ -226,22 +330,58 @@ impl Nongoose {
   /// # Options
   /// ```rust,no_run,ignore
   /// FindOneOptions::builder()
-  ///   .allow_partial_results(...) // Optional (bool)
-  ///   .collation(...) // Optional (mongodb::options::Collation)
-  ///   .comment(...) // Optional (String)
-  ///   .hint(...) // Optional (mongodb::options::Hint)
-  ///   .max(...) // Optional (mongodb::bson::Document)
-  ///   .max_scan(...) // Optional (u64)
-  ///   .max_time(...) // Optional (std::time::Duration)
-  ///   .min(...) // Optional (mongodb::bson::Document)
-  ///   .projection(...) // Optional (mongodb::bson::Document)
-  ///   .read_concern(...) // Optional (mongodb::options::ReadConcern)
-  ///   .return_key(...) // Optional (bool)
-  ///   .selection_criteria(...) // Optional (mongodb::options::SelectionCriteria)
-  ///   .show_record_id(...) // Optional (bool)
-  ///   .skip(...) // Optional (u64)
-  ///   .sort(...) // Optional (mongodb::bson::Document)
-  ///   .build() // Required to create the instance of `FindOneOptions`
+  ///   // Optional (bool)
+  ///   // If true, partial results will be returned from a mongos rather than an error being returned if one or more shards is down.
+  ///   .allow_partial_results(...)
+  ///   // Optional (mongodb::options::Collation)
+  ///   // The collation to use for the operation.
+  ///   // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  ///   .collation(...)
+  ///   // Optional (String)
+  ///   // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  ///   .comment(...)
+  ///   // Optional (mongodb::options::Hint)
+  ///   // The index to use for the operation.
+  ///   .hint(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The exclusive upper bound for a specific index.
+  ///   .max(...)
+  ///   // Optional (u64)
+  ///   // Maximum number of documents or index keys to scan when executing the query.
+  ///   // Note: this option is deprecated starting in MongoDB version 4.0 and removed in MongoDB 4.2. Use the maxTimeMS option instead.
+  ///   .max_scan(...)
+  ///   // Optional (std::time::Duration)
+  ///   // The maximum amount of time to allow the query to run.
+  ///   // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  ///   .max_time(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The inclusive lower bound for a specific index.
+  ///   .min(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // Limits the fields of the document being returned.
+  ///   .projection(...)
+  ///   // Optional (mongodb::options::ReadConcern)
+  ///   // The read concern to use for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .read_concern(...)
+  ///   // Optional (bool)
+  ///   // Whether to return only the index keys in the documents.
+  ///   .return_key(...)
+  ///   // Optional (mongodb::options::SelectionCriteria)
+  ///   // The criteria used to select a server for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .selection_criteria(...)
+  ///   // Optional (bool)
+  ///   // Whether to return the record identifier for each document.
+  ///   .show_record_id(...)
+  ///   // Optional (u64)
+  ///   // The number of documents to skip before counting.
+  ///   .skip(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The order of the documents for the purposes of the operation.
+  ///   .sort(...)
+  ///   // Required to create the instance of `FindOneOptions`
+  ///   .build()
   /// ```
   ///
   /// # Example
@@ -280,22 +420,58 @@ impl Nongoose {
   /// # Options
   /// ```rust,no_run,ignore
   /// FindOneOptions::builder()
-  ///   .allow_partial_results(...) // Optional (bool)
-  ///   .collation(...) // Optional (mongodb::options::Collation)
-  ///   .comment(...) // Optional (String)
-  ///   .hint(...) // Optional (mongodb::options::Hint)
-  ///   .max(...) // Optional (mongodb::bson::Document)
-  ///   .max_scan(...) // Optional (u64)
-  ///   .max_time(...) // Optional (std::time::Duration)
-  ///   .min(...) // Optional (mongodb::bson::Document)
-  ///   .projection(...) // Optional (mongodb::bson::Document)
-  ///   .read_concern(...) // Optional (mongodb::options::ReadConcern)
-  ///   .return_key(...) // Optional (bool)
-  ///   .selection_criteria(...) // Optional (mongodb::options::SelectionCriteria)
-  ///   .show_record_id(...) // Optional (bool)
-  ///   .skip(...) // Optional (u64)
-  ///   .sort(...) // Optional (mongodb::bson::Document)
-  ///   .build() // Required to create the instance of `FindOneOptions`
+  ///   // Optional (bool)
+  ///   // If true, partial results will be returned from a mongos rather than an error being returned if one or more shards is down.
+  ///   .allow_partial_results(...)
+  ///   // Optional (mongodb::options::Collation)
+  ///   // The collation to use for the operation.
+  ///   // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  ///   .collation(...)
+  ///   // Optional (String)
+  ///   // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  ///   .comment(...)
+  ///   // Optional (mongodb::options::Hint)
+  ///   // The index to use for the operation.
+  ///   .hint(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The exclusive upper bound for a specific index.
+  ///   .max(...)
+  ///   // Optional (u64)
+  ///   // Maximum number of documents or index keys to scan when executing the query.
+  ///   // Note: this option is deprecated starting in MongoDB version 4.0 and removed in MongoDB 4.2. Use the maxTimeMS option instead.
+  ///   .max_scan(...)
+  ///   // Optional (std::time::Duration)
+  ///   // The maximum amount of time to allow the query to run.
+  ///   // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  ///   .max_time(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The inclusive lower bound for a specific index.
+  ///   .min(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // Limits the fields of the document being returned.
+  ///   .projection(...)
+  ///   // Optional (mongodb::options::ReadConcern)
+  ///   // The read concern to use for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .read_concern(...)
+  ///   // Optional (bool)
+  ///   // Whether to return only the index keys in the documents.
+  ///   .return_key(...)
+  ///   // Optional (mongodb::options::SelectionCriteria)
+  ///   // The criteria used to select a server for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .selection_criteria(...)
+  ///   // Optional (bool)
+  ///   // Whether to return the record identifier for each document.
+  ///   .show_record_id(...)
+  ///   // Optional (u64)
+  ///   // The number of documents to skip before counting.
+  ///   .skip(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The order of the documents for the purposes of the operation.
+  ///   .sort(...)
+  ///   // Required to create the instance of `FindOneOptions`
+  ///   .build()
   /// ```
   ///
   /// # Example
