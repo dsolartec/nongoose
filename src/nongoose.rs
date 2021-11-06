@@ -4,7 +4,8 @@ pub(crate) mod globals;
 pub use builder::NongooseBuilder;
 use mongodb::{
   bson::{doc, Document},
-  options::{FindOneOptions, FindOptions},
+  options::{FindOneOptions, FindOptions, UpdateOptions},
+  results::UpdateResult,
   sync::Database,
 };
 #[cfg(feature = "async")]
@@ -23,6 +24,46 @@ impl Nongoose {
       database,
       schemas: Vec::new(),
     }
+  }
+
+  /// Shortcut for saving one document to the database. `Nongoose.create(doc)` does `Schema.save()`.
+  ///
+  /// This function triggers `Schema.save()`.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// // Insert one new `User` document
+  /// match nongoose.create::<User>(&user) {
+  ///   Ok(user) => println!("User saved: {}", user.id),
+  ///   Err(error) => eprintln!("Error saving the user: {}", error),
+  /// }
+  /// ```
+  #[cfg(not(feature = "async"))]
+  pub fn create<T>(&self, data: &T) -> Result<T>
+  where
+    T: Schema + Clone,
+  {
+    data.clone().save()
+  }
+
+  /// Shortcut for saving one document to the database. `Nongoose.create(doc)` does `Schema.save()`.
+  ///
+  /// This function triggers `Schema.save()`.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// // Insert one new `User` document
+  /// match nongoose.create::<User>(&user).await {
+  ///   Ok(user) => println!("User saved: {}", user.id);,
+  ///   Err(error) => eprintln!("Error saving the user: {}", error),
+  /// }
+  /// ```
+  #[cfg(feature = "async")]
+  pub async fn create<T>(&self, data: &T) -> Result<T>
+  where
+    T: Schema + Clone + Send + 'static,
+  {
+    data.clone().save().await
   }
 
   /// Finds documents.
@@ -136,6 +177,50 @@ impl Nongoose {
     spawn_blocking(move || builder.find_sync(conditions, options)).await?
   }
 
+  /// Finds a single document by its `_id` field. `find_by_id(id)`is almost equivalent to `find_one(doc! { "_id": id })`.
+  /// If you want to query by a document's `_id`, use `find_by_id()`instead of `find_one()`.
+  ///
+  /// This function triggers `find_one()`.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// // Find one `User` document by `_id`
+  /// match nongoose.find_by_id::<User>(&ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap()) {
+  ///   Ok(Some(user)) => println!("User found: {}", user.id),
+  ///   Ok(None) => eprintln!("Cannot find the user"),
+  ///   Err(error) => eprintln!("Error finding user: {}", error),
+  /// }
+  /// ```
+  #[cfg(not(feature = "async"))]
+  pub fn find_by_id<T>(&self, id: &T::Id) -> Result<Option<T>>
+  where
+    T: core::fmt::Debug + Schema,
+  {
+    self.find_one(doc! { "_id": id.clone().into() }, None)
+  }
+
+  /// Finds a single document by its `_id` field. `find_by_id(id)`is almost equivalent to `find_one(doc! { "_id": id })`.
+  /// If you want to query by a document's `_id`, use `find_by_id()`instead of `find_one()`.
+  ///
+  /// This function triggers `find_one()`.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// // Find one `User` document by `_id`
+  /// match nongoose.find_by_id::<User>(&ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap()).await {
+  ///   Ok(Some(user)) => println!("User found: {}", user.id),
+  ///   Ok(None) => eprintln!("Cannot find the user"),
+  ///   Err(error) => eprintln!("Error finding user: {}", error),
+  /// }
+  /// ```
+  #[cfg(feature = "async")]
+  pub async fn find_by_id<T>(&self, id: &T::Id) -> Result<Option<T>>
+  where
+    T: core::fmt::Debug + Schema + 'static,
+  {
+    self.find_one(doc! { "_id": id.clone().into() }, None).await
+  }
+
   /// Finds one document.
   ///
   /// # Options
@@ -245,87 +330,118 @@ impl Nongoose {
     spawn_blocking(move || builder.find_one_sync(conditions, options)).await?
   }
 
-  /// Finds a single document by its `_id` field. `find_by_id(id)`is almost equivalent to `find_one(doc! { "_id": id })`.
-  /// If you want to query by a document's `_id`, use `find_by_id()`instead of `find_one()`.
+  /// Updates _all_ documents in the database that match `conditions` without returning them.
   ///
-  /// This function triggers `find_one()`.
+  /// **Note** update_many will _not_ fire update middleware (`SchemaBefore::before_update()`).
+  ///
+  /// # Options
+  /// ```rust,no_run,ignore
+  /// UpdateOptions::builder()
+  ///   // Optional (Vec<mongodb::bson::Document>)
+  ///   // A set of filters specifying to which array elements an update should apply.
+  ///   // See the documentation [here](https://docs.mongodb.com/manual/reference/command/update/) for more information on array filters.
+  ///   .array_filters(...)
+  ///   // Optional (bool)
+  ///   // Opt out of document-level validation.
+  ///   .bypass_document_validation(...)
+  ///   // Optional (bool)
+  ///   // If true, insert a document if no matching document is found.
+  ///   .upsert(...)
+  ///   // Optional (mongodb::options::Collation)
+  ///   // The collation to use for the operation.
+  ///   .collation(...)
+  ///   // Optional (mongodb::options::Hint)
+  ///   // A document or string that specifies the index to use to support the query predicate.
+  ///   // Only available in MongoDB 4.2+. See the official MongoDB [documentation](https://docs.mongodb.com/manual/reference/command/update/#ex-update-command-hint) for examples.
+  ///   .hint(...)
+  ///   // Optional (mongodb::options::WriteConcern)
+  ///   // The write concern for the operation.
+  ///   .write_concern(...)
+  ///   // Required to create the instance of `UpdateOptions`
+  ///   .build()
+  /// ```
   ///
   /// # Example
   /// ```rust,no_run,ignore
-  /// // Find one `User` document by `_id`
-  /// match nongoose.find_by_id::<User>(&ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap()) {
-  ///   Ok(Some(user)) => println!("User found: {}", user.id),
-  ///   Ok(None) => eprintln!("Cannot find the user"),
-  ///   Err(error) => eprintln!("Error finding user: {}", error),
+  /// // Update the age to 18 if it is under 18
+  /// match nongoose.update_many::<User>(
+  ///   doc! { "age": { "$lt": 18 } },
+  ///   doc! { "$set": { "age": 18 } },
+  ///   None
+  /// ) {
+  ///   Ok(result) => println!("Modified {} documents", result.modified_count),
+  ///   Err(error) => eprintln!("Error updating users: {}", error),
   /// }
   /// ```
   #[cfg(not(feature = "async"))]
-  pub fn find_by_id<T>(&self, id: &T::Id) -> Result<Option<T>>
+  pub fn update_many<T>(
+    &self,
+    conditions: Document,
+    data: Document,
+    options: Option<UpdateOptions>,
+  ) -> Result<UpdateResult>
   where
     T: core::fmt::Debug + Schema,
   {
-    self.find_one(doc! { "_id": id.clone().into() }, None)
+    self
+      .builder
+      .update_many_sync::<T>(conditions, data, options)
   }
 
-  /// Finds a single document by its `_id` field. `find_by_id(id)`is almost equivalent to `find_one(doc! { "_id": id })`.
-  /// If you want to query by a document's `_id`, use `find_by_id()`instead of `find_one()`.
+  /// Updates _all_ documents in the database that match `conditions` without returning them.
   ///
-  /// This function triggers `find_one()`.
+  /// **Note** update_many will _not_ fire update middleware (`SchemaBefore::before_update()`).
+  ///
+  /// # Options
+  /// ```rust,no_run,ignore
+  /// UpdateOptions::builder()
+  ///   // Optional (Vec<mongodb::bson::Document>)
+  ///   // A set of filters specifying to which array elements an update should apply.
+  ///   // See the documentation [here](https://docs.mongodb.com/manual/reference/command/update/) for more information on array filters.
+  ///   .array_filters(...)
+  ///   // Optional (bool)
+  ///   // Opt out of document-level validation.
+  ///   .bypass_document_validation(...)
+  ///   // Optional (bool)
+  ///   // If true, insert a document if no matching document is found.
+  ///   .upsert(...)
+  ///   // Optional (mongodb::options::Collation)
+  ///   // The collation to use for the operation.
+  ///   .collation(...)
+  ///   // Optional (mongodb::options::Hint)
+  ///   // A document or string that specifies the index to use to support the query predicate.
+  ///   // Only available in MongoDB 4.2+. See the official MongoDB [documentation](https://docs.mongodb.com/manual/reference/command/update/#ex-update-command-hint) for examples.
+  ///   .hint(...)
+  ///   // Optional (mongodb::options::WriteConcern)
+  ///   // The write concern for the operation.
+  ///   .write_concern(...)
+  ///   // Required to create the instance of `UpdateOptions`
+  ///   .build()
+  /// ```
   ///
   /// # Example
   /// ```rust,no_run,ignore
-  /// // Find one `User` document by `_id`
-  /// match nongoose.find_by_id::<User>(&ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap()).await {
-  ///   Ok(Some(user)) => println!("User found: {}", user.id),
-  ///   Ok(None) => eprintln!("Cannot find the user"),
-  ///   Err(error) => eprintln!("Error finding user: {}", error),
+  /// // Update the age to 18 if it is under 18
+  /// match nongoose.update_many::<User>(
+  ///   doc! { "age": { "$lt": 18 } },
+  ///   doc! { "$set": { "age": 18 } },
+  ///   None
+  /// ).await {
+  ///   Ok(result) => println!("Modified {} documents", result.modified_count),
+  ///   Err(error) => eprintln!("Error updating users: {}", error),
   /// }
   /// ```
   #[cfg(feature = "async")]
-  pub async fn find_by_id<T>(&self, id: &T::Id) -> Result<Option<T>>
+  pub async fn update_many<T>(
+    &self,
+    conditions: Document,
+    data: Document,
+    options: Option<UpdateOptions>,
+  ) -> Result<UpdateResult>
   where
     T: core::fmt::Debug + Schema + 'static,
   {
-    self.find_one(doc! { "_id": id.clone().into() }, None).await
-  }
-
-  /// Shortcut for saving one document to the database. `Nongoose.create(doc)` does `Schema.save()`.
-  ///
-  /// This function triggers `Schema.save()`.
-  ///
-  /// # Example
-  /// ```rust,no_run,ignore
-  /// // Insert one new `User` document
-  /// match nongoose.create::<User>(&user) {
-  ///   Ok(user) => println!("User saved: {}", user.id),
-  ///   Err(error) => eprintln!("Error saving the user: {}", error),
-  /// }
-  /// ```
-  #[cfg(not(feature = "async"))]
-  pub fn create<T>(&self, data: &T) -> Result<T>
-  where
-    T: Schema + Clone,
-  {
-    data.clone().save()
-  }
-
-  /// Shortcut for saving one document to the database. `Nongoose.create(doc)` does `Schema.save()`.
-  ///
-  /// This function triggers `Schema.save()`.
-  ///
-  /// # Example
-  /// ```rust,no_run,ignore
-  /// // Insert one new `User` document
-  /// match nongoose.create::<User>(&user).await {
-  ///   Ok(user) => println!("User saved: {}", user.id);,
-  ///   Err(error) => eprintln!("Error saving the user: {}", error),
-  /// }
-  /// ```
-  #[cfg(feature = "async")]
-  pub async fn create<T>(&self, data: &T) -> Result<T>
-  where
-    T: Schema + Clone + Send + 'static,
-  {
-    data.clone().save().await
+    let builder = self.builder.clone();
+    spawn_blocking(move || builder.update_many_sync::<T>(conditions, data, options)).await?
   }
 }

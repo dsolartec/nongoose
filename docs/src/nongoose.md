@@ -186,3 +186,46 @@ match nongoose.find_one::<User>(
   Err(error) => eprintln!("Error finding user: {}", error),
 }
 ```
+
+## `Nongoose.update_many()`
+
+**Generics**
+
+- T `Debug + Schema` value of schema to query by
+
+**Arguments**
+
+- conditions `bson::Document`
+- data `bson::Document`
+- options `mongodb::options::UpdateOptions`
+
+**Returns**
+
+- `nongoose::errors::Result<mongodb::results::UpdateResult>`
+
+Updates _all_ documents in the database that match `conditions` without returning them.
+
+**Note** update_many will _not_ fire update middleware (`SchemaBefore::before_update()`).
+
+**Example**
+```rust,no_run
+// Update the age to 18 if it is under 18 (Sync method)
+match nongoose.update_many::<User>(
+  doc! { "age": { "$lt": 18 } },
+  doc! { "$set": { "age": 18 } },
+  None
+) {
+  Ok(result) => println!("Modified {} documents", result.modified_count),
+  Err(error) => eprintln!("Error updating users: {}", error),
+}
+
+// Update the age to 18 if it is under 18 (Async method)
+match nongoose.update_many::<User>(
+  doc! { "age": { "$lt": 18 } },
+  doc! { "$set": { "age": 18 } },
+  None
+).await {
+  Ok(result) => println!("Modified {} documents", result.modified_count),
+  Err(error) => eprintln!("Error updating users: {}", error),
+}
+```

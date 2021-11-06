@@ -1,6 +1,7 @@
 use mongodb::{
   bson::{from_bson, Bson, Document},
-  options::{FindOneOptions, FindOptions},
+  options::{FindOneOptions, FindOptions, UpdateOptions},
+  results::UpdateResult,
   sync::Database,
 };
 
@@ -103,6 +104,32 @@ impl NongooseBuilder {
         Some(document) => from_bson(Bson::Document(document))?,
         None => None,
       },
+    )
+  }
+
+  pub(crate) fn update_many_sync<T>(
+    &self,
+    conditions: Document,
+    data: Document,
+    options: Option<UpdateOptions>,
+  ) -> Result<UpdateResult>
+  where
+    T: core::fmt::Debug + Schema,
+  {
+    let collection_name = T::__get_collection_name();
+
+    if !self.has_schema(&collection_name) {
+      panic!(
+        "Schema is not associated to a Nongoose instance ({})",
+        collection_name
+      );
+    }
+
+    Ok(
+      self
+        .database
+        .collection::<Document>(collection_name.as_str())
+        .update_many(conditions, data, options)?,
     )
   }
 }
