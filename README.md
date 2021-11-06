@@ -69,7 +69,7 @@ $ DATABASE_URL=mongodb://localhost:27017 cargo run --example one-to-many --no-de
 $ DATABASE_URL=mongodb://localhost:27017 cargo run --example one-to-many
 ```
 
-## Tests
+## Tests
 
 ```sh
 # Sync tests
@@ -87,6 +87,6 @@ Check the [COPYING](./COPYING) file for more information.
 
 Thanks to this amazing people for make Nongoose better:
 
-- [@danielsolartech](https://github.com/danielsolartech) - `NextChat Founder`
+- [@danielsolartech](https://github.com/danielsolartech)
 
 > If you help to Nongoose feel free to add here.
