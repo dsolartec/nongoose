@@ -1,6 +1,6 @@
 use mongodb::{
   bson::{from_bson, Bson, Document},
-  options::{FindOneOptions, FindOptions, UpdateOptions},
+  options::{CountOptions, FindOneOptions, FindOptions, UpdateOptions},
   results::UpdateResult,
   sync::Database,
 };
@@ -48,16 +48,39 @@ impl NongooseBuilder {
   }
 
   // Internals
+  pub(crate) fn count_sync<T>(
+    &self,
+    conditions: Document,
+    options: Option<CountOptions>,
+  ) -> Result<u64>
+  where
+    T: Schema,
+  {
+    let collection_name = T::__get_collection_name();
+    if !self.has_schema(&collection_name) {
+      panic!(
+        "Schema is not associated to a Nongoose instance ({})",
+        collection_name
+      );
+    }
+
+    Ok(
+      self
+        .database
+        .collection::<Document>(collection_name.as_str())
+        .count_documents(conditions, options)?,
+    )
+  }
+
   pub(crate) fn find_sync<T>(
     &self,
     conditions: Document,
     options: Option<FindOptions>,
   ) -> Result<Vec<T>>
   where
-    T: core::fmt::Debug + Schema,
+    T: Schema,
   {
     let collection_name = T::__get_collection_name();
-
     if !self.has_schema(&collection_name) {
       panic!(
         "Schema is not associated to a Nongoose instance ({})",
@@ -84,7 +107,7 @@ impl NongooseBuilder {
     options: Option<FindOneOptions>,
   ) -> Result<Option<T>>
   where
-    T: core::fmt::Debug + Schema,
+    T: Schema,
   {
     let collection_name = T::__get_collection_name();
 
@@ -114,7 +137,7 @@ impl NongooseBuilder {
     options: Option<UpdateOptions>,
   ) -> Result<UpdateResult>
   where
-    T: core::fmt::Debug + Schema,
+    T: Schema,
   {
     let collection_name = T::__get_collection_name();
 

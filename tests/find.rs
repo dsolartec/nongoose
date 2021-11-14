@@ -27,6 +27,7 @@ impl Actor {
   }
 }
 
+#[cfg_attr(feature = "async", async_trait::async_trait)]
 impl SchemaBefore for Actor {}
 
 #[cfg(test)]

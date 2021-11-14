@@ -4,7 +4,7 @@ pub(crate) mod globals;
 pub use builder::NongooseBuilder;
 use mongodb::{
   bson::{doc, Document},
-  options::{FindOneOptions, FindOptions, UpdateOptions},
+  options::{CountOptions, FindOneOptions, FindOptions, UpdateOptions},
   results::UpdateResult,
   sync::Database,
 };
@@ -64,6 +64,130 @@ impl Nongoose {
     T: Schema + Clone + Send + 'static,
   {
     data.clone().save().await
+  }
+
+  /// Counts number of documents that match `conditions` in a database collection.
+  ///
+  /// # Options
+  /// ```rust,no_run,ignore
+  /// CountOptions::builder()
+  ///   // Optional (mongodb::options::Collation)
+  ///   // The collation to use for the operation.
+  ///   // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  ///   .collation(...)
+  ///   // Optional (mongodb::options::Hint)
+  ///   // The index to use for the operation.
+  ///   .hint(...)
+  ///   // Optional (i64)
+  ///   // The maximum number of documents to query. If a negative number is specified, the documents will be returned in a single batch limited in number
+  ///   // by the positive value of the specified limit.
+  ///   .limit(...)
+  ///   // Optional (std::time::Duration)
+  ///   // The maximum amount of time to allow the query to run.
+  ///   // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  ///   .max_time(...)
+  ///   // Optional (mongodb::options::ReadConcern)
+  ///   // The read concern to use for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .read_concern(...)
+  ///   // Optional (mongodb::options::SelectionCriteria)
+  ///   // The criteria used to select a server for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .selection_criteria(...)
+  ///   // Optional (u64)
+  ///   // The number of documents to skip before counting.
+  ///   .skip(...)
+  ///   // Required to create the instance of `CountOptions`
+  ///   .build()
+  /// ```
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// // Count users over 18 years of age
+  /// match nongoose.count::<User>(doc! { "age": { "$gte": 18 } }, None) {
+  ///   Ok(users) => println!("Found {} users!", users),
+  ///   Err(error) => eprintln!("Error finding users: {}", error),
+  /// }
+  ///
+  /// // Passing options
+  /// match nongoose.count::<User>(
+  ///   doc! { "age": { "$gte": 18 } },
+  ///   Some(CountOptions::builder().limit(5).build())
+  /// ) {
+  ///   Ok(users) => println!("Found {} users!", users),
+  ///   Err(error) => eprintln!("Error finding users: {}", error),
+  /// }
+  /// ```
+  #[cfg(not(feature = "async"))]
+  pub fn count<T>(&self, conditions: Document, options: Option<CountOptions>) -> Result<u64>
+  where
+    T: Schema,
+  {
+    self.builder.count_sync::<T>(conditions, options)
+  }
+
+  /// Counts number of documents that match `conditions` in a database collection.
+  ///
+  /// # Options
+  /// ```rust,no_run,ignore
+  /// CountOptions::builder()
+  ///   // Optional (mongodb::options::Collation)
+  ///   // The collation to use for the operation.
+  ///   // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  ///   .collation(...)
+  ///   // Optional (mongodb::options::Hint)
+  ///   // The index to use for the operation.
+  ///   .hint(...)
+  ///   // Optional (i64)
+  ///   // The maximum number of documents to query. If a negative number is specified, the documents will be returned in a single batch limited in number
+  ///   // by the positive value of the specified limit.
+  ///   .limit(...)
+  ///   // Optional (std::time::Duration)
+  ///   // The maximum amount of time to allow the query to run.
+  ///   // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  ///   .max_time(...)
+  ///   // Optional (mongodb::options::ReadConcern)
+  ///   // The read concern to use for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .read_concern(...)
+  ///   // Optional (mongodb::options::SelectionCriteria)
+  ///   // The criteria used to select a server for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .selection_criteria(...)
+  ///   // Optional (u64)
+  ///   // The number of documents to skip before counting.
+  ///   .skip(...)
+  ///   // Required to create the instance of `CountOptions`
+  ///   .build()
+  /// ```
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// // Count users over 18 years of age
+  /// match nongoose.count::<User>(doc! { "age": { "$gte": 18 } }, None).await {
+  ///   Ok(users) => println!("Found {} users!", users),
+  ///   Err(error) => eprintln!("Error finding users: {}", error),
+  /// }
+  ///
+  /// // Passing options
+  /// match nongoose
+  ///   .count::<User>(
+  ///     doc! { "age": { "$gte": 18 } },
+  ///     Some(CountOptions::builder().limit(5).build())
+  ///   )
+  ///   .await
+  /// {
+  ///   Ok(users) => println!("Found {} users!", users),
+  ///   Err(error) => eprintln!("Error finding users: {}", error),
+  /// }
+  /// ```
+  #[cfg(feature = "async")]
+  pub async fn count<T>(&self, conditions: Document, options: Option<CountOptions>) -> Result<u64>
+  where
+    T: Schema + Send + 'static,
+  {
+    let builder = self.builder.clone();
+    spawn_blocking(move || builder.count_sync::<T>(conditions, options)).await?
   }
 
   /// Finds documents.
@@ -155,7 +279,7 @@ impl Nongoose {
   ///   Err(error) => eprintln!("Error finding users: {}", error),
   /// }
   ///
-  /// // Passing arguments
+  /// // Passing options
   /// match nongoose.find::<User>(
   ///   doc! { "age": { "$gte": 18 } },
   ///   Some(FindOptions::builder().sort(doc! { "username": 1 }).build())
@@ -167,7 +291,7 @@ impl Nongoose {
   #[cfg(not(feature = "async"))]
   pub fn find<T>(&self, conditions: Document, options: Option<FindOptions>) -> Result<Vec<T>>
   where
-    T: core::fmt::Debug + Schema,
+    T: Schema,
   {
     self.builder.find_sync(conditions, options)
   }
@@ -263,7 +387,7 @@ impl Nongoose {
   ///   Err(error) => eprintln!("Error finding users: {}", error),
   /// }
   ///
-  /// // Passing arguments
+  /// // Passing options
   /// match nongoose.find::<User>(
   ///   doc! { "age": { "$gte": 18 } },
   ///   Some(FindOptions::builder().sort(doc! { "username": 1 }).build())
@@ -275,7 +399,7 @@ impl Nongoose {
   #[cfg(feature = "async")]
   pub async fn find<T>(&self, conditions: Document, options: Option<FindOptions>) -> Result<Vec<T>>
   where
-    T: core::fmt::Debug + Schema + 'static,
+    T: Schema + 'static,
   {
     let builder = self.builder.clone();
     spawn_blocking(move || builder.find_sync(conditions, options)).await?
@@ -298,7 +422,7 @@ impl Nongoose {
   #[cfg(not(feature = "async"))]
   pub fn find_by_id<T>(&self, id: &T::Id) -> Result<Option<T>>
   where
-    T: core::fmt::Debug + Schema,
+    T: Schema,
   {
     self.find_one(doc! { "_id": id.clone().into() }, None)
   }
@@ -320,7 +444,7 @@ impl Nongoose {
   #[cfg(feature = "async")]
   pub async fn find_by_id<T>(&self, id: &T::Id) -> Result<Option<T>>
   where
-    T: core::fmt::Debug + Schema + 'static,
+    T: Schema + 'static,
   {
     self.find_one(doc! { "_id": id.clone().into() }, None).await
   }
@@ -410,7 +534,7 @@ impl Nongoose {
     options: Option<FindOneOptions>,
   ) -> Result<Option<T>>
   where
-    T: core::fmt::Debug + Schema,
+    T: Schema,
   {
     self.builder.find_one_sync(conditions, options)
   }
@@ -500,7 +624,7 @@ impl Nongoose {
     options: Option<FindOneOptions>,
   ) -> Result<Option<T>>
   where
-    T: core::fmt::Debug + Schema + 'static,
+    T: Schema + 'static,
   {
     let builder = self.builder.clone();
     spawn_blocking(move || builder.find_one_sync(conditions, options)).await?
@@ -557,7 +681,7 @@ impl Nongoose {
     options: Option<UpdateOptions>,
   ) -> Result<UpdateResult>
   where
-    T: core::fmt::Debug + Schema,
+    T: Schema,
   {
     self
       .builder
@@ -615,7 +739,7 @@ impl Nongoose {
     options: Option<UpdateOptions>,
   ) -> Result<UpdateResult>
   where
-    T: core::fmt::Debug + Schema + 'static,
+    T: Schema + 'static,
   {
     let builder = self.builder.clone();
     spawn_blocking(move || builder.update_many_sync::<T>(conditions, data, options)).await?
