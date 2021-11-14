@@ -145,6 +145,26 @@ pub trait Schema: SchemaBefore {
     spawn_blocking(move || self.__populate_sync(field)).await?
   }
 
+  #[cfg(not(feature = "async"))]
+  fn remove(&self) -> Result<bool> {
+    let db = Self::__get_database(None);
+    let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
+
+    let result = collection.delete_one(self.__get_id_query(), None)?;
+    Ok(result.deleted_count == 1)
+  }
+
+  #[cfg(feature = "async")]
+  async fn remove(&self) -> Result<bool> {
+    let db = Self::__get_database(None);
+    let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
+
+    let id = self.__get_id_query();
+
+    let result = spawn_blocking(move || collection.delete_one(id, None)).await??;
+    Ok(result.deleted_count == 1)
+  }
+
   /// Saves this document by inserting a new document into the database if it does not exist before, or sends an `replace_one` operation with the modifications to the database.
   ///
   /// If the document needs to be inserted to the database, the `SchemaBefore.before_create()` method is called before insert the document;
@@ -207,11 +227,13 @@ pub trait Schema: SchemaBefore {
 
     self.__check_unique_fields()?;
 
-    if collection
-      .find_one(Some(self.__get_id_query()), None)?
-      .is_some()
-    {
+    let id_query = self.__get_id_query();
+    let result = spawn_blocking(move || collection.find_one(Some(id_query), None)).await??;
+
+    if result.is_some() {
       self.before_update(db).await?;
+
+      let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
 
       let id_query = self.__get_id_query();
       let document = self.__to_document()?;
@@ -226,6 +248,8 @@ pub trait Schema: SchemaBefore {
       .await??;
     } else {
       self.before_create(db).await?;
+
+      let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
 
       let document = self.__to_document()?;
       spawn_blocking(move || collection.insert_one(document, None)).await??;
