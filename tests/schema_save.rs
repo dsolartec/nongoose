@@ -58,7 +58,7 @@ fn get_instance() -> Nongoose {
 
 #[cfg(not(feature = "async"))]
 #[test]
-fn save() {
+fn schema_save() {
   let _nongoose = get_instance();
 
   let mut dog = Animal::new(AnimalType::Dog, "dog");
@@ -91,7 +91,7 @@ fn save() {
 
 #[cfg(feature = "async")]
 #[cfg_attr(feature = "async", tokio::test)]
-async fn save() {
+async fn schema_save() {
   let _nongoose = get_instance();
 
   let mut dog = Animal::new(AnimalType::Dog, "dog");
