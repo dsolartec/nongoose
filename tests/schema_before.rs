@@ -79,8 +79,8 @@ fn get_instance() -> Nongoose {
 }
 
 #[cfg(not(feature = "async"))]
-#[test]
-fn before_create() {
+#[cfg_attr(not(feature = "async"), test)]
+fn schema_before_create() {
   let nongoose = get_instance();
 
   let mut user = User::new("nongoose", "password");
@@ -103,7 +103,7 @@ fn before_create() {
 
 #[cfg(feature = "async")]
 #[cfg_attr(feature = "async", tokio::test)]
-async fn before_create() {
+async fn schema_before_create() {
   let nongoose = get_instance();
 
   let mut user = User::new("nongoose", "password");
