@@ -47,28 +47,6 @@ async fn main() {
 }
 ```
 
-## Examples
-
-1. [Many to One relation](./examples/many-to-one.rs)
-
-```sh
-# Sync example
-$ DATABASE_URL=mongodb://localhost:27017 cargo run --example many-to-one --no-default-features --features derive
-
-# Async example
-$ DATABASE_URL=mongodb://localhost:27017 cargo run --example many-to-one
-```
-
-2. [One to Many relation](./examples/one-to-many.rs)
-
-```sh
-# Sync example
-$ DATABASE_URL=mongodb://localhost:27017 cargo run --example one-to-many --no-default-features --features derive
-
-# Async example
-$ DATABASE_URL=mongodb://localhost:27017 cargo run --example one-to-many
-```
-
 ## Tests
 
 ```sh

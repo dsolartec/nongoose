@@ -1,8 +1,7 @@
-use mongodb::{
-  bson::{doc, oid::ObjectId},
-  sync::Client,
+use nongoose::{
+  mongodb::{bson::{doc, oid::ObjectId}, sync::Client},
+  schema_relations, Nongoose, Schema, SchemaBefore
 };
-use nongoose::{schema_relations, Nongoose, Schema, SchemaBefore};
 use serde::{Deserialize, Serialize};
 
 #[schema_relations]
