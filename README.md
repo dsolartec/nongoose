@@ -7,8 +7,7 @@ ODM for MongoDB based on Mongoose and written in Rust
 ## Basic usage
 
 ```rust
-use mongodb::{bson::oid::ObjectId, sync::Client};
-use nongoose::Schema;
+use nongoose::{bson::oid::ObjectId, Client, Schema};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Schema, Serialize)]
