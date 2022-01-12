@@ -1,7 +1,17 @@
 [package]
 name = "nongoose-derive"
 version = "0.1.0-beta.1"
+authors = [
+  "Daniel Solarte <contact@danielsolarte.com>"
+]
+license = "GPL-3.0"
+description = "Macros implementation of #[derive(Schema)]"
 edition = "2018"
+homepage = "https://nongoose.danielsolarte.com"
+documentation = "https://docs.rs/nongoose"
+repository = "https://github.com/danielsolartech/nongoose"
+keywords = ["nongoose"]
+include = ["src/**/*.rs", "../COPYING", "../README.md"]
 
 [lib]
 proc-macro = true

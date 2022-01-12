@@ -12,6 +12,7 @@ documentation = "https://docs.rs/nongoose"
 repository = "https://github.com/danielsolartech/nongoose"
 categories = ["database"]
 keywords = ["async", "odm", "mongodb", "tokio"]
+include = ["src/**/*.rs", "COPYING", "README.md"]
 
 [workspace]
 members = ["./derive/"]
