@@ -1,14 +1,13 @@
 # Nongoose
 
-![Crates.io version](https://img.shields.io/crates/v/nongoose?label=version) ![Crates.io downloads](https://img.shields.io/crates/d/nongoose?label=downloads) ![License](https://img.shields.io/github/license/nextchatorg/nongoose) ![GitHub repository stars](https://img.shields.io/github/stars/nextchatorg/nongoose?style=social)
+![Crates.io version](https://img.shields.io/crates/v/nongoose?label=version) ![Crates.io downloads](https://img.shields.io/crates/d/nongoose?label=downloads) ![License](https://img.shields.io/github/license/danielsolartech/nongoose) ![GitHub repository stars](https://img.shields.io/github/stars/danielsolartech/nongoose?style=social)
 
-MongoDB ODM for Rust based on Mongoose
+ODM for MongoDB based on Mongoose and written in Rust
 
 ## Basic usage
 
 ```rust
-use mongodb::{bson::oid::ObjectId, sync::Client};
-use nongoose::Schema;
+use nongoose::{bson::oid::ObjectId, Client, Schema};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Schema, Serialize)]
@@ -47,35 +46,13 @@ async fn main() {
 }
 ```
 
-## Examples
-
-1. [Many to One relation](./examples/many-to-one.rs)
-
-```sh
-# Sync example
-$ DATABASE_URL=mongodb://localhost:27017 cargo run --example many-to-one --no-default-features --features derive
-
-# Async example
-$ DATABASE_URL=mongodb://localhost:27017 cargo run --example many-to-one
-```
-
-2. [One to Many relation](./examples/one-to-many.rs)
-
-```sh
-# Sync example
-$ DATABASE_URL=mongodb://localhost:27017 cargo run --example one-to-many --no-default-features --features derive
-
-# Async example
-$ DATABASE_URL=mongodb://localhost:27017 cargo run --example one-to-many
-```
-
 ## Tests
 
 ```sh
 # Sync tests
-$ DATABASE_URL=mongodb://localhost:27017 cargo test --no-default-features --features derive
+$ DATABASE_URL=mongodb://localhost:27017 cargo test --no-default-features --features derive,sync
 
-# Async tests
+# Async tests (Tokio runtime)
 $ DATABASE_URL=mongodb://localhost:27017 cargo test
 ```
 

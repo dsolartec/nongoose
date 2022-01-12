@@ -11,7 +11,7 @@ pub(crate) fn getter(schema_data: &SchemaData<'_>) -> TokenStream {
     let convert_ident = format_ident!("{}", lit.value());
 
     quote! {
-      type Id = #nongoose::mongodb::bson::Bson;
+      type Id = #nongoose::bson::Bson;
 
       fn __get_id(&self) -> Self::Id {
         #convert_ident(self.#id_field_ident.clone())

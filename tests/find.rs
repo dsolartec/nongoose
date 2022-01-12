@@ -1,10 +1,7 @@
 use nongoose::{
-  mongodb::{
-    bson::{doc, oid::ObjectId, Regex},
-    options::FindOptions,
-    sync::Client,
-  },
-  Nongoose, Schema, SchemaBefore,
+  bson::{doc, oid::ObjectId, Regex},
+  options::FindOptions,
+  Client, Nongoose, Schema, SchemaBefore,
 };
 use serde::{Deserialize, Serialize};
 
@@ -27,7 +24,7 @@ impl Actor {
   }
 }
 
-#[cfg_attr(feature = "async", async_trait::async_trait)]
+#[cfg_attr(feature = "tokio-runtime", async_trait::async_trait)]
 impl SchemaBefore for Actor {}
 
 #[cfg(test)]
@@ -48,13 +45,13 @@ fn get_instance() -> Nongoose {
     }
   };
 
-  Nongoose::build(client.database("nongoose"))
+  Nongoose::builder(client.database("nongoose"))
     .add_schema::<Actor>()
-    .finish()
+    .build()
 }
 
-#[cfg(not(feature = "async"))]
-#[cfg_attr(not(feature = "async"), test)]
+#[cfg(feature = "sync")]
+#[cfg_attr(feature = "sync", test)]
 fn find() {
   let nongoose = get_instance();
 
@@ -128,8 +125,8 @@ fn find() {
   assert_eq!(tom_actors[1].fullname, tom_cruise.fullname);
 }
 
-#[cfg(feature = "async")]
-#[cfg_attr(feature = "async", tokio::test)]
+#[cfg(feature = "tokio-runtime")]
+#[cfg_attr(feature = "tokio-runtime", tokio::test)]
 async fn find() {
   let nongoose = get_instance();
 

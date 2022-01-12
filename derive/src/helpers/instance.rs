@@ -5,12 +5,12 @@ pub(crate) fn getter() -> TokenStream {
   let nongoose = crate::utils::crates::get_nongoose_crate_name();
 
   quote! {
-    fn __get_database(database: Option<#nongoose::mongodb::sync::Database>) -> &'static #nongoose::mongodb::sync::Database {
+    fn __get_database(database: Option<#nongoose::Database>) -> &'static #nongoose::Database {
       use #nongoose::re_exports::OnceCell;
 
       let collection_name = Self::__get_collection_name();
 
-      static DATABASE: OnceCell<#nongoose::mongodb::sync::Database> = OnceCell::new();
+      static DATABASE: OnceCell<#nongoose::Database> = OnceCell::new();
 
       if let Some(database) = DATABASE.get() {
         return database;

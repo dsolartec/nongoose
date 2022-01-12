@@ -1,6 +1,6 @@
 use nongoose::{
-  mongodb::{bson::oid::ObjectId, sync::Client},
-  schema_relations, Nongoose, Schema, SchemaBefore,
+  schema_relations, bson::oid::ObjectId,
+  Client, Nongoose, Schema, SchemaBefore,
 };
 use serde::{Deserialize, Serialize};
 
@@ -23,7 +23,7 @@ impl User {
   }
 }
 
-#[cfg_attr(feature = "async", async_trait::async_trait)]
+#[cfg_attr(feature = "tokio-runtime", async_trait::async_trait)]
 impl SchemaBefore for User {}
 
 #[schema_relations]
@@ -42,7 +42,7 @@ struct UserFriend {
   pub to: Option<User>,
 }
 
-#[cfg_attr(feature = "async", async_trait::async_trait)]
+#[cfg_attr(feature = "tokio-runtime", async_trait::async_trait)]
 impl SchemaBefore for UserFriend {}
 
 fn get_instance() -> Nongoose {
@@ -68,8 +68,8 @@ fn get_instance() -> Nongoose {
     .finish()
 }
 
-#[cfg(not(feature = "async"))]
-fn run_sync(nongoose: Nongoose, user_friend_id: &ObjectId) -> nongoose::errors::Result<UserFriend> {
+#[cfg(feature = "sync")]
+fn run_sync(nongoose: Nongoose, user_friend_id: &ObjectId) -> nongoose::Result<UserFriend> {
   let user_friends = nongoose.find_by_id::<UserFriend>(user_friend_id);
 
   match user_friends {
@@ -92,11 +92,11 @@ fn run_sync(nongoose: Nongoose, user_friend_id: &ObjectId) -> nongoose::errors::
   }
 }
 
-#[cfg(feature = "async")]
+#[cfg(feature = "tokio-runtime")]
 async fn run_async(
   nongoose: Nongoose,
   user_friend_id: &ObjectId,
-) -> nongoose::errors::Result<UserFriend> {
+) -> nongoose::Result<UserFriend> {
   let user_friends = nongoose.find_by_id::<UserFriend>(user_friend_id).await;
 
   match user_friends {
@@ -120,8 +120,8 @@ async fn run_async(
   }
 }
 
-#[cfg(not(feature = "async"))]
-fn main() -> nongoose::errors::Result<()> {
+#[cfg(feature = "sync")]
+fn main() -> nongoose::Result<()> {
   let user_friend_id = ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap();
   let nongoose = get_instance();
 
@@ -131,9 +131,9 @@ fn main() -> nongoose::errors::Result<()> {
   Ok(())
 }
 
-#[cfg(feature = "async")]
-#[cfg_attr(feature = "async", tokio::main)]
-async fn main() -> nongoose::errors::Result<()> {
+#[cfg(feature = "tokio-runtime")]
+#[cfg_attr(feature = "tokio-runtime", tokio::main)]
+async fn main() -> nongoose::Result<()> {
   let user_friend_id = ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap();
   let nongoose = get_instance();
 

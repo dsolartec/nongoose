@@ -21,7 +21,7 @@ pub(crate) fn getter(schema_data: &SchemaData) -> TokenStream {
       static_relations.extend(quote! {
         #nongoose::types::SchemaRelation {
           field_ident: #field_ident_name.to_string(),
-          field_value: #nongoose::mongodb::bson::Bson::Null,
+          field_value: #nongoose::bson::Bson::Null,
 
           relation_type: #nongoose::types::SchemaRelationType::parse_str(#relation_type).unwrap(),
 
@@ -66,7 +66,7 @@ pub(crate) fn getter(schema_data: &SchemaData) -> TokenStream {
 
       set_relations.extend(quote! {
         if field == #field_ident_name {
-          self.#field_ident = #nongoose::mongodb::bson::from_bson(new_value)?;
+          self.#field_ident = #nongoose::bson::from_bson(new_value)?;
           return Ok(());
         }
       });
@@ -87,9 +87,9 @@ pub(crate) fn getter(schema_data: &SchemaData) -> TokenStream {
           }
         }
 
-        fn __set_relations(&mut self, field: &str, new_value: #nongoose::mongodb::bson::Bson) -> #nongoose::errors::Result<()> {
+        fn __set_relations(&mut self, field: &str, new_value: #nongoose::bson::Bson) -> #nongoose::Result<()> {
           #set_relations
-          Err(#nongoose::errors::Error::NoImplemented)
+          Err(#nongoose::Error::NoImplemented)
         }
       };
     }
@@ -104,7 +104,7 @@ pub(crate) fn getter(schema_data: &SchemaData) -> TokenStream {
       None
     }
 
-    fn __set_relations(&mut self, _field: &str, _new_value: #nongoose::mongodb::bson::Bson) -> #nongoose::errors::Result<()> {
+    fn __set_relations(&mut self, _field: &str, _new_value: #nongoose::bson::Bson) -> #nongoose::Result<()> {
       Ok(())
     }
   }

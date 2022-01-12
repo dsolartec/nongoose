@@ -1,8 +1,6 @@
-use mongodb::{
-  bson::{doc, oid::ObjectId},
-  sync::Client,
+use nongoose::{
+  schema_relations, bson::{doc, oid::ObjectId}, Client, Nongoose, Schema, SchemaBefore
 };
-use nongoose::{schema_relations, Nongoose, Schema, SchemaBefore};
 use serde::{Deserialize, Serialize};
 
 #[schema_relations]
@@ -30,7 +28,7 @@ impl Author {
   }
 }
 
-#[cfg_attr(feature = "async", async_trait::async_trait)]
+#[cfg_attr(feature = "tokio-runtime", async_trait::async_trait)]
 impl SchemaBefore for Author {}
 
 #[schema_relations]
@@ -67,7 +65,7 @@ impl Post {
   }
 }
 
-#[cfg_attr(feature = "async", async_trait::async_trait)]
+#[cfg_attr(feature = "tokio-runtime", async_trait::async_trait)]
 impl SchemaBefore for Post {}
 
 fn get_instance() -> Nongoose {
@@ -93,8 +91,8 @@ fn get_instance() -> Nongoose {
     .finish()
 }
 
-#[cfg(not(feature = "async"))]
-fn main() -> nongoose::errors::Result<()> {
+#[cfg(feature = "sync")]
+fn main() -> nongoose::Result<()> {
   let nongoose = get_instance();
 
   if let Some(author) = nongoose.find_one::<Author>(doc! { "username": "nongoose" }, None)? {
@@ -119,9 +117,9 @@ fn main() -> nongoose::errors::Result<()> {
   Ok(())
 }
 
-#[cfg(feature = "async")]
-#[cfg_attr(feature = "async", tokio::main)]
-async fn main() -> nongoose::errors::Result<()> {
+#[cfg(feature = "tokio-runtime")]
+#[cfg_attr(feature = "tokio-runtime", tokio::main)]
+async fn main() -> nongoose::Result<()> {
   let nongoose = get_instance();
 
   if let Some(author) = nongoose

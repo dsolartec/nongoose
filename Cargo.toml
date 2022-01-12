@@ -5,10 +5,11 @@ authors = [
   "Daniel Solarte <contact@danielsolarte.com>"
 ]
 license = "GPL-3.0"
-description = "MongoDB ODM for Rust based on Mongoose"
+description = "ODM for MongoDB based on Mongoose"
 edition = "2018"
+homepage = "https://nongoose.danielsolarte.com"
 documentation = "https://docs.rs/nongoose"
-repository = "https://github.com/NextChatORG/nongoose"
+repository = "https://github.com/danielsolartech/nongoose"
 categories = ["database"]
 keywords = ["async", "odm", "mongodb", "tokio"]
 
@@ -17,20 +18,15 @@ members = ["./derive/"]
 
 [dependencies]
 async-trait = { optional = true, version = "0.1" }
-mongodb = { default-features = false, features = ["bson-chrono-0_4", "bson-uuid-0_8", "sync"], version = "2.0.0-beta.2" }
-nongoose-derive = { optional = true, path = "./derive/", version = "0.1.0" }
+mongodb = { default-features = false, features = ["bson-chrono-0_4", "bson-uuid-0_8", "sync"], version = "2.1.0" }
+nongoose-derive = { optional = true, path = "./derive/", version = "0.1.0-beta.1" }
 once_cell = "1"
 serde = { features = ["derive"], version = "1" }
 thiserror = "1"
 tokio = { features = ["macros"], optional = true, version = "1" }
 
-[[example]]
-name = "many-to-one"
-
-[[example]]
-name = "one-to-many"
-
 [features]
-default = ["async", "derive"]
-async = ["async-trait", "tokio"]
+default = ["derive", "tokio-runtime"]
 derive = ["nongoose-derive"]
+sync = []
+tokio-runtime = ["async-trait", "tokio"]

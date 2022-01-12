@@ -33,9 +33,9 @@ pub(crate) fn parse(input: &DeriveInput) -> TokenStream {
       #relations_getter
     }
 
-    impl From<#ident> for #nongoose::mongodb::bson::Bson {
+    impl From<#ident> for #nongoose::bson::Bson {
       fn from(key: #ident) -> Self {
-        match #nongoose::mongodb::bson::to_bson(&key) {
+        match #nongoose::bson::to_bson(&key) {
           Ok(bson) => bson,
           Err(e) => panic!("Cannot parse the Schema as BSON (name: {})", <#ident as #nongoose::Schema>::__get_collection_name()),
         }

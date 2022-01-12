@@ -54,7 +54,7 @@ jobs:
       - name: Check cargo-clippy
         run: |
           cargo clippy --all-targets -- -D warnings
-          cargo clippy --all-targets --no-default-features --features derive -- -D warnings
+          cargo clippy --all-targets --no-default-features --features derive,sync -- -D warnings
 
       - name: Check tests
         env:
@@ -62,14 +62,7 @@ jobs:
         run: |
           cargo test
           ./scripts/drop-database
-          cargo test --no-default-features --features derive
+          cargo test --no-default-features --features derive,sync
           ./scripts/drop-database
-          cargo test --no-default-features --features derive,async
+          cargo test --no-default-features --features derive,tokio-runtime
           ./scripts/drop-database
-
-      - name: Run examples
-        env:
-          DATABASE_URL: 'mongodb://localhost:27017/'
-        run: |
-          ./scripts/run-sync-examples
-          ./scripts/run-async-examples

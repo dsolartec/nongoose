@@ -12,4 +12,5 @@
 - [Building your first instance](./building-your-first-instance.md)
 - [Examples](./examples/README.md)
   - [One to Many relation](./examples/one-to-many-relation.md)
+  - [Many to One relation](./examples/many-to-one-relation.md)
 - [Feature flags](./feature-flags.md)

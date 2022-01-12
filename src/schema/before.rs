@@ -1,29 +1,71 @@
 use mongodb::{bson::Bson, sync::Database};
 use serde::{de::DeserializeOwned, Serialize};
 
-use crate::errors::Result;
+use crate::error::Result;
 
 /// Schema before functions
 ///
 /// This trait is defined through the [`async-trait`](https://crates.io/crates/async-trait) macro.
-#[cfg_attr(feature = "async", async_trait::async_trait)]
+#[cfg_attr(feature = "tokio-runtime", async_trait::async_trait)]
 pub trait SchemaBefore: DeserializeOwned + Serialize + Send + Into<Bson> + Clone {
-  #[cfg(not(feature = "async"))]
+  /// Executes a custom validation before insert the document to the database.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// impl SchemaBefore for User {
+  ///   fn before_create(&mut self, _db: &Database) -> Result<()> {
+  ///     Ok(())
+  ///   }
+  /// }
+  /// ```
+  #[cfg(feature = "sync")]
   fn before_create(&mut self, _db: &Database) -> Result<()> {
     Ok(())
   }
 
-  #[cfg(feature = "async")]
+  /// Executes a custom validation before insert the document to the database.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// #[async_trait::async_trait]
+  /// impl SchemaBefore for User {
+  ///   async fn before_create(&mut self, _db: &Database) -> Result<()> {
+  ///     Ok(())
+  ///   }
+  /// }
+  /// ```
+  #[cfg(feature = "tokio-runtime")]
   async fn before_create(&mut self, _db: &Database) -> Result<()> {
     Ok(())
   }
 
-  #[cfg(not(feature = "async"))]
+  /// Executes a custom validation before replace the document in the database (called on `Schema.save()`).
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// impl SchemaBefore for User {
+  ///   fn before_update(&mut self, _db: &Database) -> Result<()> {
+  ///     Ok(())
+  ///   }
+  /// }
+  /// ```
+  #[cfg(feature = "sync")]
   fn before_update(&mut self, _db: &Database) -> Result<()> {
     Ok(())
   }
 
-  #[cfg(feature = "async")]
+  /// Executes a custom validation before replace the document in the database (called on `Schema.save()`).
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// #[async_trait::async_trait]
+  /// impl SchemaBefore for User {
+  ///   async fn before_update(&mut self, _db: &Database) -> Result<()> {
+  ///     Ok(())
+  ///   }
+  /// }
+  /// ```
+  #[cfg(feature = "tokio-runtime")]
   async fn before_update(&mut self, _db: &Database) -> Result<()> {
     Ok(())
   }

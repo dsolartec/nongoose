@@ -1,8 +1,4 @@
-use mongodb::{
-  bson::oid::ObjectId,
-  sync::{Client, Database},
-};
-use nongoose::{Nongoose, Schema, SchemaBefore};
+use nongoose::{bson::oid::ObjectId, Client, Database, Nongoose, Schema, SchemaBefore};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Schema, Serialize)]
@@ -40,16 +36,16 @@ impl User {
   }
 }
 
-#[cfg_attr(feature = "async", async_trait::async_trait)]
+#[cfg_attr(feature = "tokio-runtime", async_trait::async_trait)]
 impl SchemaBefore for User {
-  #[cfg(not(feature = "async"))]
-  fn before_create(&mut self, _db: &Database) -> nongoose::errors::Result<()> {
+  #[cfg(feature = "sync")]
+  fn before_create(&mut self, _db: &Database) -> nongoose::Result<()> {
     self.change_password();
     Ok(())
   }
 
-  #[cfg(feature = "async")]
-  async fn before_create(&mut self, _db: &Database) -> nongoose::errors::Result<()> {
+  #[cfg(feature = "tokio-runtime")]
+  async fn before_create(&mut self, _db: &Database) -> nongoose::Result<()> {
     self.change_password();
     Ok(())
   }
@@ -73,13 +69,13 @@ fn get_instance() -> Nongoose {
     }
   };
 
-  Nongoose::build(client.database("nongoose"))
+  Nongoose::builder(client.database("nongoose"))
     .add_schema::<User>()
-    .finish()
+    .build()
 }
 
-#[cfg(not(feature = "async"))]
-#[cfg_attr(not(feature = "async"), test)]
+#[cfg(feature = "sync")]
+#[cfg_attr(feature = "sync", test)]
 fn schema_before_create() {
   let nongoose = get_instance();
 
@@ -101,8 +97,8 @@ fn schema_before_create() {
   assert_eq!(check_user.password, user.password);
 }
 
-#[cfg(feature = "async")]
-#[cfg_attr(feature = "async", tokio::test)]
+#[cfg(feature = "tokio-runtime")]
+#[cfg_attr(feature = "tokio-runtime", tokio::test)]
 async fn schema_before_create() {
   let nongoose = get_instance();
 
