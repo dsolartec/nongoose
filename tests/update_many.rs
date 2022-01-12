@@ -1,8 +1,7 @@
-use mongodb::{
+use nongoose::{
   bson::{doc, oid::ObjectId},
-  sync::Client,
+  Client, Nongoose, Schema, SchemaBefore,
 };
-use nongoose::{Nongoose, Schema, SchemaBefore};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Schema, Serialize)]
@@ -24,6 +23,7 @@ impl Article {
   }
 }
 
+#[cfg_attr(feature = "tokio-runtime", async_trait::async_trait)]
 impl SchemaBefore for Article {}
 
 #[cfg(test)]
@@ -44,13 +44,13 @@ fn get_instance() -> Nongoose {
     }
   };
 
-  Nongoose::build(client.database("nongoose"))
+  Nongoose::builder(client.database("nongoose"))
     .add_schema::<Article>()
-    .finish()
+    .build()
 }
 
-#[cfg(not(feature = "async"))]
-#[test]
+#[cfg(feature = "sync")]
+#[cfg_attr(feature = "sync", test)]
 fn update_many() {
   let nongoose = get_instance();
 
@@ -106,8 +106,8 @@ fn update_many() {
   assert_eq!(new_article_two.content, new_article_one.content);
 }
 
-#[cfg(feature = "async")]
-#[cfg_attr(feature = "async", tokio::test)]
+#[cfg(feature = "tokio-runtime")]
+#[cfg_attr(feature = "tokio-runtime", tokio::test)]
 async fn update_many() {
   let nongoose = get_instance();
 

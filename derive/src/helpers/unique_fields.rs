@@ -18,7 +18,7 @@ pub(crate) fn getter(schema_data: &SchemaData) -> TokenStream {
         let convert_ident = format_ident!("{}", lit.value());
         idents.extend(quote! {
           (
-            #nongoose::mongodb::bson::doc! { #ident_str: #convert_ident(#value.clone()) },
+            #nongoose::bson::doc! { #ident_str: #convert_ident(#value.clone()) },
             #ident_str,
             #value.clone().to_string(),
           ),
@@ -26,7 +26,7 @@ pub(crate) fn getter(schema_data: &SchemaData) -> TokenStream {
       } else {
         idents.extend(quote! {
           (
-            #nongoose::mongodb::bson::doc! { #ident_str: #value.clone() },
+            #nongoose::bson::doc! { #ident_str: #value.clone() },
             #ident_str,
             #value.clone().to_string(),
           ),
@@ -35,16 +35,16 @@ pub(crate) fn getter(schema_data: &SchemaData) -> TokenStream {
     }
 
     quote! {
-      fn __check_unique_fields(&self) -> #nongoose::errors::Result<()> {
+      fn __check_unique_fields(&self) -> #nongoose::Result<()> {
         let data = vec![#idents];
         for (document, field, value) in data {
           if let Some(doc) = Self::__get_database(None)
-            .collection::<#nongoose::mongodb::bson::Document>(Self::__get_collection_name().as_str())
+            .collection::<#nongoose::bson::Document>(Self::__get_collection_name().as_str())
             .find_one(document, None)?
           {
-            let data: Self = #nongoose::mongodb::bson::from_bson(#nongoose::mongodb::bson::Bson::Document(doc))?;
+            let data: Self = #nongoose::bson::from_bson(#nongoose::bson::Bson::Document(doc))?;
             if self.__get_id() != data.__get_id() {
-              return Err(#nongoose::errors::Error::DuplicatedSchemaField(field.to_string(), value.to_string()));
+              return Err(#nongoose::Error::DuplicatedSchemaField(field.to_string(), value.to_string()));
             }
           }
         }
@@ -54,7 +54,7 @@ pub(crate) fn getter(schema_data: &SchemaData) -> TokenStream {
     }
   } else {
     quote! {
-      fn __check_unique_fields(&self) -> #nongoose::errors::Result<()> {
+      fn __check_unique_fields(&self) -> #nongoose::Result<()> {
         Ok(())
       }
     }

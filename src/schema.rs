@@ -1,5 +1,10 @@
 mod before;
 mod data;
+
+/// Schema types:
+///
+/// - Type of the relation.
+/// - Data of the relation.
 pub mod types;
 
 pub use before::SchemaBefore;
@@ -9,18 +14,21 @@ use mongodb::{
   options::ReplaceOptions,
   sync::Database,
 };
-#[cfg(feature = "async")]
+#[cfg(feature = "tokio-runtime")]
 use tokio::task::spawn_blocking;
 
-use crate::errors::Result;
+use crate::error::Result;
 
 use self::types::SchemaRelationType;
 
 /// Schema
 ///
 /// This trait is defined through the [`async-trait`](https://crates.io/crates/async-trait) macro.
-#[cfg_attr(feature = "async", async_trait::async_trait)]
+#[cfg_attr(feature = "tokio-runtime", async_trait::async_trait)]
 pub trait Schema: SchemaBefore {
+  /// `_id` field of the Document.
+  ///
+  /// In the Schema is defined as `#[schema(id)]`
   type Id: Into<Bson> + Clone + Send;
 
   #[doc(hidden)]
@@ -122,7 +130,7 @@ pub trait Schema: SchemaBefore {
   ///   Err(error) => eprintln!("Error populating user: {}", error),
   /// }
   /// ```
-  #[cfg(not(feature = "async"))]
+  #[cfg(feature = "sync")]
   fn populate(mut self, field: &str) -> Result<Self> {
     self.__populate_sync(field)
   }
@@ -137,7 +145,7 @@ pub trait Schema: SchemaBefore {
   ///   Err(error) => eprintln!("Error populating user: {}", error),
   /// }
   /// ```
-  #[cfg(feature = "async")]
+  #[cfg(feature = "tokio-runtime")]
   async fn populate(mut self, field: &'static str) -> Result<Self>
   where
     Self: 'static,
@@ -145,7 +153,17 @@ pub trait Schema: SchemaBefore {
     spawn_blocking(move || self.__populate_sync(field)).await?
   }
 
-  #[cfg(not(feature = "async"))]
+  /// Removes this document from the db.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// match user.remove() {
+  ///   Ok(true) => println!("The user was deleted!"),
+  ///   Ok(false) => println!("The user could not be deleted!"),
+  ///   Err(error) => eprintln!("Error deleting the user: {}", error),
+  /// }
+  /// ```
+  #[cfg(feature = "sync")]
   fn remove(&self) -> Result<bool> {
     let db = Self::__get_database(None);
     let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
@@ -154,7 +172,17 @@ pub trait Schema: SchemaBefore {
     Ok(result.deleted_count == 1)
   }
 
-  #[cfg(feature = "async")]
+  /// Removes this document from the db.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// match user.remove().await {
+  ///   Ok(true) => println!("The user was deleted!"),
+  ///   Ok(false) => println!("The user could not be deleted!"),
+  ///   Err(error) => eprintln!("Error deleting the user: {}", error),
+  /// }
+  /// ```
+  #[cfg(feature = "tokio-runtime")]
   async fn remove(&self) -> Result<bool> {
     let db = Self::__get_database(None);
     let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
@@ -177,7 +205,7 @@ pub trait Schema: SchemaBefore {
   ///   Err(error) => eprintln!("Error saving user: {}", error),
   /// }
   /// ```
-  #[cfg(not(feature = "async"))]
+  #[cfg(feature = "sync")]
   fn save(&mut self) -> Result<Self> {
     let db = Self::__get_database(None);
     let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
@@ -220,7 +248,7 @@ pub trait Schema: SchemaBefore {
   ///   Err(error) => eprintln!("Error saving user: {}", error),
   /// }
   /// ```
-  #[cfg(feature = "async")]
+  #[cfg(feature = "tokio-runtime")]
   async fn save(&mut self) -> Result<Self> {
     let db = Self::__get_database(None);
     let collection = db.collection::<Document>(Self::__get_collection_name().as_str());

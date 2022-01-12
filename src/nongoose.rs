@@ -8,18 +8,22 @@ use mongodb::{
   results::UpdateResult,
   sync::Database,
 };
-#[cfg(feature = "async")]
+#[cfg(feature = "tokio-runtime")]
 use tokio::task::spawn_blocking;
 
-use crate::{errors::Result, Schema};
+use crate::{error::Result, Schema};
 
+/// Nongoose instance
 #[derive(Clone)]
+#[non_exhaustive]
 pub struct Nongoose {
   builder: NongooseBuilder,
 }
 
 impl Nongoose {
-  pub fn build(database: Database) -> NongooseBuilder {
+  /// Create a builder for building `Nongoose`. On the builder, call `.add_schema::<Schema>()` (Optional).
+  /// Finally, call `.build()` to create an instance of `Nongoose`.
+  pub fn builder(database: Database) -> NongooseBuilder {
     NongooseBuilder {
       database,
       schemas: Vec::new(),
@@ -38,7 +42,7 @@ impl Nongoose {
   ///   Err(error) => eprintln!("Error saving the user: {}", error),
   /// }
   /// ```
-  #[cfg(not(feature = "async"))]
+  #[cfg(feature = "sync")]
   pub fn create<T>(&self, data: &T) -> Result<T>
   where
     T: Schema + Clone,
@@ -58,7 +62,7 @@ impl Nongoose {
   ///   Err(error) => eprintln!("Error saving the user: {}", error),
   /// }
   /// ```
-  #[cfg(feature = "async")]
+  #[cfg(feature = "tokio-runtime")]
   pub async fn create<T>(&self, data: &T) -> Result<T>
   where
     T: Schema + Clone + Send + 'static,
@@ -118,7 +122,7 @@ impl Nongoose {
   ///   Err(error) => eprintln!("Error finding users: {}", error),
   /// }
   /// ```
-  #[cfg(not(feature = "async"))]
+  #[cfg(feature = "sync")]
   pub fn count<T>(&self, conditions: Document, options: Option<CountOptions>) -> Result<u64>
   where
     T: Schema,
@@ -181,7 +185,7 @@ impl Nongoose {
   ///   Err(error) => eprintln!("Error finding users: {}", error),
   /// }
   /// ```
-  #[cfg(feature = "async")]
+  #[cfg(feature = "tokio-runtime")]
   pub async fn count<T>(&self, conditions: Document, options: Option<CountOptions>) -> Result<u64>
   where
     T: Schema + Send + 'static,
@@ -288,7 +292,7 @@ impl Nongoose {
   ///   Err(error) => eprintln!("Error finding users: {}", error),
   /// }
   /// ```
-  #[cfg(not(feature = "async"))]
+  #[cfg(feature = "sync")]
   pub fn find<T>(&self, conditions: Document, options: Option<FindOptions>) -> Result<Vec<T>>
   where
     T: Schema,
@@ -396,7 +400,7 @@ impl Nongoose {
   ///   Err(error) => eprintln!("Error finding users: {}", error),
   /// }
   /// ```
-  #[cfg(feature = "async")]
+  #[cfg(feature = "tokio-runtime")]
   pub async fn find<T>(&self, conditions: Document, options: Option<FindOptions>) -> Result<Vec<T>>
   where
     T: Schema + 'static,
@@ -419,7 +423,7 @@ impl Nongoose {
   ///   Err(error) => eprintln!("Error finding user: {}", error),
   /// }
   /// ```
-  #[cfg(not(feature = "async"))]
+  #[cfg(feature = "sync")]
   pub fn find_by_id<T>(&self, id: &T::Id) -> Result<Option<T>>
   where
     T: Schema,
@@ -441,7 +445,7 @@ impl Nongoose {
   ///   Err(error) => eprintln!("Error finding user: {}", error),
   /// }
   /// ```
-  #[cfg(feature = "async")]
+  #[cfg(feature = "tokio-runtime")]
   pub async fn find_by_id<T>(&self, id: &T::Id) -> Result<Option<T>>
   where
     T: Schema + 'static,
@@ -527,7 +531,7 @@ impl Nongoose {
   ///   Err(error) => eprintln!("Error finding user: {}", error),
   /// }
   /// ```
-  #[cfg(not(feature = "async"))]
+  #[cfg(feature = "sync")]
   pub fn find_one<T>(
     &self,
     conditions: Document,
@@ -617,7 +621,7 @@ impl Nongoose {
   ///   Err(error) => eprintln!("Error finding user: {}", error),
   /// }
   /// ```
-  #[cfg(feature = "async")]
+  #[cfg(feature = "tokio-runtime")]
   pub async fn find_one<T>(
     &self,
     conditions: Document,
@@ -673,7 +677,7 @@ impl Nongoose {
   ///   Err(error) => eprintln!("Error updating users: {}", error),
   /// }
   /// ```
-  #[cfg(not(feature = "async"))]
+  #[cfg(feature = "sync")]
   pub fn update_many<T>(
     &self,
     conditions: Document,
@@ -731,7 +735,7 @@ impl Nongoose {
   ///   Err(error) => eprintln!("Error updating users: {}", error),
   /// }
   /// ```
-  #[cfg(feature = "async")]
+  #[cfg(feature = "tokio-runtime")]
   pub async fn update_many<T>(
     &self,
     conditions: Document,

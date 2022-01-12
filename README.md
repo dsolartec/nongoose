@@ -1,8 +1,8 @@
 # Nongoose
 
-![Crates.io version](https://img.shields.io/crates/v/nongoose?label=version) ![Crates.io downloads](https://img.shields.io/crates/d/nongoose?label=downloads) ![License](https://img.shields.io/github/license/nextchatorg/nongoose) ![GitHub repository stars](https://img.shields.io/github/stars/nextchatorg/nongoose?style=social)
+![Crates.io version](https://img.shields.io/crates/v/nongoose?label=version) ![Crates.io downloads](https://img.shields.io/crates/d/nongoose?label=downloads) ![License](https://img.shields.io/github/license/danielsolartech/nongoose) ![GitHub repository stars](https://img.shields.io/github/stars/danielsolartech/nongoose?style=social)
 
-MongoDB ODM for Rust based on Mongoose
+ODM for MongoDB based on Mongoose and written in Rust
 
 ## Basic usage
 
@@ -51,9 +51,9 @@ async fn main() {
 
 ```sh
 # Sync tests
-$ DATABASE_URL=mongodb://localhost:27017 cargo test --no-default-features --features derive
+$ DATABASE_URL=mongodb://localhost:27017 cargo test --no-default-features --features derive,sync
 
-# Async tests
+# Async tests (Tokio runtime)
 $ DATABASE_URL=mongodb://localhost:27017 cargo test
 ```
 

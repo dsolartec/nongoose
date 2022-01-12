@@ -1,9 +1,6 @@
 use nongoose::{
-  mongodb::{
-    bson::{doc, oid::ObjectId, Regex},
-    sync::Client,
-  },
-  Nongoose, Schema, SchemaBefore,
+  bson::{doc, oid::ObjectId, Regex},
+  Client, Nongoose, Schema, SchemaBefore,
 };
 use serde::{Deserialize, Serialize};
 
@@ -48,13 +45,13 @@ fn get_instance() -> Nongoose {
     }
   };
 
-  Nongoose::build(client.database("nongoose"))
+  Nongoose::builder(client.database("nongoose"))
     .add_schema::<Actor>()
-    .finish()
+    .build()
 }
 
-#[cfg(not(feature = "async"))]
-#[cfg_attr(not(feature = "async"), test)]
+#[cfg(feature = "sync")]
+#[cfg_attr(feature = "sync", test)]
 fn count() {
   let nongoose = get_instance();
 
@@ -95,8 +92,8 @@ fn count() {
   assert_eq!(tom_actors.unwrap(), 2_u64);
 }
 
-#[cfg(feature = "async")]
-#[cfg_attr(feature = "async", tokio::test)]
+#[cfg(feature = "tokio-runtime")]
+#[cfg_attr(feature = "tokio-runtime", tokio::test)]
 async fn count() {
   let nongoose = get_instance();
 

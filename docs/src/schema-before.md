@@ -8,7 +8,7 @@
 
 **Returns**
 
-- `nongoose::errors::Result<()>`
+- `nongoose::Result<()>`
 
 Executes a custom validation before insert the document to the database.
 
@@ -39,7 +39,7 @@ impl SchemaBefore for User {
 
 **Returns**
 
-- `nongoose::errors::Result<()>`
+- `nongoose::Result<()>`
 
 Executes a custom validation before replace the document in the database (called on `Schema.save()`).
 

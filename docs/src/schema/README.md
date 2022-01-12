@@ -8,7 +8,7 @@
 
 **Returns**
 
-- `nongoose::errors::Result<Self>`
+- `nongoose::Result<Self>`
 
 Populates fields on an existing schema.
 
@@ -28,11 +28,37 @@ match user.clone().populate("role").await {
 }
 ```
 
+## `Schema.remove()`
+
+**Returns**
+
+- `nongoose::Result<bool>`
+
+Removes this document from the db.
+
+**Example**
+
+```rust,no_run
+// Sync method
+match user.remove() {
+  Ok(true) => println!("The user was deleted!"),
+  Ok(false) => println!("The user could not be deleted!"),
+  Err(error) => eprintln!("Error deleting the user: {}", error),
+}
+
+// Async method
+match user.remove().await {
+  Ok(true) => println!("The user was deleted!"),
+  Ok(false) => println!("The user could not be deleted!"),
+  Err(error) => eprintln!("Error deleting the user: {}", error),
+}
+```
+
 ## `Schema.save()`
 
 **Returns**
 
-- `nongoose::errors::Result<Self>`
+- `nongoose::Result<Self>`
 
 Saves this document by inserting a new document into the database if it does not exist before, or sends an `replace_one` operation with the modifications to the database.
 

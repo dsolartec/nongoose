@@ -1,5 +1,4 @@
-use mongodb::{bson::oid::ObjectId, sync::Client};
-use nongoose::{Nongoose, Schema, SchemaBefore};
+use nongoose::{bson::oid::ObjectId, Client, Nongoose, Schema, SchemaBefore};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
@@ -20,7 +19,7 @@ pub struct Animal {
   pub name: String,
 }
 
-#[cfg_attr(feature = "async", async_trait::async_trait)]
+#[cfg_attr(feature = "tokio-runtime", async_trait::async_trait)]
 impl SchemaBefore for Animal {}
 
 impl Animal {
@@ -51,13 +50,13 @@ fn get_instance() -> Nongoose {
     }
   };
 
-  Nongoose::build(client.database("nongoose"))
+  Nongoose::builder(client.database("nongoose"))
     .add_schema::<Animal>()
-    .finish()
+    .build()
 }
 
-#[cfg(not(feature = "async"))]
-#[test]
+#[cfg(feature = "sync")]
+#[cfg_attr(feature = "sync", test)]
 fn schema_save() {
   let _nongoose = get_instance();
 
@@ -89,8 +88,8 @@ fn schema_save() {
   assert_eq!(cat, cat_saved.unwrap());
 }
 
-#[cfg(feature = "async")]
-#[cfg_attr(feature = "async", tokio::test)]
+#[cfg(feature = "tokio-runtime")]
+#[cfg_attr(feature = "tokio-runtime", tokio::test)]
 async fn schema_save() {
   let _nongoose = get_instance();
 

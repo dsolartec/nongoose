@@ -32,7 +32,7 @@ let nongoose = Nongoose::build()
 
 **Returns**
 
-- `nongoose::errors::Result<T>`
+- `nongoose::Result<T>`
 
 Shortcut for saving one document to the database. `Nongoose.create(doc)` does `doc.save()`.
 
@@ -75,7 +75,7 @@ match nongoose.create::<User>(&user).await {
 
 **Returns**
 
-- `nongoose::errors::Result<u64>`
+- `nongoose::Result<u64>`
 
 Counts number of documents that match `conditions` in a database collection.
 
@@ -148,7 +148,7 @@ match nongoose
 
 **Returns**
 
-- `nongoose::errors::Result<Vec<T>>`
+- `nongoose::Result<Vec<T>>`
 
 Finds documents.
 
@@ -265,7 +265,7 @@ match nongoose.find::<User>(
 
 **Returns**
 
-- `nongoose::errors::Result<Option<T>>`
+- `nongoose::Result<Option<T>>`
 
 Finds a single document by its `_id` field. `find_by_id(id)`is almost equivalent to `find_one(doc! { "_id": id })`.
 If you want to query by a document's `_id`, use `find_by_id()`instead of `find_one()`.
@@ -307,7 +307,7 @@ match nongoose.find_by_id::<User>(
 
 **Returns**
 
-- `nongoose::errors::Result<Option<T>>`
+- `nongoose::Result<Option<T>>`
 
 Finds one document.
 
@@ -410,7 +410,7 @@ match nongoose.find_one::<User>(
 
 **Returns**
 
-- `nongoose::errors::Result<mongodb::results::UpdateResult>`
+- `nongoose::Result<mongodb::results::UpdateResult>`
 
 Updates _all_ documents in the database that match `conditions` without returning them.
 

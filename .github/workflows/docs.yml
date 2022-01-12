@@ -40,7 +40,7 @@ jobs:
         run: mdbook build docs
 
       - name: Add CNAME file
-        run: echo 'nongoose.nextchat.org' > docs/book/CNAME
+        run: echo 'nongoose.danielsolarte.com' > docs/book/CNAME
 
       - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v2

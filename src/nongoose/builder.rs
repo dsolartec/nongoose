@@ -5,15 +5,23 @@ use mongodb::{
   sync::Database,
 };
 
-use crate::{errors::Result, schema::SchemaData, Nongoose, Schema};
+use crate::{error::Result, schema::SchemaData, Nongoose, Schema};
 
+/// Specifies the options to a Nongoose instance.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct NongooseBuilder {
+  /// MongoDB instance
   pub database: Database,
+
+  /// Registered schemas.
+  ///
+  /// You can add one using `NongooseBuilder.add_schema<Schema>()`
   pub schemas: Vec<SchemaData>,
 }
 
 impl NongooseBuilder {
+  /// Register a Schema if it was not registered before.
   pub fn add_schema<T>(mut self) -> Self
   where
     T: Schema,
@@ -32,19 +40,16 @@ impl NongooseBuilder {
     self
   }
 
+  /// Verify if the Nongoose instance has a registered Schema.
   pub fn has_schema(&self, name: &str) -> bool {
     self.schemas.iter().any(|e| e.get_name().as_str() == name)
   }
 
-  pub fn finish(&self) -> Nongoose {
+  /// Return the Nongoose instance.
+  pub fn build(&self) -> Nongoose {
     Nongoose {
       builder: self.clone(),
     }
-  }
-
-  pub fn replace_with(&mut self, new_data: Self) {
-    self.database = new_data.database;
-    self.schemas = new_data.schemas;
   }
 
   // Internals
