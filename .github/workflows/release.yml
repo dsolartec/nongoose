@@ -75,7 +75,7 @@ jobs:
         if: |
           startsWith(github.ref, 'refs/tags/v') &&
           github.repository == 'danielsolartech/nongoose'
-        run: zip -r source_code.zip derive examples src tests .gitignore .rustfmt.toml Cargo.toml COPYING README.md
+        run: zip -r source_code.zip derive docs scripts src tests .gitignore .rustfmt.toml Cargo.toml COPYING README.md
 
       - name: Create release body using conventional commits
         id: changelog
