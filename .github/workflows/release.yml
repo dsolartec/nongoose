@@ -109,6 +109,7 @@ jobs:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: |
           cd derive
-          cargo publish --all-features
+          cargo publish
+          wait 5000
           cd ..
-          cargo publish --all-features
+          cargo publish
