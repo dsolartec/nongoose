@@ -8,7 +8,7 @@
 //! - Rust 1.48+
 //! - MongoDB 3.6+
 //!
-//! ## Importing
+//! ## Importing
 //! The library is available on [crates.io](https://crates.io/crates/nongoose). To use it in
 //! your application, simply add it to your project's `Cargo.toml`.
 //! ```toml
