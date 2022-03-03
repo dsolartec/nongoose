@@ -26,8 +26,7 @@ impl NongooseBuilder {
   where
     T: Schema,
   {
-    let collection_name = T::__get_collection_name();
-
+    let collection_name = T::collection_name();
     if !self.has_schema(&collection_name) {
       let schema = SchemaData::new::<T>();
 
@@ -61,7 +60,7 @@ impl NongooseBuilder {
   where
     T: Schema,
   {
-    let collection_name = T::__get_collection_name();
+    let collection_name = T::collection_name();
     if !self.has_schema(&collection_name) {
       panic!(
         "Schema is not associated to a Nongoose instance ({})",
@@ -85,7 +84,7 @@ impl NongooseBuilder {
   where
     T: Schema,
   {
-    let collection_name = T::__get_collection_name();
+    let collection_name = T::collection_name();
     if !self.has_schema(&collection_name) {
       panic!(
         "Schema is not associated to a Nongoose instance ({})",
@@ -114,8 +113,7 @@ impl NongooseBuilder {
   where
     T: Schema,
   {
-    let collection_name = T::__get_collection_name();
-
+    let collection_name = T::collection_name();
     if !self.has_schema(&collection_name) {
       panic!(
         "Schema is not associated to a Nongoose instance ({})",
@@ -144,8 +142,7 @@ impl NongooseBuilder {
   where
     T: Schema,
   {
-    let collection_name = T::__get_collection_name();
-
+    let collection_name = T::collection_name();
     if !self.has_schema(&collection_name) {
       panic!(
         "Schema is not associated to a Nongoose instance ({})",

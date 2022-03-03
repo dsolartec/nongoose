@@ -26,7 +26,7 @@ pub(crate) fn getter(schema_data: &SchemaData) -> TokenStream {
           relation_type: #nongoose::types::SchemaRelationType::parse_str(#relation_type).unwrap(),
 
           schema_ident: #schema_ident_name.to_string(),
-          schema_name: <#schema_ident>::__get_collection_name(),
+          schema_name: <#schema_ident>::collection_name(),
         },
       });
 
@@ -43,7 +43,7 @@ pub(crate) fn getter(schema_data: &SchemaData) -> TokenStream {
             relation_type: #nongoose::types::SchemaRelationType::parse_str(#relation_type).unwrap(),
 
             schema_ident: #schema_ident_name.to_string(),
-            schema_name: <#schema_ident>::__get_collection_name(),
+            schema_name: <#schema_ident>::collection_name(),
           },
         });
       } else if relation_type == "one_to_many" {
@@ -55,7 +55,7 @@ pub(crate) fn getter(schema_data: &SchemaData) -> TokenStream {
             relation_type: #nongoose::types::SchemaRelationType::parse_str(#relation_type).unwrap(),
 
             schema_ident: #schema_ident_name.to_string(),
-            schema_name: <#schema_ident>::__get_collection_name(),
+            schema_name: <#schema_ident>::collection_name(),
           },
         });
       }
