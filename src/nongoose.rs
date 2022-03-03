@@ -30,10 +30,10 @@ impl Nongoose {
     }
   }
 
-    /// Performs [aggregations](https://docs.mongodb.com/manual/aggregation/) on the schemas collection.
-  /// 
+  /// Performs [aggregations](https://docs.mongodb.com/manual/aggregation/) on the schemas collection.
+  ///
   /// - [MongoDB Aggregation docs](https://docs.mongodb.org/manual/applications/aggregation/)
-  /// 
+  ///
   /// # Options
   /// ```rust,no_run,ignore
   /// AggregationOptions::builder();
@@ -84,7 +84,7 @@ impl Nongoose {
   ///   // Required to create the instance of `CountOptions`
   ///   .build()
   /// ```
-  /// 
+  ///
   /// # Example
   /// ```rust,no_run,ignore
   /// // Aggregation result struct.
@@ -93,7 +93,7 @@ impl Nongoose {
   ///   posts_with_comments: Vec<String>,
   ///   users_with_comments: Vec<String>,
   /// }
-  /// 
+  ///
   /// impl From<Document> for SearchResult {
   ///   fn from(document: Document) -> Self {
   ///     Self {
@@ -116,7 +116,7 @@ impl Nongoose {
   ///     }
   ///   }
   /// }
-  /// 
+  ///
   /// // Aggregation
   /// let aggregation = nongoose
   ///   .aggregate::<PostComment, SearchResult>(
@@ -152,7 +152,7 @@ impl Nongoose {
   ///     ],
   ///     None,
   ///   );
-  /// 
+  ///
   /// match aggregation {
   ///   Ok(data) => {
   ///     println!("Total retuned: {} - Data: {:?}", data.len(), data);
@@ -176,9 +176,9 @@ impl Nongoose {
   }
 
   /// Performs [aggregations](https://docs.mongodb.com/manual/aggregation/) on the schemas collection.
-  /// 
+  ///
   /// - [MongoDB Aggregation docs](https://docs.mongodb.org/manual/applications/aggregation/)
-  /// 
+  ///
   /// # Options
   /// ```rust,no_run,ignore
   /// AggregationOptions::builder();
@@ -229,7 +229,7 @@ impl Nongoose {
   ///   // Required to create the instance of `CountOptions`
   ///   .build()
   /// ```
-  /// 
+  ///
   /// # Example
   /// ```rust,no_run,ignore
   /// // Aggregation result struct.
@@ -238,7 +238,7 @@ impl Nongoose {
   ///   posts_with_comments: Vec<String>,
   ///   users_with_comments: Vec<String>,
   /// }
-  /// 
+  ///
   /// impl From<Document> for SearchResult {
   ///   fn from(document: Document) -> Self {
   ///     Self {
@@ -261,7 +261,7 @@ impl Nongoose {
   ///     }
   ///   }
   /// }
-  /// 
+  ///
   /// // Aggregation
   /// let aggregation = nongoose
   ///   .aggregate::<PostComment, SearchResult>(
@@ -297,7 +297,7 @@ impl Nongoose {
   ///     ],
   ///     None,
   ///   );
-  /// 
+  ///
   /// match aggregation.await {
   ///   Ok(data) => {
   ///     println!("Total retuned: {} - Data: {:?}", data.len(), data);
