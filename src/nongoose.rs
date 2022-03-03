@@ -4,7 +4,7 @@ pub(crate) mod globals;
 pub use builder::NongooseBuilder;
 use mongodb::{
   bson::{doc, Document},
-  options::{CountOptions, FindOneOptions, FindOptions, UpdateOptions},
+  options::{AggregateOptions, CountOptions, FindOneOptions, FindOptions, UpdateOptions},
   results::UpdateResult,
   sync::Database,
 };
@@ -28,6 +28,297 @@ impl Nongoose {
       database,
       schemas: Vec::new(),
     }
+  }
+
+    /// Performs [aggregations](https://docs.mongodb.com/manual/aggregation/) on the schemas collection.
+  /// 
+  /// - [MongoDB Aggregation docs](https://docs.mongodb.org/manual/applications/aggregation/)
+  /// 
+  /// # Options
+  /// ```rust,no_run,ignore
+  /// AggregationOptions::builder();
+  ///   // Optional (bool)
+  ///   // Enables writing to temporary files. When set to true, aggregation stages can write data to the _tmp subdirectory in the dbPath directory.
+  ///   .allow_disk_use(...)
+  ///   // Optional (u32)
+  ///   // The number of documents the server should return per cursor batch.
+  ///   // Note that this does not have any affect on the documents that are returned by a cursor, only the number of documents kept in memory at a given time (and by extension, the number of round trips needed to return the entire set of documents returned by the query).
+  ///   .batch_size(...)
+  ///   // Optional (bool)
+  ///   // Opt out of document-level validation.
+  ///   .bypass_document_validation(...)
+  ///   // Optional (mongodb::options::Collation)
+  ///   // The collation to use for the operation.
+  ///   // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  ///   .collation(...)
+  ///   // Optional (String)
+  ///   // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  ///   .comment(...)
+  ///   // Optional (mongodb::options::Hint)
+  ///   // The index to use for the operation.
+  ///   .hint(...)
+  ///   // Optional (std::time::Duration)
+  ///   // The maximum amount of time for the server to wait on new documents to satisfy a tailable await cursor query.
+  ///   // This option will have no effect on non-tailable cursors that result from this operation.
+  ///   .max_await_time(...)
+  ///   // Optional (std::time::Duration)
+  ///   // The maximum amount of time to allow the query to run.
+  ///   // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  ///   .max_time(...)
+  ///   // Optional (mongodb::options::ReadConcern)
+  ///   // The read concern to use for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .read_concern(...)
+  ///   // Optional (mongodb::options::SelectionCriteria)
+  ///   // The criteria used to select a server for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .selection_criteria(...)
+  ///   // Optional (mongodb::options::WriteConcern)
+  ///   // The write concern for the operation.
+  ///   // If none is specified, the write concern defined on the object executing this operation will be used.
+  ///   .write_concern(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // A document with any amount of parameter names, each followed by definitions of constants in the MQL Aggregate Expression language. Each parameter name is then usable to access the value of the corresponding MQL Expression with the “$$” syntax within Aggregate Expression contexts.
+  ///   // This feature is only available on server versions 5.0 and above.
+  ///   .let_vars(...)
+  ///   // Required to create the instance of `CountOptions`
+  ///   .build()
+  /// ```
+  /// 
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// // Aggregation result struct.
+  /// #[derive(Debug)]
+  /// struct SearchResult {
+  ///   posts_with_comments: Vec<String>,
+  ///   users_with_comments: Vec<String>,
+  /// }
+  /// 
+  /// impl From<Document> for SearchResult {
+  ///   fn from(document: Document) -> Self {
+  ///     Self {
+  ///       posts_with_comments: document
+  ///         .get_array("posts_with_comments")
+  ///         .unwrap_or(&Vec::new())
+  ///         .iter()
+  ///         .map(|d| d.as_str())
+  ///         .filter(|d| d.is_some())
+  ///         .map(|d| String::from(d.unwrap()))
+  ///         .collect(),
+  ///       users_with_comments: document
+  ///         .get_array("users_with_comments")
+  ///         .unwrap_or(&Vec::new())
+  ///         .iter()
+  ///         .map(|d| d.as_str())
+  ///         .filter(|d| d.is_some())
+  ///         .map(|d| String::from(d.unwrap()))
+  ///         .collect(),
+  ///     }
+  ///   }
+  /// }
+  /// 
+  /// // Aggregation
+  /// let aggregation = nongoose
+  ///   .aggregate::<PostComment, SearchResult>(
+  ///     vec![
+  ///       doc! {
+  ///         "$match": {
+  ///           "message": Regex { pattern: String::from(" "), options: String::new() },
+  ///         },
+  ///       },
+  ///       doc! {
+  ///         "$lookup": {
+  ///           "from": User::collection_name(),
+  ///           "localField": "author_id",
+  ///           "foreignField": "_id",
+  ///           "as": "users",
+  ///         }
+  ///       },
+  ///       doc! {
+  ///         "$lookup": {
+  ///           "from": Post::collection_name(),
+  ///           "localField": "post_id",
+  ///           "foreignField": "_id",
+  ///           "as": "posts",
+  ///         },
+  ///       },
+  ///       doc! {
+  ///         "$group": {
+  ///           "_id": "1",
+  ///           "posts_with_comments": { "$addToSet": { "$first": "$posts.title" } },
+  ///           "users_with_comments": { "$addToSet": { "$first": "$users.realname" } },
+  ///         },
+  ///       },
+  ///     ],
+  ///     None,
+  ///   );
+  /// 
+  /// match aggregation {
+  ///   Ok(data) => {
+  ///     println!("Total retuned: {} - Data: {:?}", data.len(), data);
+  ///   },
+  ///   Err(error) => {
+  ///     eprintln!("MongoDB error: {}", error);
+  ///   }
+  /// }
+  /// ```
+  #[cfg(feature = "sync")]
+  pub fn aggregate<S, T>(
+    &self,
+    pipeline: Vec<Document>,
+    options: Option<AggregateOptions>,
+  ) -> Result<Vec<T>>
+  where
+    S: Schema + Clone,
+    T: From<Document>,
+  {
+    self.builder.aggregate_sync::<S, T>(pipeline, options)
+  }
+
+  /// Performs [aggregations](https://docs.mongodb.com/manual/aggregation/) on the schemas collection.
+  /// 
+  /// - [MongoDB Aggregation docs](https://docs.mongodb.org/manual/applications/aggregation/)
+  /// 
+  /// # Options
+  /// ```rust,no_run,ignore
+  /// AggregationOptions::builder();
+  ///   // Optional (bool)
+  ///   // Enables writing to temporary files. When set to true, aggregation stages can write data to the _tmp subdirectory in the dbPath directory.
+  ///   .allow_disk_use(...)
+  ///   // Optional (u32)
+  ///   // The number of documents the server should return per cursor batch.
+  ///   // Note that this does not have any affect on the documents that are returned by a cursor, only the number of documents kept in memory at a given time (and by extension, the number of round trips needed to return the entire set of documents returned by the query).
+  ///   .batch_size(...)
+  ///   // Optional (bool)
+  ///   // Opt out of document-level validation.
+  ///   .bypass_document_validation(...)
+  ///   // Optional (mongodb::options::Collation)
+  ///   // The collation to use for the operation.
+  ///   // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  ///   .collation(...)
+  ///   // Optional (String)
+  ///   // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  ///   .comment(...)
+  ///   // Optional (mongodb::options::Hint)
+  ///   // The index to use for the operation.
+  ///   .hint(...)
+  ///   // Optional (std::time::Duration)
+  ///   // The maximum amount of time for the server to wait on new documents to satisfy a tailable await cursor query.
+  ///   // This option will have no effect on non-tailable cursors that result from this operation.
+  ///   .max_await_time(...)
+  ///   // Optional (std::time::Duration)
+  ///   // The maximum amount of time to allow the query to run.
+  ///   // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  ///   .max_time(...)
+  ///   // Optional (mongodb::options::ReadConcern)
+  ///   // The read concern to use for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .read_concern(...)
+  ///   // Optional (mongodb::options::SelectionCriteria)
+  ///   // The criteria used to select a server for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .selection_criteria(...)
+  ///   // Optional (mongodb::options::WriteConcern)
+  ///   // The write concern for the operation.
+  ///   // If none is specified, the write concern defined on the object executing this operation will be used.
+  ///   .write_concern(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // A document with any amount of parameter names, each followed by definitions of constants in the MQL Aggregate Expression language. Each parameter name is then usable to access the value of the corresponding MQL Expression with the “$$” syntax within Aggregate Expression contexts.
+  ///   // This feature is only available on server versions 5.0 and above.
+  ///   .let_vars(...)
+  ///   // Required to create the instance of `CountOptions`
+  ///   .build()
+  /// ```
+  /// 
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// // Aggregation result struct.
+  /// #[derive(Debug)]
+  /// struct SearchResult {
+  ///   posts_with_comments: Vec<String>,
+  ///   users_with_comments: Vec<String>,
+  /// }
+  /// 
+  /// impl From<Document> for SearchResult {
+  ///   fn from(document: Document) -> Self {
+  ///     Self {
+  ///       posts_with_comments: document
+  ///         .get_array("posts_with_comments")
+  ///         .unwrap_or(&Vec::new())
+  ///         .iter()
+  ///         .map(|d| d.as_str())
+  ///         .filter(|d| d.is_some())
+  ///         .map(|d| String::from(d.unwrap()))
+  ///         .collect(),
+  ///       users_with_comments: document
+  ///         .get_array("users_with_comments")
+  ///         .unwrap_or(&Vec::new())
+  ///         .iter()
+  ///         .map(|d| d.as_str())
+  ///         .filter(|d| d.is_some())
+  ///         .map(|d| String::from(d.unwrap()))
+  ///         .collect(),
+  ///     }
+  ///   }
+  /// }
+  /// 
+  /// // Aggregation
+  /// let aggregation = nongoose
+  ///   .aggregate::<PostComment, SearchResult>(
+  ///     vec![
+  ///       doc! {
+  ///         "$match": {
+  ///           "message": Regex { pattern: String::from(" "), options: String::new() },
+  ///         },
+  ///       },
+  ///       doc! {
+  ///         "$lookup": {
+  ///           "from": User::collection_name(),
+  ///           "localField": "author_id",
+  ///           "foreignField": "_id",
+  ///           "as": "users",
+  ///         }
+  ///       },
+  ///       doc! {
+  ///         "$lookup": {
+  ///           "from": Post::collection_name(),
+  ///           "localField": "post_id",
+  ///           "foreignField": "_id",
+  ///           "as": "posts",
+  ///         },
+  ///       },
+  ///       doc! {
+  ///         "$group": {
+  ///           "_id": "1",
+  ///           "posts_with_comments": { "$addToSet": { "$first": "$posts.title" } },
+  ///           "users_with_comments": { "$addToSet": { "$first": "$users.realname" } },
+  ///         },
+  ///       },
+  ///     ],
+  ///     None,
+  ///   );
+  /// 
+  /// match aggregation.await {
+  ///   Ok(data) => {
+  ///     println!("Total retuned: {} - Data: {:?}", data.len(), data);
+  ///   },
+  ///   Err(error) => {
+  ///     eprintln!("MongoDB error: {}", error);
+  ///   }
+  /// }
+  /// ```
+  #[cfg(feature = "tokio-runtime")]
+  pub async fn aggregate<S, T>(
+    &self,
+    pipeline: Vec<Document>,
+    options: Option<AggregateOptions>,
+  ) -> Result<Vec<T>>
+  where
+    S: Schema + Clone + Send + 'static,
+    T: From<Document> + Send + 'static,
+  {
+    let builder = self.builder.clone();
+    spawn_blocking(move || builder.aggregate_sync::<S, T>(pipeline, options)).await?
   }
 
   /// Shortcut for saving one document to the database. `Nongoose.create(doc)` does `Schema.save()`.

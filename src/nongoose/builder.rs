@@ -1,6 +1,6 @@
 use mongodb::{
   bson::{from_bson, Bson, Document},
-  options::{CountOptions, FindOneOptions, FindOptions, UpdateOptions},
+  options::{AggregateOptions, CountOptions, FindOneOptions, FindOptions, UpdateOptions},
   results::UpdateResult,
   sync::Database,
 };
@@ -52,6 +52,36 @@ impl NongooseBuilder {
   }
 
   // Internals
+  pub(crate) fn aggregate_sync<S, T>(
+    &self,
+    pipeline: Vec<Document>,
+    options: Option<AggregateOptions>,
+  ) -> Result<Vec<T>>
+  where
+    S: Schema,
+    T: From<Document>,
+  {
+    let collection_name = S::collection_name();
+    if !self.has_schema(&collection_name) {
+      panic!(
+        "Schema is not associated to a Nongoose instance ({})",
+        collection_name
+      );
+    }
+
+    let documents = self
+      .database
+      .collection::<Document>(collection_name.as_str())
+      .aggregate(pipeline, options)?;
+
+    let mut data = Vec::new();
+    for doc in documents {
+      data.push(doc?.into());
+    }
+
+    Ok(data)
+  }
+
   pub(crate) fn count_sync<T>(
     &self,
     conditions: Document,
