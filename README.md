@@ -60,6 +60,10 @@ $ DATABASE_URL=mongodb://localhost:27017 cargo test
 
 Check the [COPYING](./COPYING) file for more information.
 
+## Related projects
+- [wither](https://github.com/thedodd/wither)
+- [MongODM](https://github.com/Devolutions/mongodm-rs)
+
 ## Contributors
 
 Thanks to this amazing people for make Nongoose better:
