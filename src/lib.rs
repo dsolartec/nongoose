@@ -36,7 +36,10 @@ mod schema;
 
 pub use crate::nongoose::{Nongoose, NongooseBuilder};
 pub use error::{Error, Result};
-pub use mongodb::{bson, options, results, sync::{Client, Database}};
+pub use mongodb::{
+  bson, options, results,
+  sync::{Client, Database},
+};
 #[cfg(feature = "derive")]
 pub use nongoose_derive::{schema_relations, Schema};
 pub use schema::{types, Schema, SchemaBefore};
