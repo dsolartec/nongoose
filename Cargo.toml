@@ -19,7 +19,7 @@ members = ["./derive/"]
 
 [dependencies]
 async-trait = { optional = true, version = "0.1" }
-mongodb = { default-features = false, features = ["bson-chrono-0_4", "bson-uuid-0_8", "sync"], version = "2.1.0" }
+mongodb = { default-features = false, features = ["bson-chrono-0_4", "bson-uuid-0_8", "sync"], version = "2.3.0" }
 nongoose-derive = { optional = true, path = "./derive/", version = "0.1.0-beta.1" }
 once_cell = "1"
 serde = { features = ["derive"], version = "1" }
