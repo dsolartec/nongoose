@@ -1,6 +1,6 @@
 [package]
 name = "nongoose-derive"
-version = "0.1.0-beta.1"
+version = "0.1.0-beta.2"
 authors = [
   "Daniel Solarte <contact@danielsolarte.com>"
 ]
@@ -9,7 +9,7 @@ description = "Macros implementation of #[derive(Schema)]"
 edition = "2021"
 homepage = "https://nongoose.danielsolarte.com"
 documentation = "https://docs.rs/nongoose"
-repository = "https://github.com/danielsolartech/nongoose"
+repository = "https://github.com/dsolarte/nongoose"
 keywords = ["nongoose"]
 include = ["src/**/*.rs", "../COPYING", "../README.md"]
 
