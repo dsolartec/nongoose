@@ -6,7 +6,7 @@ authors = [
 ]
 license = "GPL-3.0"
 description = "ODM for MongoDB based on Mongoose"
-edition = "2018"
+edition = "2021"
 homepage = "https://nongoose.danielsolarte.com"
 documentation = "https://docs.rs/nongoose"
 repository = "https://github.com/danielsolartech/nongoose"
