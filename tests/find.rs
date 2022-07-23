@@ -81,6 +81,16 @@ fn find() {
   let tom_cruise = tom_cruise.unwrap();
   let emma_stone = emma_stone.unwrap();
 
+  // Find by id
+  let by_id = nongoose.find_by_id::<Actor>(&emma_stone.id);
+  assert!(by_id.is_ok());
+
+  let by_id = by_id.unwrap();
+  assert!(by_id.is_some());
+
+  let by_id = by_id.unwrap();
+  assert_eq!(by_id.fullname, emma_stone.fullname);
+
   // Find one by age
   let age_32 = nongoose.find_one::<Actor>(doc! { "age": 32 }, None);
   assert!(age_32.is_ok());
@@ -155,6 +165,16 @@ async fn find() {
   let jeniffer_lopez = jeniffer_lopez.unwrap();
   let tom_cruise = tom_cruise.unwrap();
   let emma_stone = emma_stone.unwrap();
+
+  // Find by id
+  let by_id = nongoose.find_by_id::<Actor>(&emma_stone.id).await;
+  assert!(by_id.is_ok());
+
+  let by_id = by_id.unwrap();
+  assert!(by_id.is_some());
+
+  let by_id = by_id.unwrap();
+  assert_eq!(by_id.fullname, emma_stone.fullname);
 
   // Find one by age
   let age_32 = nongoose.find_one::<Actor>(doc! { "age": 32 }, None).await;
