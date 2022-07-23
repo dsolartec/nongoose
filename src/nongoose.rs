@@ -1004,17 +1004,17 @@ impl Nongoose {
   /// }
   /// ```
   #[cfg(feature = "sync")]
-  pub async fn find_one_and_remove<T>(
+  pub fn find_one_and_remove<T>(
     &self,
     conditions: Document,
-    options: Option<FindOneOptions>
+    options: Option<FindOneOptions>,
   ) -> Result<(bool, Option<T>)>
   where
     T: Schema + Sync,
   {
     let result = self.find_one::<T>(conditions, options)?;
     if let Some(result) = result {
-      return Ok((result.remove().await?, Some(result)));
+      return Ok((result.remove()?, Some(result)));
     }
 
     Ok((false, None))
@@ -1102,7 +1102,7 @@ impl Nongoose {
   pub async fn find_one_and_remove<T>(
     &self,
     conditions: Document,
-    options: Option<FindOneOptions>
+    options: Option<FindOneOptions>,
   ) -> Result<(bool, Option<T>)>
   where
     T: Schema + Sync + 'static,
