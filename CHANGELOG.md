@@ -6,11 +6,19 @@
 - @dsolartec `feat(schema): Expose collection name`
 - @dsolartec `feat(error): Wrap  MongoDB document access error`
 - @dsolartec `feat(schema): Add aggregate method (MongoDB aggregations)`
+- @dsolartec `feat: update cargo edition to 2021`
+- @dsolartec `feat: update mongodb crate version to 2.3.0`
+- @dsolartec `feat(nongoose): add find_one_and_remove method`
+- @dsolartec `feat(nongoose): add find_and_remove method`
+- @dsolartec `feat(tests): add find and remove (one or more) tests`
+- @dsolartec `feat(nongoose): add find_by_id_and_remove method`
+- @dsolartec `feat(tests): add find by id and remove test`
 
 ### Bugfixes
 
 - @dsolartec `fix(docs): Unicode bug and orthographic error`
 - @dsolartec `fix(tests): Change 'async' feature to 'tokio-runtime'`
+- @dsolartec `fix(nongoose): find_one_and_remove sync method`
 
 ## v0.1.0-beta.1
 
