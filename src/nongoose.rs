@@ -925,6 +925,196 @@ impl Nongoose {
     spawn_blocking(move || builder.find_one_sync(conditions, options)).await?
   }
 
+  /// Finds one document and remove it from the db.
+  ///
+  /// # Options
+  /// ```rust,no_run,ignore
+  /// FindOneOptions::builder()
+  ///   // Optional (bool)
+  ///   // If true, partial results will be returned from a mongos rather than an error being returned if one or more shards is down.
+  ///   .allow_partial_results(...)
+  ///   // Optional (mongodb::options::Collation)
+  ///   // The collation to use for the operation.
+  ///   // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  ///   .collation(...)
+  ///   // Optional (String)
+  ///   // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  ///   .comment(...)
+  ///   // Optional (mongodb::options::Hint)
+  ///   // The index to use for the operation.
+  ///   .hint(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The exclusive upper bound for a specific index.
+  ///   .max(...)
+  ///   // Optional (u64)
+  ///   // Maximum number of documents or index keys to scan when executing the query.
+  ///   // Note: this option is deprecated starting in MongoDB version 4.0 and removed in MongoDB 4.2. Use the maxTimeMS option instead.
+  ///   .max_scan(...)
+  ///   // Optional (std::time::Duration)
+  ///   // The maximum amount of time to allow the query to run.
+  ///   // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  ///   .max_time(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The inclusive lower bound for a specific index.
+  ///   .min(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // Limits the fields of the document being returned.
+  ///   .projection(...)
+  ///   // Optional (mongodb::options::ReadConcern)
+  ///   // The read concern to use for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .read_concern(...)
+  ///   // Optional (bool)
+  ///   // Whether to return only the index keys in the documents.
+  ///   .return_key(...)
+  ///   // Optional (mongodb::options::SelectionCriteria)
+  ///   // The criteria used to select a server for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .selection_criteria(...)
+  ///   // Optional (bool)
+  ///   // Whether to return the record identifier for each document.
+  ///   .show_record_id(...)
+  ///   // Optional (u64)
+  ///   // The number of documents to skip before counting.
+  ///   .skip(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The order of the documents for the purposes of the operation.
+  ///   .sort(...)
+  ///   // Required to create the instance of `FindOneOptions`
+  ///   .build()
+  /// ```
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// // Find one user whose `username` is `nongoose`
+  /// match nongoose.find_one_and_remove::<User>(doc! { "username": "nongoose" }, None) {
+  ///   Ok((_, Some(user))) => println!("User found: {}", user.id),
+  ///   Ok((_, None)) => eprintln!("Cannot find the user"),
+  ///   Err(error) => eprintln!("Error finding user: {}", error),
+  /// }
+  ///
+  /// // Passing options
+  /// match nongoose.find_one_and_remove::<User>(
+  ///   doc! { "username": "nongoose" },
+  ///   Some(FindOneOptions::builder().sort(doc! { "username": 1 }).build())
+  /// ) {
+  ///   Ok((_, Some(user))) => println!("User found: {}", user.id),
+  ///   Ok((_, None)) => eprintln!("Cannot find the user"),
+  ///   Err(error) => eprintln!("Error finding user: {}", error),
+  /// }
+  /// ```
+  #[cfg(feature = "sync")]
+  pub async fn find_one_and_remove<T>(
+    &self,
+    conditions: Document,
+    options: Option<FindOneOptions>
+  ) -> Result<(bool, Option<T>)>
+  where
+    T: Schema + Sync,
+  {
+    let result = self.find_one::<T>(conditions, options)?;
+    if let Some(result) = result {
+      return Ok((result.remove().await?, Some(result)));
+    }
+
+    Ok((false, None))
+  }
+
+  /// Finds one document and remove it from the db.
+  ///
+  /// # Options
+  /// ```rust,no_run,ignore
+  /// FindOneOptions::builder()
+  ///   // Optional (bool)
+  ///   // If true, partial results will be returned from a mongos rather than an error being returned if one or more shards is down.
+  ///   .allow_partial_results(...)
+  ///   // Optional (mongodb::options::Collation)
+  ///   // The collation to use for the operation.
+  ///   // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  ///   .collation(...)
+  ///   // Optional (String)
+  ///   // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  ///   .comment(...)
+  ///   // Optional (mongodb::options::Hint)
+  ///   // The index to use for the operation.
+  ///   .hint(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The exclusive upper bound for a specific index.
+  ///   .max(...)
+  ///   // Optional (u64)
+  ///   // Maximum number of documents or index keys to scan when executing the query.
+  ///   // Note: this option is deprecated starting in MongoDB version 4.0 and removed in MongoDB 4.2. Use the maxTimeMS option instead.
+  ///   .max_scan(...)
+  ///   // Optional (std::time::Duration)
+  ///   // The maximum amount of time to allow the query to run.
+  ///   // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  ///   .max_time(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The inclusive lower bound for a specific index.
+  ///   .min(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // Limits the fields of the document being returned.
+  ///   .projection(...)
+  ///   // Optional (mongodb::options::ReadConcern)
+  ///   // The read concern to use for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .read_concern(...)
+  ///   // Optional (bool)
+  ///   // Whether to return only the index keys in the documents.
+  ///   .return_key(...)
+  ///   // Optional (mongodb::options::SelectionCriteria)
+  ///   // The criteria used to select a server for this find query.
+  ///   // If none specified, the default set on the collection will be used.
+  ///   .selection_criteria(...)
+  ///   // Optional (bool)
+  ///   // Whether to return the record identifier for each document.
+  ///   .show_record_id(...)
+  ///   // Optional (u64)
+  ///   // The number of documents to skip before counting.
+  ///   .skip(...)
+  ///   // Optional (mongodb::bson::Document)
+  ///   // The order of the documents for the purposes of the operation.
+  ///   .sort(...)
+  ///   // Required to create the instance of `FindOneOptions`
+  ///   .build()
+  /// ```
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// // Find one user whose `username` is `nongoose`
+  /// match nongoose.find_one_and_remove::<User>(doc! { "username": "nongoose" }, None).await {
+  ///   Ok((_, Some(user))) => println!("User found: {}", user.id),
+  ///   Ok((_, None)) => eprintln!("Cannot find the user"),
+  ///   Err(error) => eprintln!("Error finding user: {}", error),
+  /// }
+  ///
+  /// // Passing options
+  /// match nongoose.find_one_and_remove::<User>(
+  ///   doc! { "username": "nongoose" },
+  ///   Some(FindOneOptions::builder().sort(doc! { "username": 1 }).build())
+  /// ).await {
+  ///   Ok((_, Some(user))) => println!("User found: {}", user.id),
+  ///   Ok((_, None)) => eprintln!("Cannot find the user"),
+  ///   Err(error) => eprintln!("Error finding user: {}", error),
+  /// }
+  /// ```
+  #[cfg(feature = "tokio-runtime")]
+  pub async fn find_one_and_remove<T>(
+    &self,
+    conditions: Document,
+    options: Option<FindOneOptions>
+  ) -> Result<(bool, Option<T>)>
+  where
+    T: Schema + Sync + 'static,
+  {
+    let result = self.find_one::<T>(conditions, options).await?;
+    if let Some(result) = result {
+      return Ok((result.remove().await?, Some(result)));
+    }
+
+    Ok((false, None))
+  }
+
   /// Updates _all_ documents in the database that match `conditions` without returning them.
   ///
   /// **Note** update_many will _not_ fire update middleware (`SchemaBefore::before_update()`).
