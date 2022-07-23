@@ -82,6 +82,17 @@ fn remove() {
   let tom_cruise = tom_cruise.unwrap();
   let emma_stone = emma_stone.unwrap();
 
+  // Remove one by id
+  let by_id = nongoose.find_by_id_and_remove::<Actor>(&emma_stone.id);
+  assert!(by_id.is_ok());
+
+  let (by_id_result, by_id_user) = by_id.unwrap();
+  assert!(by_id_result);
+  assert!(by_id_user.is_some());
+
+  let by_id_user = by_id_user.unwrap();
+  assert_eq!(by_id_user.fullname, emma_stone.fullname);
+
   // Remove one by age
   let age_32 = nongoose.find_one_and_remove::<Actor>(doc! { "age": 32 }, None);
   assert!(age_32.is_ok());
@@ -162,6 +173,17 @@ async fn remove() {
   let jeniffer_lopez = jeniffer_lopez.unwrap();
   let tom_cruise = tom_cruise.unwrap();
   let emma_stone = emma_stone.unwrap();
+
+  // Remove one by id
+  let by_id = nongoose.find_by_id_and_remove::<Actor>(&emma_stone.id).await;
+  assert!(by_id.is_ok());
+
+  let (by_id_result, by_id_user) = by_id.unwrap();
+  assert!(by_id_result);
+  assert!(by_id_user.is_some());
+
+  let by_id_user = by_id_user.unwrap();
+  assert_eq!(by_id_user.fullname, emma_stone.fullname);
 
   // Remove one by age
   let age_32 = nongoose
