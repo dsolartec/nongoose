@@ -1,6 +1,6 @@
 # Nongoose
 
-![Crates.io version](https://img.shields.io/crates/v/nongoose?label=version) ![Crates.io downloads](https://img.shields.io/crates/d/nongoose?label=downloads) ![License](https://img.shields.io/github/license/danielsolartech/nongoose) ![GitHub repository stars](https://img.shields.io/github/stars/danielsolartech/nongoose?style=social)
+![Crates.io version](https://img.shields.io/crates/v/nongoose?label=version) ![Crates.io downloads](https://img.shields.io/crates/d/nongoose?label=downloads) ![License](https://img.shields.io/github/license/dsolartec/nongoose) ![GitHub repository stars](https://img.shields.io/github/stars/dsolartec/nongoose?style=social)
 
 ODM for MongoDB based on Mongoose and written in Rust
 
@@ -68,6 +68,6 @@ Check the [COPYING](./COPYING) file for more information.
 
 Thanks to this amazing people for make Nongoose better:
 
-- [@danielsolartech](https://github.com/danielsolartech)
+- [@dsolartec](https://github.com/dsolartec)
 
 > If you help to Nongoose feel free to add here.
