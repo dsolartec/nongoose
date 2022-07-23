@@ -940,8 +940,8 @@ impl Nongoose {
     Ok(result)
   }
 
-  /// Finds a single document by its `_id` field. `find_by_id(id)`is almost equivalent to `find_one(doc! { "_id": id })`.
-  /// If you want to query by a document's `_id`, use `find_by_id()`instead of `find_one()`.
+  /// Finds a single document by its `_id` field. `find_by_id(id)` is almost equivalent to `find_one(doc! { "_id": id })`.
+  /// If you want to query by a document's `_id`, use `find_by_id()` instead of `find_one()`.
   ///
   /// This function triggers `find_one()`.
   ///
@@ -962,8 +962,8 @@ impl Nongoose {
     self.find_one(doc! { "_id": id.clone().into() }, None)
   }
 
-  /// Finds a single document by its `_id` field. `find_by_id(id)`is almost equivalent to `find_one(doc! { "_id": id })`.
-  /// If you want to query by a document's `_id`, use `find_by_id()`instead of `find_one()`.
+  /// Finds a single document by its `_id` field. `find_by_id(id)` is almost equivalent to `find_one(doc! { "_id": id })`.
+  /// If you want to query by a document's `_id`, use `find_by_id()` instead of `find_one()`.
   ///
   /// This function triggers `find_one()`.
   ///
@@ -982,6 +982,56 @@ impl Nongoose {
     T: Schema + 'static,
   {
     self.find_one(doc! { "_id": id.clone().into() }, None).await
+  }
+
+  /// Finds a single document by its `_id` field and remove it from the db. `find_by_id_and_remove(id)` is almost
+  /// equivalent to `find_one_and_remove(doc! { "_id": id })`. If you want to query by a document's `_id`, use
+  /// `find_by_id_and_remove()` instead of `find_one_and_remove()`.
+  ///
+  /// This function triggers `find_one_and_remove()`.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// // Find one `User` document by `_id`
+  /// match nongoose.find_by_id_and_remove::<User>(
+  ///   &ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap()
+  /// ) {
+  ///   Ok((_, Some(user))) => println!("User found: {}", user.id),
+  ///   Ok((_, None)) => eprintln!("Cannot find the user"),
+  ///   Err(error) => eprintln!("Error finding user: {}", error),
+  /// }
+  /// ```
+  #[cfg(feature = "sync")]
+  pub fn find_by_id_and_remove<T>(&self, id: &T::Id) -> Result<(bool, Option<T>)>
+  where
+    T: Schema + Sync
+  {
+    self.find_one_and_remove(doc! { "_id": id.clone().into() }, None)
+  }
+
+  /// Finds a single document by its `_id` field and remove it from the db. `find_by_id_and_remove(id)` is almost
+  /// equivalent to `find_one_and_remove(doc! { "_id": id })`. If you want to query by a document's `_id`, use
+  /// `find_by_id_and_remove()` instead of `find_one_and_remove()`.
+  ///
+  /// This function triggers `find_one_and_remove()`.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// // Find one `User` document by `_id`
+  /// match nongoose.find_by_id_and_remove::<User>(
+  ///   &ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap()
+  /// ).await {
+  ///   Ok((_, Some(user))) => println!("User found: {}", user.id),
+  ///   Ok((_, None)) => eprintln!("Cannot find the user"),
+  ///   Err(error) => eprintln!("Error finding user: {}", error),
+  /// }
+  /// ```
+  #[cfg(feature = "tokio-runtime")]
+  pub async fn find_by_id_and_remove<T>(&self, id: &T::Id) -> Result<(bool, Option<T>)>
+  where
+    T: Schema + Sync + 'static,
+  {
+    self.find_one_and_remove(doc! { "_id": id.clone().into() }, None).await
   }
 
   /// Finds one document.
