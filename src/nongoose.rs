@@ -1004,7 +1004,7 @@ impl Nongoose {
   #[cfg(feature = "sync")]
   pub fn find_by_id_and_remove<T>(&self, id: &T::Id) -> Result<(bool, Option<T>)>
   where
-    T: Schema + Sync
+    T: Schema + Sync,
   {
     self.find_one_and_remove(doc! { "_id": id.clone().into() }, None)
   }
@@ -1031,7 +1031,9 @@ impl Nongoose {
   where
     T: Schema + Sync + 'static,
   {
-    self.find_one_and_remove(doc! { "_id": id.clone().into() }, None).await
+    self
+      .find_one_and_remove(doc! { "_id": id.clone().into() }, None)
+      .await
   }
 
   /// Finds one document.

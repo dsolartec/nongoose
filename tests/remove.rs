@@ -175,7 +175,9 @@ async fn remove() {
   let emma_stone = emma_stone.unwrap();
 
   // Remove one by id
-  let by_id = nongoose.find_by_id_and_remove::<Actor>(&emma_stone.id).await;
+  let by_id = nongoose
+    .find_by_id_and_remove::<Actor>(&emma_stone.id)
+    .await;
   assert!(by_id.is_ok());
 
   let (by_id_result, by_id_user) = by_id.unwrap();
