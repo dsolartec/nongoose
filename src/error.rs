@@ -13,6 +13,10 @@ pub enum Error {
   #[error("MongoDB error: {0}")]
   MongoDB(#[from] mongodb::error::Error),
 
+  /// Wrap BSON Document value access errors.
+  #[error("Document value access error")]
+  DocumentAccessError(#[from] mongodb::bson::document::ValueAccessError),
+
   /// Wrap Tokio Task errors.
   #[cfg(feature = "tokio")]
   #[error("Tokio task error: {0}")]

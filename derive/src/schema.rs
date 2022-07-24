@@ -23,7 +23,7 @@ pub(crate) fn parse(input: &DeriveInput) -> TokenStream {
   let traits = quote! {
     #[cfg_attr(feature = "async", #nongoose::re_exports::async_trait)]
     impl #nongoose::Schema for #ident {
-      fn __get_collection_name() -> String {
+      fn collection_name() -> String {
         #collection_name.to_string()
       }
 
@@ -37,7 +37,7 @@ pub(crate) fn parse(input: &DeriveInput) -> TokenStream {
       fn from(key: #ident) -> Self {
         match #nongoose::bson::to_bson(&key) {
           Ok(bson) => bson,
-          Err(e) => panic!("Cannot parse the Schema as BSON (name: {})", <#ident as #nongoose::Schema>::__get_collection_name()),
+          Err(e) => panic!("Cannot parse the Schema as BSON (name: {})", <#ident as #nongoose::Schema>::collection_name()),
         }
       }
     }

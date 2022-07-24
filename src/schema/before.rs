@@ -39,6 +39,37 @@ pub trait SchemaBefore: DeserializeOwned + Serialize + Send + Into<Bson> + Clone
     Ok(())
   }
 
+  /// Executes a custom validation before delete the document from the database.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// impl SchemaBefore for User {
+  ///   fn before_delete(&mut self, _db: &Database) -> Result<bool> {
+  ///     Ok(true)
+  ///   }
+  /// }
+  /// ```
+  #[cfg(feature = "sync")]
+  fn before_delete(&mut self, _db: &Database) -> Result<bool> {
+    Ok(true)
+  }
+
+  /// Executes a custom validation before delete the document from the database.
+  ///
+  /// # Example
+  /// ```rust,no_run,ignore
+  /// #[async_trait::async_trait]
+  /// impl SchemaBefore for User {
+  ///   async fn before_delete(&mut self, _db: &Database) -> Result<bool> {
+  ///     Ok(true)
+  ///   }
+  /// }
+  /// ```
+  #[cfg(feature = "tokio-runtime")]
+  async fn before_delete(&mut self, _db: &Database) -> Result<bool> {
+    Ok(true)
+  }
+
   /// Executes a custom validation before replace the document in the database (called on `Schema.save()`).
   ///
   /// # Example

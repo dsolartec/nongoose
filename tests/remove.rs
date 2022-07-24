@@ -3,6 +3,7 @@ use nongoose::{
   options::FindOptions,
   Client, Nongoose, Schema, SchemaBefore,
 };
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Schema, Serialize)]
@@ -52,7 +53,7 @@ fn get_instance() -> Nongoose {
 
 #[cfg(feature = "sync")]
 #[cfg_attr(feature = "sync", test)]
-fn find() {
+fn remove() {
   let nongoose = get_instance();
 
   let tom_hanks = Actor::new("Tom Hanks", 65).save();
@@ -81,49 +82,56 @@ fn find() {
   let tom_cruise = tom_cruise.unwrap();
   let emma_stone = emma_stone.unwrap();
 
-  // Find by id
-  let by_id = nongoose.find_by_id::<Actor>(&emma_stone.id);
+  // Remove one by id
+  let by_id = nongoose.find_by_id_and_remove::<Actor>(&emma_stone.id);
   assert!(by_id.is_ok());
 
-  let by_id = by_id.unwrap();
-  assert!(by_id.is_some());
+  let (by_id_result, by_id_user) = by_id.unwrap();
+  assert!(by_id_result);
+  assert!(by_id_user.is_some());
 
-  let by_id = by_id.unwrap();
-  assert_eq!(by_id.fullname, emma_stone.fullname);
+  let by_id_user = by_id_user.unwrap();
+  assert_eq!(by_id_user.fullname, emma_stone.fullname);
 
-  // Find one by age
-  let age_32 = nongoose.find_one::<Actor>(doc! { "age": 32 }, None);
+  // Remove one by age
+  let age_32 = nongoose.find_one_and_remove::<Actor>(doc! { "age": 32 }, None);
   assert!(age_32.is_ok());
 
-  let age_32 = age_32.unwrap();
-  assert!(age_32.is_some());
+  let (age_32_result, age_32_user) = age_32.unwrap();
+  assert!(age_32_result);
+  assert!(age_32_user.is_some());
 
-  let age_32 = age_32.unwrap();
-  assert_eq!(age_32.fullname, emma_stone.fullname);
+  let age_32_user = age_32_user.unwrap();
+  assert_eq!(age_32_user.fullname, emma_stone.fullname);
 
-  // Find actors between 40 and 49 years old
-  let actors_40s_age = nongoose.find::<Actor>(doc! { "age": { "$gte": 40, "$lte": 49 } }, None);
+  // Remove actors between 40 and 49 years old
+  let actors_40s_age =
+    nongoose.find_and_remove::<Actor>(doc! { "age": { "$gte": 40, "$lte": 49 } }, None);
   assert!(actors_40s_age.is_ok());
 
   let actors_40s_age = actors_40s_age.unwrap();
-  assert_eq!(actors_40s_age.len(), 1);
-  assert_eq!(actors_40s_age[0].fullname, leonardo_dicaprio.fullname);
+  assert_eq!(actors_40s_age.len(), 2);
+  assert!(actors_40s_age[0].0);
+  assert_eq!(actors_40s_age[0].1.fullname, leonardo_dicaprio.fullname);
 
-  // Find actors between 50 and 59 years old
-  let actors_50s_age = nongoose.find::<Actor>(
+  // Remove actors between 50 and 59 years old
+  let actors_50s_age = nongoose.find_and_remove::<Actor>(
     doc! { "age": { "$gte": 50, "$lte": 59 }},
     Some(FindOptions::builder().sort(doc! { "age": 1 }).build()),
   );
   assert!(actors_50s_age.is_ok());
 
   let actors_50s_age = actors_50s_age.unwrap();
-  assert_eq!(actors_50s_age.len(), 3);
-  assert_eq!(actors_50s_age[0].fullname, jeniffer_lopez.fullname);
-  assert_eq!(actors_50s_age[1].fullname, will_smith.fullname);
-  assert_eq!(actors_50s_age[2].fullname, tom_cruise.fullname);
+  assert_eq!(actors_50s_age.len(), 6);
+  assert!(actors_50s_age[0].0);
+  assert_eq!(actors_50s_age[1].1.fullname, jeniffer_lopez.fullname);
+  assert!(actors_50s_age[2].0);
+  assert_eq!(actors_50s_age[3].1.fullname, will_smith.fullname);
+  assert!(actors_50s_age[4].0);
+  assert_eq!(actors_50s_age[5].1.fullname, tom_cruise.fullname);
 
-  // Find actors with the word "Tom" in their name
-  let tom_actors = nongoose.find::<Actor>(
+  // Remove actors with the word "Tom" in their name
+  let tom_actors = nongoose.find_and_remove::<Actor>(
     doc! { "fullname": Regex { pattern: String::from("^Tom"), options: String::new() } },
     Some(FindOptions::builder().sort(doc! { "age": -1 }).build()),
   );
@@ -131,13 +139,13 @@ fn find() {
 
   let tom_actors = tom_actors.unwrap();
   assert_eq!(tom_actors.len(), 2);
-  assert_eq!(tom_actors[0].fullname, tom_hanks.fullname);
-  assert_eq!(tom_actors[1].fullname, tom_cruise.fullname);
+  assert!(tom_actors[0].0);
+  assert_eq!(tom_actors[1].1.fullname, tom_hanks.fullname);
 }
 
 #[cfg(feature = "tokio-runtime")]
 #[cfg_attr(feature = "tokio-runtime", tokio::test)]
-async fn find() {
+async fn remove() {
   let nongoose = get_instance();
 
   let tom_hanks = Actor::new("Tom Hanks", 65).save().await;
@@ -166,39 +174,46 @@ async fn find() {
   let tom_cruise = tom_cruise.unwrap();
   let emma_stone = emma_stone.unwrap();
 
-  // Find by id
-  let by_id = nongoose.find_by_id::<Actor>(&emma_stone.id).await;
+  // Remove one by id
+  let by_id = nongoose
+    .find_by_id_and_remove::<Actor>(&emma_stone.id)
+    .await;
   assert!(by_id.is_ok());
 
-  let by_id = by_id.unwrap();
-  assert!(by_id.is_some());
+  let (by_id_result, by_id_user) = by_id.unwrap();
+  assert!(by_id_result);
+  assert!(by_id_user.is_some());
 
-  let by_id = by_id.unwrap();
-  assert_eq!(by_id.fullname, emma_stone.fullname);
+  let by_id_user = by_id_user.unwrap();
+  assert_eq!(by_id_user.fullname, emma_stone.fullname);
 
-  // Find one by age
-  let age_32 = nongoose.find_one::<Actor>(doc! { "age": 32 }, None).await;
+  // Remove one by age
+  let age_32 = nongoose
+    .find_one_and_remove::<Actor>(doc! { "age": 32 }, None)
+    .await;
   assert!(age_32.is_ok());
 
-  let age_32 = age_32.unwrap();
-  assert!(age_32.is_some());
+  let (age_32_result, age_32_user) = age_32.unwrap();
+  assert!(age_32_result);
+  assert!(age_32_user.is_some());
 
-  let age_32 = age_32.unwrap();
-  assert_eq!(age_32.fullname, emma_stone.fullname);
+  let age_32_user = age_32_user.unwrap();
+  assert_eq!(age_32_user.fullname, emma_stone.fullname);
 
-  // Find actors between 40 and 49 years old
+  // Remove actors between 40 and 49 years old
   let actors_40s_age = nongoose
-    .find::<Actor>(doc! { "age": { "$gte": 40, "$lte": 49 } }, None)
+    .find_and_remove::<Actor>(doc! { "age": { "$gte": 40, "$lte": 49 } }, None)
     .await;
   assert!(actors_40s_age.is_ok());
 
   let actors_40s_age = actors_40s_age.unwrap();
-  assert_eq!(actors_40s_age.len(), 1);
-  assert_eq!(actors_40s_age[0].fullname, leonardo_dicaprio.fullname);
+  assert_eq!(actors_40s_age.len(), 2);
+  assert!(actors_40s_age[0].0);
+  assert_eq!(actors_40s_age[0].1.fullname, leonardo_dicaprio.fullname);
 
-  // Find actors between 50 and 59 years old
+  // Remove actors between 50 and 59 years old
   let actors_50s_age = nongoose
-    .find::<Actor>(
+    .find_and_remove::<Actor>(
       doc! { "age": { "$gte": 50, "$lte": 59 }},
       Some(FindOptions::builder().sort(doc! { "age": 1 }).build()),
     )
@@ -206,14 +221,17 @@ async fn find() {
   assert!(actors_50s_age.is_ok());
 
   let actors_50s_age = actors_50s_age.unwrap();
-  assert_eq!(actors_50s_age.len(), 3);
-  assert_eq!(actors_50s_age[0].fullname, jeniffer_lopez.fullname);
-  assert_eq!(actors_50s_age[1].fullname, will_smith.fullname);
-  assert_eq!(actors_50s_age[2].fullname, tom_cruise.fullname);
+  assert_eq!(actors_50s_age.len(), 6);
+  assert!(actors_50s_age[0].0);
+  assert_eq!(actors_50s_age[1].1.fullname, jeniffer_lopez.fullname);
+  assert!(actors_50s_age[2].0);
+  assert_eq!(actors_50s_age[3].1.fullname, will_smith.fullname);
+  assert!(actors_50s_age[4].0);
+  assert_eq!(actors_50s_age[5].1.fullname, tom_cruise.fullname);
 
-  // Find actors with the word "Tom" in their name
+  // Remove actors with the word "Tom" in their name
   let tom_actors = nongoose
-    .find::<Actor>(
+    .find_and_remove::<Actor>(
       doc! { "fullname": Regex { pattern: String::from("^Tom"), options: String::new() } },
       Some(FindOptions::builder().sort(doc! { "age": -1 }).build()),
     )
@@ -222,6 +240,6 @@ async fn find() {
 
   let tom_actors = tom_actors.unwrap();
   assert_eq!(tom_actors.len(), 2);
-  assert_eq!(tom_actors[0].fullname, tom_hanks.fullname);
-  assert_eq!(tom_actors[1].fullname, tom_cruise.fullname);
+  assert!(tom_actors[0].0);
+  assert_eq!(tom_actors[1].1.fullname, tom_hanks.fullname);
 }

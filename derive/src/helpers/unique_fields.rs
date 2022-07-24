@@ -39,7 +39,7 @@ pub(crate) fn getter(schema_data: &SchemaData) -> TokenStream {
         let data = vec![#idents];
         for (document, field, value) in data {
           if let Some(doc) = Self::__get_database(None)
-            .collection::<#nongoose::bson::Document>(Self::__get_collection_name().as_str())
+            .collection::<#nongoose::bson::Document>(Self::collection_name().as_str())
             .find_one(document, None)?
           {
             let data: Self = #nongoose::bson::from_bson(#nongoose::bson::Bson::Document(doc))?;

@@ -12,7 +12,7 @@ impl SchemaData {
     T: super::Schema,
   {
     Self {
-      name: T::__get_collection_name(),
+      name: T::collection_name(),
       relations: T::__relations(),
     }
   }

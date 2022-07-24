@@ -34,8 +34,8 @@ pub trait Schema: SchemaBefore {
   #[doc(hidden)]
   fn __get_database(database: Option<Database>) -> &'static Database;
 
-  #[doc(hidden)]
-  fn __get_collection_name() -> String;
+  /// Get the collection name.
+  fn collection_name() -> String;
 
   #[doc(hidden)]
   fn __get_id(&self) -> Self::Id;
@@ -92,7 +92,7 @@ pub trait Schema: SchemaBefore {
                   continue;
                 }
 
-                if schema_relation.schema_name == Self::__get_collection_name() {
+                if schema_relation.schema_name == Self::collection_name() {
                   let documents: Vec<mongodb::error::Result<Document>> = database
                     .collection::<Document>(collection_name.as_str())
                     .find(
@@ -166,7 +166,7 @@ pub trait Schema: SchemaBefore {
   #[cfg(feature = "sync")]
   fn remove(&self) -> Result<bool> {
     let db = Self::__get_database(None);
-    let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
+    let collection = db.collection::<Document>(Self::collection_name().as_str());
 
     let result = collection.delete_one(self.__get_id_query(), None)?;
     Ok(result.deleted_count == 1)
@@ -185,7 +185,7 @@ pub trait Schema: SchemaBefore {
   #[cfg(feature = "tokio-runtime")]
   async fn remove(&self) -> Result<bool> {
     let db = Self::__get_database(None);
-    let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
+    let collection = db.collection::<Document>(Self::collection_name().as_str());
 
     let id = self.__get_id_query();
 
@@ -208,7 +208,7 @@ pub trait Schema: SchemaBefore {
   #[cfg(feature = "sync")]
   fn save(&mut self) -> Result<Self> {
     let db = Self::__get_database(None);
-    let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
+    let collection = db.collection::<Document>(Self::collection_name().as_str());
 
     self.__check_unique_fields()?;
 
@@ -251,7 +251,7 @@ pub trait Schema: SchemaBefore {
   #[cfg(feature = "tokio-runtime")]
   async fn save(&mut self) -> Result<Self> {
     let db = Self::__get_database(None);
-    let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
+    let collection = db.collection::<Document>(Self::collection_name().as_str());
 
     self.__check_unique_fields()?;
 
@@ -261,7 +261,7 @@ pub trait Schema: SchemaBefore {
     if result.is_some() {
       self.before_update(db).await?;
 
-      let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
+      let collection = db.collection::<Document>(Self::collection_name().as_str());
 
       let id_query = self.__get_id_query();
       let document = self.__to_document()?;
@@ -277,7 +277,7 @@ pub trait Schema: SchemaBefore {
     } else {
       self.before_create(db).await?;
 
-      let collection = db.collection::<Document>(Self::__get_collection_name().as_str());
+      let collection = db.collection::<Document>(Self::collection_name().as_str());
 
       let document = self.__to_document()?;
       spawn_blocking(move || collection.insert_one(document, None)).await??;

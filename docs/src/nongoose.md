@@ -1,5 +1,17 @@
 # Nongoose
 
+- [build](#nongoosebuild)
+- [aggregate](#nongooseaggregate)
+- [count](#nongoosecount)
+- [create](#nongoosecreate)
+- [find](#nongoosefind)
+- [find_and_remove](#nongoosefind_and_remove)
+- [find_by_id](#nongoosefind_by_id)
+- [find_by_id_and_remove](#nongoosefind_by_id_and_remove)
+- [find_one](#nongoosefind_one)
+- [find_one_and_remove](#nongoosefind_one_and_remove)
+- [update_many](#nongooseupdate_many)
+
 ## `Nongoose::build()`
 
 **Arguments**
@@ -20,44 +32,164 @@ let nongoose = Nongoose::build()
   .finish();
 ```
 
-## `Nongoose.create()`
+## `Nongoose.aggregate()`
 
 **Generics**
 
-- T `Schema` value of schema to query by
+- S `Schema` value of schema to query by
+- T `From<Document>`
 
 **Arguments**
 
-- data `&T` Document to insert
+- pipeline `Vec<Document>` aggregation pipeline as an array of BSON documents
+- options `Option<nongoose::mongodb::AggregateOptions>` aggregation options
 
 **Returns**
 
-- `nongoose::Result<T>`
+- `nongoose::Result<Vec<T>>`
 
-Shortcut for saving one document to the database. `Nongoose.create(doc)` does `doc.save()`.
+Performs [aggregations](https://docs.mongodb.com/manual/aggregation/) on the schemas collection.
 
-This function triggers `save()`.
+- [MongoDB Aggregation docs](https://docs.mongodb.org/manual/applications/aggregation/)
+
+**Options**
+
+```rust,no_run
+AggregationOptions::builder();
+  // Optional (bool)
+  // Enables writing to temporary files. When set to true, aggregation stages can write data to the _tmp subdirectory in the dbPath directory.
+  .allow_disk_use(...)
+  // Optional (u32)
+  // The number of documents the server should return per cursor batch.
+  // Note that this does not have any affect on the documents that are returned by a cursor, only the number of documents kept in memory at a given time (and by extension, the number of round trips needed to return the entire set of documents returned by the query).
+  .batch_size(...)
+  // Optional (bool)
+  // Opt out of document-level validation.
+  .bypass_document_validation(...)
+  // Optional (mongodb::options::Collation)
+  // The collation to use for the operation.
+  // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  .collation(...)
+  // Optional (String)
+  // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  .comment(...)
+  // Optional (mongodb::options::Hint)
+  // The index to use for the operation.
+  .hint(...)
+  // Optional (std::time::Duration)
+  // The maximum amount of time for the server to wait on new documents to satisfy a tailable await cursor query.
+  // This option will have no effect on non-tailable cursors that result from this operation.
+  .max_await_time(...)
+  // Optional (std::time::Duration)
+  // The maximum amount of time to allow the query to run.
+  // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  .max_time(...)
+  // Optional (mongodb::options::ReadConcern)
+  // The read concern to use for this find query.
+  // If none specified, the default set on the collection will be used.
+  .read_concern(...)
+  // Optional (mongodb::options::SelectionCriteria)
+  // The criteria used to select a server for this find query.
+  // If none specified, the default set on the collection will be used.
+  .selection_criteria(...)
+  // Optional (mongodb::options::WriteConcern)
+  // The write concern for the operation.
+  // If none is specified, the write concern defined on the object executing this operation will be used.
+  .write_concern(...)
+  // Optional (mongodb::bson::Document)
+  // A document with any amount of parameter names, each followed by definitions of constants in the MQL Aggregate Expression language. Each parameter name is then usable to access the value of the corresponding MQL Expression with the “$$” syntax within Aggregate Expression contexts.
+  // This feature is only available on server versions 5.0 and above.
+  .let_vars(...)
+  // Required to create the instance of `CountOptions`
+  .build()
+```
 
 **Example**
 
 ```rust,no_run
-// Insert one new `User` document (Sync method)
-match nongoose.create::<User>(&user) {
-  Ok(user) => {
-    println!("User saved: {}", user.id);
-  },
-  Err(error) => {
-    eprintln!("Error saving the user: {}", error);
+// Aggregation result struct.
+#[derive(Debug)]
+struct SearchResult {
+  posts_with_comments: Vec<String>,
+  users_with_comments: Vec<String>,
+}
+
+impl From<Document> for SearchResult {
+  fn from(document: Document) -> Self {
+    Self {
+      posts_with_comments: document
+        .get_array("posts_with_comments")
+        .unwrap_or(&Vec::new())
+        .iter()
+        .map(|d| d.as_str())
+        .filter(|d| d.is_some())
+        .map(|d| String::from(d.unwrap()))
+        .collect(),
+      users_with_comments: document
+        .get_array("users_with_comments")
+        .unwrap_or(&Vec::new())
+        .iter()
+        .map(|d| d.as_str())
+        .filter(|d| d.is_some())
+        .map(|d| String::from(d.unwrap()))
+        .collect(),
+    }
   }
 }
 
-// Insert one new `User` document (Async method)
-match nongoose.create::<User>(&user).await {
-  Ok(user) => {
-    println!("User saved: {}", user.id);
+// Aggregation
+let aggregation = nongoose
+  .aggregate::<PostComment, SearchResult>(
+    vec![
+      doc! {
+        "$match": {
+          "message": Regex { pattern: String::from(" "), options: String::new() },
+        },
+      },
+      doc! {
+        "$lookup": {
+          "from": User::collection_name(),
+          "localField": "author_id",
+          "foreignField": "_id",
+          "as": "users",
+        }
+      },
+      doc! {
+        "$lookup": {
+          "from": Post::collection_name(),
+          "localField": "post_id",
+          "foreignField": "_id",
+          "as": "posts",
+        },
+      },
+      doc! {
+        "$group": {
+          "_id": "1",
+          "posts_with_comments": { "$addToSet": { "$first": "$posts.title" } },
+          "users_with_comments": { "$addToSet": { "$first": "$users.realname" } },
+        },
+      },
+    ],
+    None,
+  );
+
+// Aggregation (Sync method)
+match aggregation {
+  Ok(data) => {
+    println!("Total retuned: {} - Data: {:?}", data.len(), data);
   },
   Err(error) => {
-    eprintln!("Error saving the user: {}", error);
+    eprintln!("MongoDB error: {}", error);
+  }
+}
+
+// Aggregation (Async method)
+match aggregation.await {
+  Ok(data) => {
+    println!("Total retuned: {} - Data: {:?}", data.len(), data);
+  },
+  Err(error) => {
+    eprintln!("MongoDB error: {}", error);
   }
 }
 ```
@@ -132,6 +264,48 @@ match nongoose
 {
   Ok(users) => println!("Found {} users!", users),
   Err(error) => eprintln!("Error finding users: {}", error),
+}
+```
+
+## `Nongoose.create()`
+
+**Generics**
+
+- T `Schema` value of schema to query by
+
+**Arguments**
+
+- data `&T` Document to insert
+
+**Returns**
+
+- `nongoose::Result<T>`
+
+Shortcut for saving one document to the database. `Nongoose.create(doc)` does `doc.save()`.
+
+This function triggers `save()`.
+
+**Example**
+
+```rust,no_run
+// Insert one new `User` document (Sync method)
+match nongoose.create::<User>(&user) {
+  Ok(user) => {
+    println!("User saved: {}", user.id);
+  },
+  Err(error) => {
+    eprintln!("Error saving the user: {}", error);
+  }
+}
+
+// Insert one new `User` document (Async method)
+match nongoose.create::<User>(&user).await {
+  Ok(user) => {
+    println!("User saved: {}", user.id);
+  },
+  Err(error) => {
+    eprintln!("Error saving the user: {}", error);
+  }
 }
 ```
 
@@ -253,6 +427,124 @@ match nongoose.find::<User>(
 }
 ```
 
+## `Nongoose.find_and_remove()`
+
+**Generics**
+
+- T `Schema` value of schema to query by
+
+**Arguments**
+
+- conditions `bson::Document`
+- options `mongodb::options::FindOptions`
+
+**Returns**
+
+- `nongoose::Result<Vec<(bool, T)>>`
+
+Finds documents and remove them from the db.
+
+**Options**
+```rust,no_run
+FindOptions::builder()
+  // Optional (bool)
+  // Enables writing to temporary files by the server. When set to true, the find operation can write data to the _tmp subdirectory in the dbPath directory.
+  // Only supported in server versions 4.4+.
+  .allow_disk_use(...)
+  // Optional (bool)
+  // If true, partial results will be returned from a mongos rather than an error being returned if one or more shards is down.
+  .allow_partial_results(...)
+  // Optional (u32)
+  // The number of documents the server should return per cursor batch.
+  // Note that this does not have any affect on the documents that are returned by a cursor, only the number of documents kept in memory at a given time
+  // (and by extension, the number of round trips needed to return the entire set of documents returned by the query.
+  .batch_size(...)
+  // Optional (String)
+  // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  .comment(...)
+  // Optional (mongodb::options::CursorType)
+  // The type of cursor to return.
+  .cursor_type(...)
+  // Optional (mongodb::options::Hint)
+  // The index to use for the operation.
+  .hint(...)
+  // Optional (i64)
+  // The maximum number of documents to query. If a negative number is specified, the documents will be returned in a single batch limited in number
+  // by the positive value of the specified limit.
+  .limit(...)
+  // Optional (mongodb::bson::Document)
+  // The exclusive upper bound for a specific index.
+  .max(...)
+  // Optional (std::time::Duration)
+  // The maximum amount of time for the server to wait on new documents to satisfy a tailable cursor query. If the cursor is not tailable, this option is ignored.
+  .max_await_time(...)
+  // Optional (u64)
+  // Maximum number of documents or index keys to scan when executing the query.
+  // Note: this option is deprecated starting in MongoDB version 4.0 and removed in MongoDB 4.2. Use the maxTimeMS option instead.
+  .max_scan(...)
+  // Optional (std::time::Duration)
+  // The maximum amount of time to allow the query to run.
+  // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  .max_time(...)
+  // Optional (mongodb::bson::Document)
+  // The inclusive lower bound for a specific index.
+  .min(...)
+  // Optional (bool)
+  // Whether the server should close the cursor after a period of inactivity.
+  .no_cursor_timeout(...)
+  // Optional (mongodb::bson::Document)
+  // Limits the fields of the document being returned.
+  .projection(...)
+  // Optional (mongodb::options::ReadConcern)
+  // The read concern to use for this find query.
+  // If none specified, the default set on the collection will be used.
+  .read_concern(...)
+  // Optional (bool)
+  // Whether to return only the index keys in the documents.
+  .return_key(...)
+  // Optional (mongodb::options::SelectionCriteria)
+  // The criteria used to select a server for this find query.
+  // If none specified, the default set on the collection will be used.
+  .selection_criteria(...)
+  // Optional (bool)
+  // Whether to return the record identifier for each document.
+  .show_record_id(...)
+  // Optional (u64)
+  // The number of documents to skip before counting.
+  .skip(...)
+  // Optional (mongodb::bson::Document)
+  // The order of the documents for the purposes of the operation.
+  .sort(...)
+  // Optional (mongodb::options::Collation)
+  // The collation to use for the operation.
+  // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  .collation(...)
+  // Required to create the instance of `FindOptions`
+  .build()
+```
+
+**Example**
+
+```rust,no_run
+// Sync method
+match nongoose.find_and_remove::<User>(
+  doc! { "age": { "$gte": 18 } },
+  Some(Findptions::builder().sort(doc! { "username": 1 }).build())
+) {
+  Ok(users) => println!("Found {} users!", users.len()),
+  Err(error) => eprintln!("Error finding users: {}", error),
+}
+
+// Async method
+match nongoose.find_and_remove::<User>(
+  doc! { "age": { "$gte": 18 } },
+  Some(FindOptions::builder().sort(doc! { "username": 1 }).build())
+).await {
+  Ok(users) => println!("Found {} users!", users.len()),
+  Err(error) => eprintln!("Error finding users: {}", error),
+}
+```
+
 ## `Nongoose.find_by_id()`
 
 **Generics**
@@ -290,6 +582,46 @@ match nongoose.find_by_id::<User>(
 ).await {
   Ok(Some(user)) => println!("User found: {}", user.id),
   Ok(None) => eprintln!("Cannot find the user"),
+  Err(error) => eprintln!("Error finding user: {}", error),
+}
+```
+
+## `Nongoose.find_by_id_and_remove()`
+
+**Generics**
+
+- T `Schema` value of schema to query by
+
+**Arguments**
+
+- id `&T::Id` value of `_id` to query by
+
+**Returns**
+
+- `nongoose::Result<(bool, Option<T>)>`
+
+Finds a single document by its `_id` field and remove it from the db. `find_by_id_and_remove(id)` is almost equivalent to `find_one_and_remove(doc! { "_id": id })`. If you want to query by a document's `_id`, use `find_by_id_and_remove()` instead of `find_one_and_remove()`.
+
+This function triggers `find_one_and_remove()`.
+
+**Example**
+
+```rust,no_run
+// Find one `User` document by `_id` (Sync method)
+match nongoose.find_by_id_and_remove::<User>(
+  &ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap()
+) {
+  Ok((_, Some(user))) => println!("User found: {}", user.id),
+  Ok((_, None)) => eprintln!("Cannot find the user"),
+  Err(error) => eprintln!("Error finding user: {}", error),
+}
+
+// Find one `User` document by `_id` (Async method)
+match nongoose.find_by_id_and_remove::<User>(
+  &ObjectId::parse_str("616c91dc8cb70be8cc7d1f38").unwrap()
+).await {
+  Ok((_, Some(user))) => println!("User found: {}", user.id),
+  Ok((_, None)) => eprintln!("Cannot find the user"),
   Err(error) => eprintln!("Error finding user: {}", error),
 }
 ```
@@ -392,6 +724,108 @@ match nongoose.find_one::<User>(
 ) {
   Ok(Some(user)) => println!("User found: {}", user.id),
   Ok(None) => eprintln!("No users over 18 years old"),
+  Err(error) => eprintln!("Error finding user: {}", error),
+}
+```
+
+## `Nongoose.find_one_and_remove()`
+
+**Generics**
+
+- T `Schema` value of schema to query by
+
+**Arguments**
+
+- conditions `bson::Document`
+- options `mongodb::options::FindOneOptions`
+
+**Returns**
+
+- `nongoose::Result<(bool, Option<T>)>`
+
+Finds one document and remove it from the db.
+
+**Options**
+```rust,no_run
+FindOneOptions::builder()
+  // Optional (bool)
+  // If true, partial results will be returned from a mongos rather than an error being returned if one or more shards is down.
+  .allow_partial_results(...)
+  // Optional (mongodb::options::Collation)
+  // The collation to use for the operation.
+  // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  .collation(...)
+  // Optional (String)
+  // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  .comment(...)
+  // Optional (mongodb::options::Hint)
+  // The index to use for the operation.
+  .hint(...)
+  // Optional (mongodb::bson::Document)
+  // The exclusive upper bound for a specific index.
+  .max(...)
+  // Optional (u64)
+  // Maximum number of documents or index keys to scan when executing the query.
+  // Note: this option is deprecated starting in MongoDB version 4.0 and removed in MongoDB 4.2. Use the maxTimeMS option instead.
+  .max_scan(...)
+  // Optional (std::time::Duration)
+  // The maximum amount of time to allow the query to run.
+  // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  .max_time(...)
+  // Optional (mongodb::bson::Document)
+  // The inclusive lower bound for a specific index.
+  .min(...)
+  // Optional (mongodb::bson::Document)
+  // Limits the fields of the document being returned.
+  .projection(...)
+  // Optional (mongodb::options::ReadConcern)
+  // The read concern to use for this find query.
+  // If none specified, the default set on the collection will be used.
+  .read_concern(...)
+  // Optional (bool)
+  // Whether to return only the index keys in the documents.
+  .return_key(...)
+  // Optional (mongodb::options::SelectionCriteria)
+  // The criteria used to select a server for this find query.
+  // If none specified, the default set on the collection will be used.
+  .selection_criteria(...)
+  // Optional (bool)
+  // Whether to return the record identifier for each document.
+  .show_record_id(...)
+  // Optional (u64)
+  // The number of documents to skip before counting.
+  .skip(...)
+  // Optional (mongodb::bson::Document)
+  // The order of the documents for the purposes of the operation.
+  .sort(...)
+  // Required to create the instance of `FindOneOptions`
+  .build()
+```
+
+**Example**
+
+```rust,no_run
+// Find one user whose `username` is `nongoose` (Sync method)
+match nongoose.find_one_and_remove::<User>(doc! { "username": "nongoose" }, None) {
+  Ok((_, Some(user))) => println!("User found: {}", user.id),
+  Ok((_, None)) => eprintln!("Cannot find the user"),
+  Err(error) => eprintln!("Error finding user: {}", error),
+}
+
+// Find one user whose `username` is `nongoose` (Async method)
+match nongoose.find_one_and_remove::<User>(doc! { "username": "nongoose" }, None).await {
+  Ok((_, Some(user))) => println!("User found: {}", user.id),
+  Ok((_, None)) => eprintln!("Cannot find the user"),
+  Err(error) => eprintln!("Error finding user: {}", error),
+}
+
+// Passing options
+match nongoose.find_one_and_remove::<User>(
+  doc! { "age": { "$gte": 18 } },
+  Some(FindOneOptions::builder().sort(doc! { "username": 1 }).build())
+) {
+  Ok((_, Some(user))) => println!("User found: {}", user.id),
+  Ok((_, None)) => eprintln!("No users over 18 years old"),
   Err(error) => eprintln!("Error finding user: {}", error),
 }
 ```
