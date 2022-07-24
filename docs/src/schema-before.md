@@ -1,5 +1,9 @@
 # SchemaBefore Trait
 
+- [before_create](#schemabeforebefore_create)
+- [before_delete](#schemabeforebefore_delete)
+- [before_update](#schemabeforebefore_update)
+
 ## `SchemaBefore.before_create()`
 
 **Arguments**
