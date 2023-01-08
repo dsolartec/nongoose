@@ -1,0 +1,497 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Aggregate - Nongoose Documentation</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../nongoose.html"><strong aria-hidden="true">2.</strong> Nongoose</a></li><li class="chapter-item expanded "><a href="../schema/index.html"><strong aria-hidden="true">3.</strong> Schema</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../schema/using-derive.html"><strong aria-hidden="true">3.1.</strong> Using derive</a></li><li class="chapter-item expanded "><a href="../schema/attributes/index.html"><strong aria-hidden="true">3.2.</strong> Attributes</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../schema/attributes/macro.html"><strong aria-hidden="true">3.2.1.</strong> Macro Attributes</a></li><li class="chapter-item expanded "><a href="../schema/attributes/container.html"><strong aria-hidden="true">3.2.2.</strong> Container Attributes</a></li><li class="chapter-item expanded "><a href="../schema/attributes/field.html"><strong aria-hidden="true">3.2.3.</strong> Field Attributes</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../schema-before.html"><strong aria-hidden="true">4.</strong> SchemaBefore Trait</a></li><li class="chapter-item expanded "><a href="../building-your-first-instance.html"><strong aria-hidden="true">5.</strong> Building your first instance</a></li><li class="chapter-item expanded "><a href="../examples/index.html"><strong aria-hidden="true">6.</strong> Examples</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../examples/aggregate.html" class="active"><strong aria-hidden="true">6.1.</strong> Aggregate</a></li><li class="chapter-item expanded "><a href="../examples/one-to-many-relation.html"><strong aria-hidden="true">6.2.</strong> One to Many relation</a></li><li class="chapter-item expanded "><a href="../examples/many-to-one-relation.html"><strong aria-hidden="true">6.3.</strong> Many to One relation</a></li></ol></li><li class="chapter-item expanded "><a href="../feature-flags.html"><strong aria-hidden="true">7.</strong> Feature flags</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Nongoose Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="aggregate"><a class="header" href="#aggregate">Aggregate</a></h1>
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use nongoose::{
+	bson::{doc, oid::ObjectId, Document, Regex},
+	schema_relations, Client, Nongoose, Schema, SchemaBefore,
+};
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, Deserialize, Schema, Serialize)]
+struct User {
+	#[schema(id, unique)]
+	#[serde(rename = &quot;_id&quot;)]
+	id: ObjectId,
+
+	#[schema(unique)]
+	username: String,
+
+	realname: String,
+	age: u64,
+}
+
+impl User {
+	pub fn new(username: &amp;str, realname: &amp;str, age: u64) -&gt; Self {
+		Self {
+			id: ObjectId::new(),
+			username: String::from(username),
+			realname: String::from(realname),
+			age,
+		}
+	}
+}
+
+#[cfg_attr(feature = &quot;tokio-runtime&quot;, async_trait::async_trait)]
+impl SchemaBefore for User {}
+
+#[schema_relations]
+#[derive(Clone, Debug, Deserialize, Schema, Serialize)]
+struct Post {
+  #[schema(id, unique)]
+  #[serde(rename = &quot;_id&quot;)]
+  id: ObjectId,
+
+  #[schema(many_to_one = &quot;User&quot;)]
+  #[serde(skip_serializing)]
+  author: Option&lt;User&gt;,
+
+  title: String,
+}
+
+impl Post {
+	pub fn new(title: &amp;str, author: &amp;User) -&gt; Self {
+		Self {
+			id: ObjectId::new(),
+			author: Some(author.clone()),
+			author_id: author.id,
+			title: String::from(title),
+		}
+	}
+}
+
+#[cfg_attr(feature = &quot;tokio-runtime&quot;, async_trait::async_trait)]
+impl SchemaBefore for Post {}
+
+#[schema_relations]
+#[derive(Clone, Debug, Deserialize, Schema, Serialize)]
+struct PostComment {
+	#[schema(id, unique)]
+	#[serde(rename = &quot;_id&quot;)]
+	id: ObjectId,
+
+	#[schema(many_to_one = &quot;User&quot;)]
+	#[serde(skip_serializing)]
+	author: Option&lt;User&gt;,
+
+	#[schema(many_to_one = &quot;Post&quot;)]
+	#[serde(skip_serializing)]
+	post: Option&lt;Post&gt;,
+
+	message: String,
+}
+  
+impl PostComment {
+	pub fn new(message: &amp;str, post: &amp;Post, author: &amp;User) -&gt; Self {
+		Self {
+			id: ObjectId::new(),
+			author: Some(author.clone()),
+			author_id: author.id,
+			post: Some(post.clone()),
+			post_id: post.id,
+			message: String::from(message),
+		}
+	}
+}
+
+#[cfg_attr(feature = &quot;tokio-runtime&quot;, async_trait::async_trait)]
+impl SchemaBefore for PostComment {}
+
+#[derive(Debug)]
+struct SearchResult {
+	posts_with_comments: Vec&lt;String&gt;,
+	users_with_comments: Vec&lt;String&gt;,
+}
+
+impl From&lt;Document&gt; for SearchResult {
+	fn from(document: Document) -&gt; Self {
+		Self {
+			posts_with_comments: document
+				.get_array(&quot;posts_with_comments&quot;)
+				.unwrap_or(&amp;Vec::new())
+				.iter()
+				.map(|d| d.as_str())
+				.filter(|d| d.is_some())
+				.map(|d| String::from(d.unwrap()))
+				.collect(),
+			users_with_comments: document
+				.get_array(&quot;users_with_comments&quot;)
+				.unwrap_or(&amp;Vec::new())
+				.iter()
+				.map(|d| d.as_str())
+				.filter(|d| d.is_some())
+				.map(|d| String::from(d.unwrap()))
+				.collect(),
+		}
+	}
+}
+
+#[cfg(test)]
+fn get_instance() -&gt; Nongoose {
+	// Get database url.
+	let url = match std::env::var(&quot;DATABASE_URL&quot;) {
+		Ok(url) =&gt; url,
+		Err(_) =&gt; {
+			panic!(&quot;Cannot find `DATABASE_URL` on the environment variables.&quot;);
+		}
+	};
+
+	// Get MongoDB connection.
+	let client = match Client::with_uri_str(&amp;url) {
+		Ok(client) =&gt; client,
+		Err(e) =&gt; {
+			panic!(&quot;Error connecting to the database: {}&quot;, e);
+		}
+	};
+
+	Nongoose::builder(client.database(&quot;nongoose&quot;))
+		.add_schema::&lt;User&gt;()
+		.add_schema::&lt;Post&gt;()
+		.add_schema::&lt;PostComment&gt;()
+		.build()
+}
+
+#[cfg(feature = &quot;tokio-runtime&quot;)]
+#[cfg_attr(feature = &quot;tokio-runtime&quot;, tokio::test)]
+async fn aggregate() {
+	let nongoose = get_instance();
+
+	// Create default users.
+	let daniel = User::new(&quot;daniel&quot;, &quot;Daniel Solarte&quot;, 19).save().await;
+	assert!(daniel.is_ok());
+
+	let robert = User::new(&quot;robert&quot;, &quot;Robert&quot;, 25).save().await;
+	assert!(robert.is_ok());
+
+	let daniel = daniel.unwrap();
+	let robert = robert.unwrap();
+
+	// Create default posts.
+	let nongoose_released = Post::new(&quot;Nongoose v0.1.0 released!&quot;, &amp;robert).save().await;
+	assert!(nongoose_released.is_ok());
+
+	let nongoose_released = nongoose_released.unwrap();
+
+	// Create default post comments.
+	let comment1 = PostComment::new(&quot;Hello! First comment&quot;, &amp;nongoose_released, &amp;daniel)
+		.save()
+		.await;
+	assert!(comment1.is_ok());
+
+	let comment2 = PostComment::new(&quot;OMG, aggregations finally! :)&quot;, &amp;nongoose_released, &amp;robert)
+		.save()
+		.await;
+	assert!(comment2.is_ok());
+
+	// Aggregation
+	let result = nongoose
+		.aggregate::&lt;PostComment, SearchResult&gt;(
+			vec![
+				doc! {
+					&quot;$match&quot;: {
+						&quot;message&quot;: Regex { pattern: String::from(&quot; &quot;), options: String::new() },
+					},
+				},
+				doc! {
+					&quot;$lookup&quot;: {
+						&quot;from&quot;: User::collection_name(),
+						&quot;localField&quot;: &quot;author_id&quot;,
+						&quot;foreignField&quot;: &quot;_id&quot;,
+						&quot;as&quot;: &quot;users&quot;,
+					}
+				},
+				doc! {
+					&quot;$lookup&quot;: {
+						&quot;from&quot;: Post::collection_name(),
+						&quot;localField&quot;: &quot;post_id&quot;,
+						&quot;foreignField&quot;: &quot;_id&quot;,
+						&quot;as&quot;: &quot;posts&quot;,
+					},
+				},
+				doc! {
+					&quot;$group&quot;: {
+						&quot;_id&quot;: &quot;1&quot;,
+						&quot;posts_with_comments&quot;: { &quot;$addToSet&quot;: { &quot;$first&quot;: &quot;$posts.title&quot; } },
+						&quot;users_with_comments&quot;: { &quot;$addToSet&quot;: { &quot;$first&quot;: &quot;$users.realname&quot; } },
+					},
+				},
+			],
+			None,
+		)
+		.await;
+	assert!(result.is_ok());
+
+	let result = result.unwrap();
+	assert_eq!(result.len(), 1);
+
+	let result_0 = result.get(0).unwrap();
+	assert_eq!(result_0.posts_with_comments.len(), 1);
+	assert_eq!(result_0.users_with_comments.len(), 2);
+}
+  
+#[cfg(feature = &quot;sync&quot;)]
+#[cfg_attr(feature = &quot;sync&quot;, test)]
+fn aggregate() {
+	let nongoose = get_instance();
+
+	// Create default users.
+	let daniel = User::new(&quot;daniel&quot;, &quot;Daniel Solarte&quot;, 19).save();
+	assert!(daniel.is_ok());
+
+	let robert = User::new(&quot;robert&quot;, &quot;Robert&quot;, 25).save();
+	assert!(robert.is_ok());
+
+	let daniel = daniel.unwrap();
+	let robert = robert.unwrap();
+
+	// Create default posts.
+	let nongoose_released = Post::new(&quot;Nongoose v0.1.0 released!&quot;, &amp;robert).save();
+	assert!(nongoose_released.is_ok());
+
+	let nongoose_released = nongoose_released.unwrap();
+
+	// Create default post comments.
+	let comment1 = PostComment::new(&quot;Hello! First comment&quot;, &amp;nongoose_released, &amp;daniel).save();
+	assert!(comment1.is_ok());
+
+	let comment2 = PostComment::new(&quot;OMG, aggregations finally! :)&quot;, &amp;nongoose_released, &amp;robert).save();
+	assert!(comment2.is_ok());
+
+	// Aggregation
+	let result = nongoose
+	  	.aggregate::&lt;PostComment, SearchResult&gt;(
+			vec![
+				doc! {
+					&quot;$match&quot;: {
+						&quot;message&quot;: Regex { pattern: String::from(&quot; &quot;), options: String::new() },
+					},
+				},
+				doc! {
+					&quot;$lookup&quot;: {
+						&quot;from&quot;: User::collection_name(),
+						&quot;localField&quot;: &quot;author_id&quot;,
+						&quot;foreignField&quot;: &quot;_id&quot;,
+						&quot;as&quot;: &quot;users&quot;,
+					}
+				},
+				doc! {
+					&quot;$lookup&quot;: {
+						&quot;from&quot;: Post::collection_name(),
+						&quot;localField&quot;: &quot;post_id&quot;,
+						&quot;foreignField&quot;: &quot;_id&quot;,
+						&quot;as&quot;: &quot;posts&quot;,
+					},
+				},
+				doc! {
+					&quot;$group&quot;: {
+						&quot;_id&quot;: &quot;1&quot;,
+						&quot;posts_with_comments&quot;: { &quot;$addToSet&quot;: { &quot;$first&quot;: &quot;$posts.title&quot; } },
+						&quot;users_with_comments&quot;: { &quot;$addToSet&quot;: { &quot;$first&quot;: &quot;$users.realname&quot; } },
+					},
+				},
+			],
+			None,
+	  	);
+	assert!(result.is_ok());
+
+	let result = result.unwrap();
+	assert_eq!(result.len(), 1);
+
+	let result_0 = result.get(0).unwrap();
+	assert_eq!(result_0.posts_with_comments.len(), 1);
+	assert_eq!(result_0.users_with_comments.len(), 2);
+}
+<span class="boring">}</span></code></pre></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../examples/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../examples/one-to-many-relation.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../examples/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../examples/one-to-many-relation.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>

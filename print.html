@@ -1,0 +1,1904 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Nongoose Documentation</title>
+        <meta name="robots" content="noindex" />
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="nongoose.html"><strong aria-hidden="true">2.</strong> Nongoose</a></li><li class="chapter-item expanded "><a href="schema/index.html"><strong aria-hidden="true">3.</strong> Schema</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="schema/using-derive.html"><strong aria-hidden="true">3.1.</strong> Using derive</a></li><li class="chapter-item expanded "><a href="schema/attributes/index.html"><strong aria-hidden="true">3.2.</strong> Attributes</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="schema/attributes/macro.html"><strong aria-hidden="true">3.2.1.</strong> Macro Attributes</a></li><li class="chapter-item expanded "><a href="schema/attributes/container.html"><strong aria-hidden="true">3.2.2.</strong> Container Attributes</a></li><li class="chapter-item expanded "><a href="schema/attributes/field.html"><strong aria-hidden="true">3.2.3.</strong> Field Attributes</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="schema-before.html"><strong aria-hidden="true">4.</strong> SchemaBefore Trait</a></li><li class="chapter-item expanded "><a href="building-your-first-instance.html"><strong aria-hidden="true">5.</strong> Building your first instance</a></li><li class="chapter-item expanded "><a href="examples/index.html"><strong aria-hidden="true">6.</strong> Examples</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="examples/aggregate.html"><strong aria-hidden="true">6.1.</strong> Aggregate</a></li><li class="chapter-item expanded "><a href="examples/one-to-many-relation.html"><strong aria-hidden="true">6.2.</strong> One to Many relation</a></li><li class="chapter-item expanded "><a href="examples/many-to-one-relation.html"><strong aria-hidden="true">6.3.</strong> Many to One relation</a></li></ol></li><li class="chapter-item expanded "><a href="feature-flags.html"><strong aria-hidden="true">7.</strong> Feature flags</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Nongoose Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="overview"><a class="header" href="#overview">Overview</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="nongoose"><a class="header" href="#nongoose">Nongoose</a></h1>
+<ul>
+<li><a href="nongoose.html#nongoosebuild">build</a></li>
+<li><a href="nongoose.html#nongooseaggregate">aggregate</a></li>
+<li><a href="nongoose.html#nongoosecount">count</a></li>
+<li><a href="nongoose.html#nongoosecreate">create</a></li>
+<li><a href="nongoose.html#nongoosefind">find</a></li>
+<li><a href="nongoose.html#nongoosefind_and_remove">find_and_remove</a></li>
+<li><a href="nongoose.html#nongoosefind_by_id">find_by_id</a></li>
+<li><a href="nongoose.html#nongoosefind_by_id_and_remove">find_by_id_and_remove</a></li>
+<li><a href="nongoose.html#nongoosefind_one">find_one</a></li>
+<li><a href="nongoose.html#nongoosefind_one_and_remove">find_one_and_remove</a></li>
+<li><a href="nongoose.html#nongooseupdate_many">update_many</a></li>
+</ul>
+<h2 id="nongoosebuild"><a class="header" href="#nongoosebuild"><code>Nongoose::build()</code></a></h2>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>database <code>mongodb::sync::Database</code> database instance</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>NongooseBuilder</code></li>
+</ul>
+<p>Create a builder for building <code>Nongoose</code>. On the builder, call <code>.add_schema::&lt;T: Schema&gt;()</code>(optional) to registry a schema. Finally, call <code>.finish()</code> to create the instance of <code>Nongoose</code>.</p>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let nongoose = Nongoose::build()
+  .add_schema::&lt;User&gt;()
+  .finish();
+<span class="boring">}</span></code></pre></pre>
+<h2 id="nongooseaggregate"><a class="header" href="#nongooseaggregate"><code>Nongoose.aggregate()</code></a></h2>
+<p><strong>Generics</strong></p>
+<ul>
+<li>S <code>Schema</code> value of schema to query by</li>
+<li>T <code>From&lt;Document&gt;</code></li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>pipeline <code>Vec&lt;Document&gt;</code> aggregation pipeline as an array of BSON documents</li>
+<li>options <code>Option&lt;nongoose::mongodb::AggregateOptions&gt;</code> aggregation options</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;Vec&lt;T&gt;&gt;</code></li>
+</ul>
+<p>Performs <a href="https://docs.mongodb.com/manual/aggregation/">aggregations</a> on the schemas collection.</p>
+<ul>
+<li><a href="https://docs.mongodb.org/manual/applications/aggregation/">MongoDB Aggregation docs</a></li>
+</ul>
+<p><strong>Options</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>AggregationOptions::builder();
+  // Optional (bool)
+  // Enables writing to temporary files. When set to true, aggregation stages can write data to the _tmp subdirectory in the dbPath directory.
+  .allow_disk_use(...)
+  // Optional (u32)
+  // The number of documents the server should return per cursor batch.
+  // Note that this does not have any affect on the documents that are returned by a cursor, only the number of documents kept in memory at a given time (and by extension, the number of round trips needed to return the entire set of documents returned by the query).
+  .batch_size(...)
+  // Optional (bool)
+  // Opt out of document-level validation.
+  .bypass_document_validation(...)
+  // Optional (mongodb::options::Collation)
+  // The collation to use for the operation.
+  // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  .collation(...)
+  // Optional (String)
+  // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  .comment(...)
+  // Optional (mongodb::options::Hint)
+  // The index to use for the operation.
+  .hint(...)
+  // Optional (std::time::Duration)
+  // The maximum amount of time for the server to wait on new documents to satisfy a tailable await cursor query.
+  // This option will have no effect on non-tailable cursors that result from this operation.
+  .max_await_time(...)
+  // Optional (std::time::Duration)
+  // The maximum amount of time to allow the query to run.
+  // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  .max_time(...)
+  // Optional (mongodb::options::ReadConcern)
+  // The read concern to use for this find query.
+  // If none specified, the default set on the collection will be used.
+  .read_concern(...)
+  // Optional (mongodb::options::SelectionCriteria)
+  // The criteria used to select a server for this find query.
+  // If none specified, the default set on the collection will be used.
+  .selection_criteria(...)
+  // Optional (mongodb::options::WriteConcern)
+  // The write concern for the operation.
+  // If none is specified, the write concern defined on the object executing this operation will be used.
+  .write_concern(...)
+  // Optional (mongodb::bson::Document)
+  // A document with any amount of parameter names, each followed by definitions of constants in the MQL Aggregate Expression language. Each parameter name is then usable to access the value of the corresponding MQL Expression with the “$$” syntax within Aggregate Expression contexts.
+  // This feature is only available on server versions 5.0 and above.
+  .let_vars(...)
+  // Required to create the instance of `CountOptions`
+  .build()
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Aggregation result struct.
+#[derive(Debug)]
+struct SearchResult {
+  posts_with_comments: Vec&lt;String&gt;,
+  users_with_comments: Vec&lt;String&gt;,
+}
+
+impl From&lt;Document&gt; for SearchResult {
+  fn from(document: Document) -&gt; Self {
+    Self {
+      posts_with_comments: document
+        .get_array(&quot;posts_with_comments&quot;)
+        .unwrap_or(&amp;Vec::new())
+        .iter()
+        .map(|d| d.as_str())
+        .filter(|d| d.is_some())
+        .map(|d| String::from(d.unwrap()))
+        .collect(),
+      users_with_comments: document
+        .get_array(&quot;users_with_comments&quot;)
+        .unwrap_or(&amp;Vec::new())
+        .iter()
+        .map(|d| d.as_str())
+        .filter(|d| d.is_some())
+        .map(|d| String::from(d.unwrap()))
+        .collect(),
+    }
+  }
+}
+
+// Aggregation
+let aggregation = nongoose
+  .aggregate::&lt;PostComment, SearchResult&gt;(
+    vec![
+      doc! {
+        &quot;$match&quot;: {
+          &quot;message&quot;: Regex { pattern: String::from(&quot; &quot;), options: String::new() },
+        },
+      },
+      doc! {
+        &quot;$lookup&quot;: {
+          &quot;from&quot;: User::collection_name(),
+          &quot;localField&quot;: &quot;author_id&quot;,
+          &quot;foreignField&quot;: &quot;_id&quot;,
+          &quot;as&quot;: &quot;users&quot;,
+        }
+      },
+      doc! {
+        &quot;$lookup&quot;: {
+          &quot;from&quot;: Post::collection_name(),
+          &quot;localField&quot;: &quot;post_id&quot;,
+          &quot;foreignField&quot;: &quot;_id&quot;,
+          &quot;as&quot;: &quot;posts&quot;,
+        },
+      },
+      doc! {
+        &quot;$group&quot;: {
+          &quot;_id&quot;: &quot;1&quot;,
+          &quot;posts_with_comments&quot;: { &quot;$addToSet&quot;: { &quot;$first&quot;: &quot;$posts.title&quot; } },
+          &quot;users_with_comments&quot;: { &quot;$addToSet&quot;: { &quot;$first&quot;: &quot;$users.realname&quot; } },
+        },
+      },
+    ],
+    None,
+  );
+
+// Aggregation (Sync method)
+match aggregation {
+  Ok(data) =&gt; {
+    println!(&quot;Total retuned: {} - Data: {:?}&quot;, data.len(), data);
+  },
+  Err(error) =&gt; {
+    eprintln!(&quot;MongoDB error: {}&quot;, error);
+  }
+}
+
+// Aggregation (Async method)
+match aggregation.await {
+  Ok(data) =&gt; {
+    println!(&quot;Total retuned: {} - Data: {:?}&quot;, data.len(), data);
+  },
+  Err(error) =&gt; {
+    eprintln!(&quot;MongoDB error: {}&quot;, error);
+  }
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="nongoosecount"><a class="header" href="#nongoosecount"><code>Nongoose.count()</code></a></h2>
+<p><strong>Generics</strong></p>
+<ul>
+<li>T <code>Schema</code> value of schema to query by</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>conditions <code>bson::Document</code></li>
+<li>options <code>mongodb::options::CountOptions</code></li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;u64&gt;</code></li>
+</ul>
+<p>Counts number of documents that match <code>conditions</code> in a database collection.</p>
+<p><strong>Options</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>CountOptions::builder()
+  // Optional (mongodb::options::Collation)
+  // The collation to use for the operation.
+  // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  .collation(...)
+  // Optional (mongodb::options::Hint)
+  // The index to use for the operation.
+  .hint(...)
+  // Optional (i64)
+  // The maximum number of documents to query. If a negative number is specified, the documents will be returned in a single batch limited in number
+  // by the positive value of the specified limit.
+  .limit(...)
+  // Optional (std::time::Duration)
+  // The maximum amount of time to allow the query to run.
+  // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  .max_time(...)
+  // Optional (mongodb::options::ReadConcern)
+  // The read concern to use for this find query.
+  // If none specified, the default set on the collection will be used.
+  .read_concern(...)
+  // Optional (mongodb::options::SelectionCriteria)
+  // The criteria used to select a server for this find query.
+  // If none specified, the default set on the collection will be used.
+  .selection_criteria(...)
+  // Optional (u64)
+  // The number of documents to skip before counting.
+  .skip(...)
+  // Required to create the instance of `CountOptions`
+  .build()
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Count users over 18 years of age (Sync method)
+match nongoose.count::&lt;User&gt;(doc! { &quot;age&quot;: { &quot;$gte&quot;: 18 } }, None) {
+  Ok(users) =&gt; println!(&quot;Found {} users!&quot;, users),
+  Err(error) =&gt; eprintln!(&quot;Error finding users: {}&quot;, error),
+}
+
+// Count users over 18 years of age (Async method with options)
+match nongoose
+  .count::&lt;User&gt;(
+    doc! { &quot;age&quot;: { &quot;$gte&quot;: 18 } },
+    Some(CountOptions::builder().limit(5).build())
+  )
+  .await
+{
+  Ok(users) =&gt; println!(&quot;Found {} users!&quot;, users),
+  Err(error) =&gt; eprintln!(&quot;Error finding users: {}&quot;, error),
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="nongoosecreate"><a class="header" href="#nongoosecreate"><code>Nongoose.create()</code></a></h2>
+<p><strong>Generics</strong></p>
+<ul>
+<li>T <code>Schema</code> value of schema to query by</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>data <code>&amp;T</code> Document to insert</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;T&gt;</code></li>
+</ul>
+<p>Shortcut for saving one document to the database. <code>Nongoose.create(doc)</code> does <code>doc.save()</code>.</p>
+<p>This function triggers <code>save()</code>.</p>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Insert one new `User` document (Sync method)
+match nongoose.create::&lt;User&gt;(&amp;user) {
+  Ok(user) =&gt; {
+    println!(&quot;User saved: {}&quot;, user.id);
+  },
+  Err(error) =&gt; {
+    eprintln!(&quot;Error saving the user: {}&quot;, error);
+  }
+}
+
+// Insert one new `User` document (Async method)
+match nongoose.create::&lt;User&gt;(&amp;user).await {
+  Ok(user) =&gt; {
+    println!(&quot;User saved: {}&quot;, user.id);
+  },
+  Err(error) =&gt; {
+    eprintln!(&quot;Error saving the user: {}&quot;, error);
+  }
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="nongoosefind"><a class="header" href="#nongoosefind"><code>Nongoose.find()</code></a></h2>
+<p><strong>Generics</strong></p>
+<ul>
+<li>T <code>Schema</code> value of schema to query by</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>conditions <code>bson::Document</code></li>
+<li>options <code>mongodb::options::FindOptions</code></li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;Vec&lt;T&gt;&gt;</code></li>
+</ul>
+<p>Finds documents.</p>
+<p><strong>Options</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>FindOptions::builder()
+  // Optional (bool)
+  // Enables writing to temporary files by the server. When set to true, the find operation can write data to the _tmp subdirectory in the dbPath directory.
+  // Only supported in server versions 4.4+.
+  .allow_disk_use(...)
+  // Optional (bool)
+  // If true, partial results will be returned from a mongos rather than an error being returned if one or more shards is down.
+  .allow_partial_results(...)
+  // Optional (u32)
+  // The number of documents the server should return per cursor batch.
+  // Note that this does not have any affect on the documents that are returned by a cursor, only the number of documents kept in memory at a given time
+  // (and by extension, the number of round trips needed to return the entire set of documents returned by the query.
+  .batch_size(...)
+  // Optional (String)
+  // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  .comment(...)
+  // Optional (mongodb::options::CursorType)
+  // The type of cursor to return.
+  .cursor_type(...)
+  // Optional (mongodb::options::Hint)
+  // The index to use for the operation.
+  .hint(...)
+  // Optional (i64)
+  // The maximum number of documents to query. If a negative number is specified, the documents will be returned in a single batch limited in number
+  // by the positive value of the specified limit.
+  .limit(...)
+  // Optional (mongodb::bson::Document)
+  // The exclusive upper bound for a specific index.
+  .max(...)
+  // Optional (std::time::Duration)
+  // The maximum amount of time for the server to wait on new documents to satisfy a tailable cursor query. If the cursor is not tailable, this option is ignored.
+  .max_await_time(...)
+  // Optional (u64)
+  // Maximum number of documents or index keys to scan when executing the query.
+  // Note: this option is deprecated starting in MongoDB version 4.0 and removed in MongoDB 4.2. Use the maxTimeMS option instead.
+  .max_scan(...)
+  // Optional (std::time::Duration)
+  // The maximum amount of time to allow the query to run.
+  // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  .max_time(...)
+  // Optional (mongodb::bson::Document)
+  // The inclusive lower bound for a specific index.
+  .min(...)
+  // Optional (bool)
+  // Whether the server should close the cursor after a period of inactivity.
+  .no_cursor_timeout(...)
+  // Optional (mongodb::bson::Document)
+  // Limits the fields of the document being returned.
+  .projection(...)
+  // Optional (mongodb::options::ReadConcern)
+  // The read concern to use for this find query.
+  // If none specified, the default set on the collection will be used.
+  .read_concern(...)
+  // Optional (bool)
+  // Whether to return only the index keys in the documents.
+  .return_key(...)
+  // Optional (mongodb::options::SelectionCriteria)
+  // The criteria used to select a server for this find query.
+  // If none specified, the default set on the collection will be used.
+  .selection_criteria(...)
+  // Optional (bool)
+  // Whether to return the record identifier for each document.
+  .show_record_id(...)
+  // Optional (u64)
+  // The number of documents to skip before counting.
+  .skip(...)
+  // Optional (mongodb::bson::Document)
+  // The order of the documents for the purposes of the operation.
+  .sort(...)
+  // Optional (mongodb::options::Collation)
+  // The collation to use for the operation.
+  // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  .collation(...)
+  // Required to create the instance of `FindOptions`
+  .build()
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Sync method
+match nongoose.find::&lt;User&gt;(
+  doc! { &quot;age&quot;: { &quot;$gte&quot;: 18 } },
+  Some(Findptions::builder().sort(doc! { &quot;username&quot;: 1 }).build())
+) {
+  Ok(users) =&gt; println!(&quot;Found {} users!&quot;, users.len()),
+  Err(error) =&gt; eprintln!(&quot;Error finding users: {}&quot;, error),
+}
+
+// Async method
+match nongoose.find::&lt;User&gt;(
+  doc! { &quot;age&quot;: { &quot;$gte&quot;: 18 } },
+  Some(FindOptions::builder().sort(doc! { &quot;username&quot;: 1 }).build())
+).await {
+  Ok(users) =&gt; println!(&quot;Found {} users!&quot;, users.len()),
+  Err(error) =&gt; eprintln!(&quot;Error finding users: {}&quot;, error),
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="nongoosefind_and_remove"><a class="header" href="#nongoosefind_and_remove"><code>Nongoose.find_and_remove()</code></a></h2>
+<p><strong>Generics</strong></p>
+<ul>
+<li>T <code>Schema</code> value of schema to query by</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>conditions <code>bson::Document</code></li>
+<li>options <code>mongodb::options::FindOptions</code></li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;Vec&lt;(bool, T)&gt;&gt;</code></li>
+</ul>
+<p>Finds documents and remove them from the db.</p>
+<p><strong>Options</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>FindOptions::builder()
+  // Optional (bool)
+  // Enables writing to temporary files by the server. When set to true, the find operation can write data to the _tmp subdirectory in the dbPath directory.
+  // Only supported in server versions 4.4+.
+  .allow_disk_use(...)
+  // Optional (bool)
+  // If true, partial results will be returned from a mongos rather than an error being returned if one or more shards is down.
+  .allow_partial_results(...)
+  // Optional (u32)
+  // The number of documents the server should return per cursor batch.
+  // Note that this does not have any affect on the documents that are returned by a cursor, only the number of documents kept in memory at a given time
+  // (and by extension, the number of round trips needed to return the entire set of documents returned by the query.
+  .batch_size(...)
+  // Optional (String)
+  // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  .comment(...)
+  // Optional (mongodb::options::CursorType)
+  // The type of cursor to return.
+  .cursor_type(...)
+  // Optional (mongodb::options::Hint)
+  // The index to use for the operation.
+  .hint(...)
+  // Optional (i64)
+  // The maximum number of documents to query. If a negative number is specified, the documents will be returned in a single batch limited in number
+  // by the positive value of the specified limit.
+  .limit(...)
+  // Optional (mongodb::bson::Document)
+  // The exclusive upper bound for a specific index.
+  .max(...)
+  // Optional (std::time::Duration)
+  // The maximum amount of time for the server to wait on new documents to satisfy a tailable cursor query. If the cursor is not tailable, this option is ignored.
+  .max_await_time(...)
+  // Optional (u64)
+  // Maximum number of documents or index keys to scan when executing the query.
+  // Note: this option is deprecated starting in MongoDB version 4.0 and removed in MongoDB 4.2. Use the maxTimeMS option instead.
+  .max_scan(...)
+  // Optional (std::time::Duration)
+  // The maximum amount of time to allow the query to run.
+  // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  .max_time(...)
+  // Optional (mongodb::bson::Document)
+  // The inclusive lower bound for a specific index.
+  .min(...)
+  // Optional (bool)
+  // Whether the server should close the cursor after a period of inactivity.
+  .no_cursor_timeout(...)
+  // Optional (mongodb::bson::Document)
+  // Limits the fields of the document being returned.
+  .projection(...)
+  // Optional (mongodb::options::ReadConcern)
+  // The read concern to use for this find query.
+  // If none specified, the default set on the collection will be used.
+  .read_concern(...)
+  // Optional (bool)
+  // Whether to return only the index keys in the documents.
+  .return_key(...)
+  // Optional (mongodb::options::SelectionCriteria)
+  // The criteria used to select a server for this find query.
+  // If none specified, the default set on the collection will be used.
+  .selection_criteria(...)
+  // Optional (bool)
+  // Whether to return the record identifier for each document.
+  .show_record_id(...)
+  // Optional (u64)
+  // The number of documents to skip before counting.
+  .skip(...)
+  // Optional (mongodb::bson::Document)
+  // The order of the documents for the purposes of the operation.
+  .sort(...)
+  // Optional (mongodb::options::Collation)
+  // The collation to use for the operation.
+  // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  .collation(...)
+  // Required to create the instance of `FindOptions`
+  .build()
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Sync method
+match nongoose.find_and_remove::&lt;User&gt;(
+  doc! { &quot;age&quot;: { &quot;$gte&quot;: 18 } },
+  Some(Findptions::builder().sort(doc! { &quot;username&quot;: 1 }).build())
+) {
+  Ok(users) =&gt; println!(&quot;Found {} users!&quot;, users.len()),
+  Err(error) =&gt; eprintln!(&quot;Error finding users: {}&quot;, error),
+}
+
+// Async method
+match nongoose.find_and_remove::&lt;User&gt;(
+  doc! { &quot;age&quot;: { &quot;$gte&quot;: 18 } },
+  Some(FindOptions::builder().sort(doc! { &quot;username&quot;: 1 }).build())
+).await {
+  Ok(users) =&gt; println!(&quot;Found {} users!&quot;, users.len()),
+  Err(error) =&gt; eprintln!(&quot;Error finding users: {}&quot;, error),
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="nongoosefind_by_id"><a class="header" href="#nongoosefind_by_id"><code>Nongoose.find_by_id()</code></a></h2>
+<p><strong>Generics</strong></p>
+<ul>
+<li>T <code>Schema</code> value of schema to query by</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>id <code>&amp;T::Id</code> value of <code>_id</code> to query by</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;Option&lt;T&gt;&gt;</code></li>
+</ul>
+<p>Finds a single document by its <code>_id</code> field. <code>find_by_id(id)</code>is almost equivalent to <code>find_one(doc! { &quot;_id&quot;: id })</code>.
+If you want to query by a document's <code>_id</code>, use <code>find_by_id()</code>instead of <code>find_one()</code>.</p>
+<p>This function triggers <code>find_one()</code>.</p>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Find one `User` document by `_id` (Sync method)
+match nongoose.find_by_id::&lt;User&gt;(
+  &amp;ObjectId::parse_str(&quot;616c91dc8cb70be8cc7d1f38&quot;).unwrap()
+) {
+  Ok(Some(user)) =&gt; println!(&quot;User found: {}&quot;, user.id),
+  Ok(None) =&gt; eprintln!(&quot;Cannot find the user&quot;),
+  Err(error) =&gt; eprintln!(&quot;Error finding user: {}&quot;, error),
+}
+
+// Find one `User` document by `_id` (Async method)
+match nongoose.find_by_id::&lt;User&gt;(
+  &amp;ObjectId::parse_str(&quot;616c91dc8cb70be8cc7d1f38&quot;).unwrap()
+).await {
+  Ok(Some(user)) =&gt; println!(&quot;User found: {}&quot;, user.id),
+  Ok(None) =&gt; eprintln!(&quot;Cannot find the user&quot;),
+  Err(error) =&gt; eprintln!(&quot;Error finding user: {}&quot;, error),
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="nongoosefind_by_id_and_remove"><a class="header" href="#nongoosefind_by_id_and_remove"><code>Nongoose.find_by_id_and_remove()</code></a></h2>
+<p><strong>Generics</strong></p>
+<ul>
+<li>T <code>Schema</code> value of schema to query by</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>id <code>&amp;T::Id</code> value of <code>_id</code> to query by</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;(bool, Option&lt;T&gt;)&gt;</code></li>
+</ul>
+<p>Finds a single document by its <code>_id</code> field and remove it from the db. <code>find_by_id_and_remove(id)</code> is almost equivalent to <code>find_one_and_remove(doc! { &quot;_id&quot;: id })</code>. If you want to query by a document's <code>_id</code>, use <code>find_by_id_and_remove()</code> instead of <code>find_one_and_remove()</code>.</p>
+<p>This function triggers <code>find_one_and_remove()</code>.</p>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Find one `User` document by `_id` (Sync method)
+match nongoose.find_by_id_and_remove::&lt;User&gt;(
+  &amp;ObjectId::parse_str(&quot;616c91dc8cb70be8cc7d1f38&quot;).unwrap()
+) {
+  Ok((_, Some(user))) =&gt; println!(&quot;User found: {}&quot;, user.id),
+  Ok((_, None)) =&gt; eprintln!(&quot;Cannot find the user&quot;),
+  Err(error) =&gt; eprintln!(&quot;Error finding user: {}&quot;, error),
+}
+
+// Find one `User` document by `_id` (Async method)
+match nongoose.find_by_id_and_remove::&lt;User&gt;(
+  &amp;ObjectId::parse_str(&quot;616c91dc8cb70be8cc7d1f38&quot;).unwrap()
+).await {
+  Ok((_, Some(user))) =&gt; println!(&quot;User found: {}&quot;, user.id),
+  Ok((_, None)) =&gt; eprintln!(&quot;Cannot find the user&quot;),
+  Err(error) =&gt; eprintln!(&quot;Error finding user: {}&quot;, error),
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="nongoosefind_one"><a class="header" href="#nongoosefind_one"><code>Nongoose.find_one()</code></a></h2>
+<p><strong>Generics</strong></p>
+<ul>
+<li>T <code>Schema</code> value of schema to query by</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>conditions <code>bson::Document</code></li>
+<li>options <code>mongodb::options::FindOneOptions</code></li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;Option&lt;T&gt;&gt;</code></li>
+</ul>
+<p>Finds one document.</p>
+<p><strong>Options</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>FindOneOptions::builder()
+  // Optional (bool)
+  // If true, partial results will be returned from a mongos rather than an error being returned if one or more shards is down.
+  .allow_partial_results(...)
+  // Optional (mongodb::options::Collation)
+  // The collation to use for the operation.
+  // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  .collation(...)
+  // Optional (String)
+  // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  .comment(...)
+  // Optional (mongodb::options::Hint)
+  // The index to use for the operation.
+  .hint(...)
+  // Optional (mongodb::bson::Document)
+  // The exclusive upper bound for a specific index.
+  .max(...)
+  // Optional (u64)
+  // Maximum number of documents or index keys to scan when executing the query.
+  // Note: this option is deprecated starting in MongoDB version 4.0 and removed in MongoDB 4.2. Use the maxTimeMS option instead.
+  .max_scan(...)
+  // Optional (std::time::Duration)
+  // The maximum amount of time to allow the query to run.
+  // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  .max_time(...)
+  // Optional (mongodb::bson::Document)
+  // The inclusive lower bound for a specific index.
+  .min(...)
+  // Optional (mongodb::bson::Document)
+  // Limits the fields of the document being returned.
+  .projection(...)
+  // Optional (mongodb::options::ReadConcern)
+  // The read concern to use for this find query.
+  // If none specified, the default set on the collection will be used.
+  .read_concern(...)
+  // Optional (bool)
+  // Whether to return only the index keys in the documents.
+  .return_key(...)
+  // Optional (mongodb::options::SelectionCriteria)
+  // The criteria used to select a server for this find query.
+  // If none specified, the default set on the collection will be used.
+  .selection_criteria(...)
+  // Optional (bool)
+  // Whether to return the record identifier for each document.
+  .show_record_id(...)
+  // Optional (u64)
+  // The number of documents to skip before counting.
+  .skip(...)
+  // Optional (mongodb::bson::Document)
+  // The order of the documents for the purposes of the operation.
+  .sort(...)
+  // Required to create the instance of `FindOneOptions`
+  .build()
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Find one user whose `username` is `nongoose` (Sync method)
+match nongoose.find_one::&lt;User&gt;(doc! { &quot;username&quot;: &quot;nongoose&quot; }, None) {
+  Ok(Some(user)) =&gt; println!(&quot;User found: {}&quot;, user.id),
+  Ok(None) =&gt; eprintln!(&quot;Cannot find the user&quot;),
+  Err(error) =&gt; eprintln!(&quot;Error finding user: {}&quot;, error),
+}
+
+// Find one user whose `username` is `nongoose` (Async method)
+match nongoose.find_one::&lt;User&gt;(doc! { &quot;username&quot;: &quot;nongoose&quot; }, None).await {
+  Ok(Some(user)) =&gt; println!(&quot;User found: {}&quot;, user.id),
+  Ok(None) =&gt; eprintln!(&quot;Cannot find the user&quot;),
+  Err(error) =&gt; eprintln!(&quot;Error finding user: {}&quot;, error),
+}
+
+// Passing options
+match nongoose.find_one::&lt;User&gt;(
+  doc! { &quot;age&quot;: { &quot;$gte&quot;: 18 } },
+  Some(FindOneOptions::builder().sort(doc! { &quot;username&quot;: 1 }).build())
+) {
+  Ok(Some(user)) =&gt; println!(&quot;User found: {}&quot;, user.id),
+  Ok(None) =&gt; eprintln!(&quot;No users over 18 years old&quot;),
+  Err(error) =&gt; eprintln!(&quot;Error finding user: {}&quot;, error),
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="nongoosefind_one_and_remove"><a class="header" href="#nongoosefind_one_and_remove"><code>Nongoose.find_one_and_remove()</code></a></h2>
+<p><strong>Generics</strong></p>
+<ul>
+<li>T <code>Schema</code> value of schema to query by</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>conditions <code>bson::Document</code></li>
+<li>options <code>mongodb::options::FindOneOptions</code></li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;(bool, Option&lt;T&gt;)&gt;</code></li>
+</ul>
+<p>Finds one document and remove it from the db.</p>
+<p><strong>Options</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>FindOneOptions::builder()
+  // Optional (bool)
+  // If true, partial results will be returned from a mongos rather than an error being returned if one or more shards is down.
+  .allow_partial_results(...)
+  // Optional (mongodb::options::Collation)
+  // The collation to use for the operation.
+  // See the [documentation](https://docs.mongodb.com/manual/reference/collation/) for more information on how to use this option.
+  .collation(...)
+  // Optional (String)
+  // Tags the query with an arbitrary string to help trace the operation through the database profiler, currentOp and logs.
+  .comment(...)
+  // Optional (mongodb::options::Hint)
+  // The index to use for the operation.
+  .hint(...)
+  // Optional (mongodb::bson::Document)
+  // The exclusive upper bound for a specific index.
+  .max(...)
+  // Optional (u64)
+  // Maximum number of documents or index keys to scan when executing the query.
+  // Note: this option is deprecated starting in MongoDB version 4.0 and removed in MongoDB 4.2. Use the maxTimeMS option instead.
+  .max_scan(...)
+  // Optional (std::time::Duration)
+  // The maximum amount of time to allow the query to run.
+  // This options maps to the `maxTimeMS` MongoDB query option, so the duration will be sent across the wire as an integer number of milliseconds.
+  .max_time(...)
+  // Optional (mongodb::bson::Document)
+  // The inclusive lower bound for a specific index.
+  .min(...)
+  // Optional (mongodb::bson::Document)
+  // Limits the fields of the document being returned.
+  .projection(...)
+  // Optional (mongodb::options::ReadConcern)
+  // The read concern to use for this find query.
+  // If none specified, the default set on the collection will be used.
+  .read_concern(...)
+  // Optional (bool)
+  // Whether to return only the index keys in the documents.
+  .return_key(...)
+  // Optional (mongodb::options::SelectionCriteria)
+  // The criteria used to select a server for this find query.
+  // If none specified, the default set on the collection will be used.
+  .selection_criteria(...)
+  // Optional (bool)
+  // Whether to return the record identifier for each document.
+  .show_record_id(...)
+  // Optional (u64)
+  // The number of documents to skip before counting.
+  .skip(...)
+  // Optional (mongodb::bson::Document)
+  // The order of the documents for the purposes of the operation.
+  .sort(...)
+  // Required to create the instance of `FindOneOptions`
+  .build()
+<span class="boring">}</span></code></pre></pre>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Find one user whose `username` is `nongoose` (Sync method)
+match nongoose.find_one_and_remove::&lt;User&gt;(doc! { &quot;username&quot;: &quot;nongoose&quot; }, None) {
+  Ok((_, Some(user))) =&gt; println!(&quot;User found: {}&quot;, user.id),
+  Ok((_, None)) =&gt; eprintln!(&quot;Cannot find the user&quot;),
+  Err(error) =&gt; eprintln!(&quot;Error finding user: {}&quot;, error),
+}
+
+// Find one user whose `username` is `nongoose` (Async method)
+match nongoose.find_one_and_remove::&lt;User&gt;(doc! { &quot;username&quot;: &quot;nongoose&quot; }, None).await {
+  Ok((_, Some(user))) =&gt; println!(&quot;User found: {}&quot;, user.id),
+  Ok((_, None)) =&gt; eprintln!(&quot;Cannot find the user&quot;),
+  Err(error) =&gt; eprintln!(&quot;Error finding user: {}&quot;, error),
+}
+
+// Passing options
+match nongoose.find_one_and_remove::&lt;User&gt;(
+  doc! { &quot;age&quot;: { &quot;$gte&quot;: 18 } },
+  Some(FindOneOptions::builder().sort(doc! { &quot;username&quot;: 1 }).build())
+) {
+  Ok((_, Some(user))) =&gt; println!(&quot;User found: {}&quot;, user.id),
+  Ok((_, None)) =&gt; eprintln!(&quot;No users over 18 years old&quot;),
+  Err(error) =&gt; eprintln!(&quot;Error finding user: {}&quot;, error),
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="nongooseupdate_many"><a class="header" href="#nongooseupdate_many"><code>Nongoose.update_many()</code></a></h2>
+<p><strong>Generics</strong></p>
+<ul>
+<li>T <code>Schema</code> value of schema to query by</li>
+</ul>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>conditions <code>bson::Document</code></li>
+<li>data <code>bson::Document</code></li>
+<li>options <code>mongodb::options::UpdateOptions</code></li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;mongodb::results::UpdateResult&gt;</code></li>
+</ul>
+<p>Updates <em>all</em> documents in the database that match <code>conditions</code> without returning them.</p>
+<p><strong>Note</strong> update_many will <em>not</em> fire update middleware (<code>SchemaBefore::before_update()</code>).</p>
+<p><strong>Options</strong></p>
+<pre><code class="language-rust no_run ignore">UpdateOptions::builder()
+  // Optional (Vec&lt;mongodb::bson::Document&gt;)
+  // A set of filters specifying to which array elements an update should apply.
+  // See the documentation [here](https://docs.mongodb.com/manual/reference/command/update/) for more information on array filters.
+  .array_filters(...)
+  // Optional (bool)
+  // Opt out of document-level validation.
+  .bypass_document_validation(...)
+  // Optional (bool)
+  // If true, insert a document if no matching document is found.
+  .upsert(...)
+  // Optional (mongodb::options::Collation)
+  // The collation to use for the operation.
+  .collation(...)
+  // Optional (mongodb::options::Hint)
+  // A document or string that specifies the index to use to support the query predicate.
+  // Only available in MongoDB 4.2+. See the official MongoDB [documentation](https://docs.mongodb.com/manual/reference/command/update/#ex-update-command-hint) for examples.
+  .hint(...)
+  // Optional (mongodb::options::WriteConcern)
+  // The write concern for the operation.
+  .write_concern(...)
+  // Required to create the instance of `UpdateOptions`
+  .build()</code></pre>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Update the age to 18 if it is under 18 (Sync method)
+match nongoose.update_many::&lt;User&gt;(
+  doc! { &quot;age&quot;: { &quot;$lt&quot;: 18 } },
+  doc! { &quot;$set&quot;: { &quot;age&quot;: 18 } },
+  None
+) {
+  Ok(result) =&gt; println!(&quot;Modified {} documents&quot;, result.modified_count),
+  Err(error) =&gt; eprintln!(&quot;Error updating users: {}&quot;, error),
+}
+
+// Update the age to 18 if it is under 18 (Async method)
+match nongoose.update_many::&lt;User&gt;(
+  doc! { &quot;age&quot;: { &quot;$lt&quot;: 18 } },
+  doc! { &quot;$set&quot;: { &quot;age&quot;: 18 } },
+  None
+).await {
+  Ok(result) =&gt; println!(&quot;Modified {} documents&quot;, result.modified_count),
+  Err(error) =&gt; eprintln!(&quot;Error updating users: {}&quot;, error),
+}
+<span class="boring">}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="schema"><a class="header" href="#schema">Schema</a></h1>
+<ul>
+<li><a href="schema/index.html#schemapopulate">populate</a></li>
+<li><a href="schema/index.html#schemaremove">remove</a></li>
+<li><a href="schema/index.html#schemasave">save</a></li>
+</ul>
+<h2 id="schemapopulate"><a class="header" href="#schemapopulate"><code>Schema.populate()</code></a></h2>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>field <code>&amp;str</code> the field to populate</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;Self&gt;</code></li>
+</ul>
+<p>Populates fields on an existing schema.</p>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Populate the role of the user (Sync method)
+match user.clone().populate(&quot;role&quot;) {
+  Ok(u) =&gt; user = u,
+  Err(error) =&gt; eprintln!(&quot;Error populating user: {}&quot;, error),
+}
+
+// Populate the role of the user (Async method)
+match user.clone().populate(&quot;role&quot;).await {
+  Ok(u) =&gt; user = u,
+  Err(error) =&gt; eprintln!(&quot;Error populating user: {}&quot;, error),
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="schemaremove"><a class="header" href="#schemaremove"><code>Schema.remove()</code></a></h2>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;bool&gt;</code></li>
+</ul>
+<p>Removes this document from the db.</p>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Sync method
+match user.remove() {
+  Ok(true) =&gt; println!(&quot;The user was deleted!&quot;),
+  Ok(false) =&gt; println!(&quot;The user could not be deleted!&quot;),
+  Err(error) =&gt; eprintln!(&quot;Error deleting the user: {}&quot;, error),
+}
+
+// Async method
+match user.remove().await {
+  Ok(true) =&gt; println!(&quot;The user was deleted!&quot;),
+  Ok(false) =&gt; println!(&quot;The user could not be deleted!&quot;),
+  Err(error) =&gt; eprintln!(&quot;Error deleting the user: {}&quot;, error),
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="schemasave"><a class="header" href="#schemasave"><code>Schema.save()</code></a></h2>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;Self&gt;</code></li>
+</ul>
+<p>Saves this document by inserting a new document into the database if it does not exist before, or sends an <code>replace_one</code> operation with the modifications to the database.</p>
+<p>If the document needs to be inserted to the database, the <code>SchemaBefore.before_create()</code> method is called before insert the document; otherwise, <code>SchemaBefore.before_update()</code> is called before replace the document.</p>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>user.username = String::from(&quot;Nongoose&quot;);
+
+// Sync method
+match user.save() {
+  Ok(u) =&gt; user = u,
+  Err(error) =&gt; eprintln!(&quot;Error saving user: {}&quot;, error),
+}
+
+// Async method
+match user.save().await {
+  Ok(u) =&gt; user = u,
+  Err(error) =&gt; eprintln!(&quot;Error saving user: {}&quot;, error),
+}
+<span class="boring">}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="using-derive"><a class="header" href="#using-derive">Using derive</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="schema-attributes"><a class="header" href="#schema-attributes">Schema Attributes</a></h1>
+<p><a href="https://doc.rust-lang.org/book/attributes.html">Attributes</a> are used to customize the <code>Schema</code> implementation produced by Nongoose's derive. They require a Rust compiler version 1.15 or newer.</p>
+<p>There are three categories of attributes:</p>
+<ul>
+<li><a href="schema/attributes/./macro.html">Macro attributes</a> - apply to a struct declaration before <code>Schema</code> derive.</li>
+<li><a href="schema/attributes/">Container attributes</a> - apply to a struct declaration.</li>
+<li><a href="schema/attributes/">Field attributes</a> - apply to one field in a struct variant.</li>
+</ul>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[schema_relations] // &lt;-- this is a macro attribute
+#[derive(Clone, Debug, Deserialize, Schema, Serialize)]
+#[schema(name = &quot;users&quot;)]   // &lt;-- this is a container attribute
+struct User {
+  #[schema(id)] // &lt;-- this is a field attribute
+  #[serde(rename = &quot;_id&quot;)]
+  id: ObjectId,
+}
+<span class="boring">}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="macro-attributes"><a class="header" href="#macro-attributes">Macro Attributes</a></h1>
+<ul>
+<li>
+<p><code>#[schema_relations]</code></p>
+<p>Add relations <code>{field_name}_id</code> fields to the <code>Struct</code>.</p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="container-attributes"><a class="header" href="#container-attributes">Container Attributes</a></h1>
+<ul>
+<li>
+<p><code>#[schema(name = &quot;name&quot;)]</code></p>
+<p>Set the collection name with the given name instead of its Rust name.</p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="field-attributes"><a class="header" href="#field-attributes">Field Attributes</a></h1>
+<ul>
+<li>
+<p><code>#[schema(id)]</code> <em>Required</em></p>
+<p>Represents the id of the document (<code>_id</code> in MongoDB).</p>
+<p><em>Note: The schema only supports one id field.</em></p>
+</li>
+<li>
+<p><code>#[schema(unique)]</code></p>
+<p>Unique this field: the field value cannot be duplicated in the document.</p>
+</li>
+<li>
+<p><code>#[schema(convert = &quot;path&quot;)]</code></p>
+<p>Call a function to convert the field type to a BSON type.</p>
+</li>
+<li>
+<p><code>#[schema(many_to_one = &quot;Schema&quot;)]</code></p>
+<p>Many to one relation.</p>
+</li>
+<li>
+<p><code>#[schema(one_to_one = &quot;Schema&quot;)]</code></p>
+<p>One to one relation.</p>
+</li>
+<li>
+<p><code>#[schema(one_to_many = &quot;Schema&quot;)]</code></p>
+<p>One to many relation.</p>
+</li>
+<li>
+<p><code>#[schema(optional)]</code></p>
+<p>Optional relation id(s) field(s).</p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="schemabefore-trait"><a class="header" href="#schemabefore-trait">SchemaBefore Trait</a></h1>
+<ul>
+<li><a href="schema-before.html#schemabeforebefore_create">before_create</a></li>
+<li><a href="schema-before.html#schemabeforebefore_delete">before_delete</a></li>
+<li><a href="schema-before.html#schemabeforebefore_update">before_update</a></li>
+</ul>
+<h2 id="schemabeforebefore_create"><a class="header" href="#schemabeforebefore_create"><code>SchemaBefore.before_create()</code></a></h2>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>db <code>&amp;nongoose::mongodb::sync::Database</code> the schema database instance</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;()&gt;</code></li>
+</ul>
+<p>Executes a custom validation before insert the document to the database.</p>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Sync method
+impl SchemaBefore for User {
+  fn before_create(&amp;mut self, _db: &amp;Database) -&gt; Result&lt;()&gt; {
+    Ok(())
+  }
+}
+
+// Async method
+#[async_trait::async_trait]
+impl SchemaBefore for User {
+  async fn before_create(&amp;mut self, _db: &amp;Database) -&gt; Result&lt;()&gt; {
+    Ok(())
+  }
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="schemabeforebefore_delete"><a class="header" href="#schemabeforebefore_delete"><code>SchemaBefore.before_delete()</code></a></h2>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>db <code>&amp;nongoose::mongodb::sync::Database</code> the schema database instance</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;bool&gt;</code> </li>
+</ul>
+<p>Executes a custom validation before delete the document from the database.</p>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Sync method
+impl SchemaBefore for User {
+  fn before_delete(&amp;mut self, _db: &amp;Database) -&gt; Result&lt;bool&gt; {
+    Ok(true)
+  }
+}
+
+// Async method
+#[async_trait::async_trait]
+impl SchemaBefore for User {
+  async fn before_delete(&amp;mut self, _db: &amp;Database) -&gt; Result&lt;bool&gt; {
+    Ok(true)
+  }
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="schemabeforebefore_update"><a class="header" href="#schemabeforebefore_update"><code>SchemaBefore.before_update()</code></a></h2>
+<p><strong>Arguments</strong></p>
+<ul>
+<li>db <code>&amp;nongoose::mongodb::sync::Database</code> the schema database instance</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>nongoose::Result&lt;()&gt;</code></li>
+</ul>
+<p>Executes a custom validation before replace the document in the database (called on <code>Schema.save()</code>).</p>
+<p><strong>Example</strong></p>
+<pre><pre class="playground"><code class="language-rust no_run edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Sync method
+impl SchemaBefore for User {
+  fn before_update(&amp;mut self, _db: &amp;Database) -&gt; Result&lt;()&gt; {
+    Ok(())
+  }
+}
+
+// Async method
+#[async_trait::async_trait]
+impl SchemaBefore for User {
+  async fn before_update(&amp;mut self, _db: &amp;Database) -&gt; Result&lt;()&gt; {
+    Ok(())
+  }
+}
+<span class="boring">}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="building-your-first-instance"><a class="header" href="#building-your-first-instance">Building your first instance</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="examples"><a class="header" href="#examples">Examples</a></h1>
+<ul>
+<li><a href="examples/./aggregate.html">Aggregate</a></li>
+<li><a href="examples/./many-to-one-relation.html">Many to One relation</a></li>
+<li><a href="examples/./one-to-many-relation.html">One to Many relation</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="aggregate"><a class="header" href="#aggregate">Aggregate</a></h1>
+<pre><pre class="playground"><code class="language-rust edition2018"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use nongoose::{
+	bson::{doc, oid::ObjectId, Document, Regex},
+	schema_relations, Client, Nongoose, Schema, SchemaBefore,
+};
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, Deserialize, Schema, Serialize)]
+struct User {
+	#[schema(id, unique)]
+	#[serde(rename = &quot;_id&quot;)]
+	id: ObjectId,
+
+	#[schema(unique)]
+	username: String,
+
+	realname: String,
+	age: u64,
+}
+
+impl User {
+	pub fn new(username: &amp;str, realname: &amp;str, age: u64) -&gt; Self {
+		Self {
+			id: ObjectId::new(),
+			username: String::from(username),
+			realname: String::from(realname),
+			age,
+		}
+	}
+}
+
+#[cfg_attr(feature = &quot;tokio-runtime&quot;, async_trait::async_trait)]
+impl SchemaBefore for User {}
+
+#[schema_relations]
+#[derive(Clone, Debug, Deserialize, Schema, Serialize)]
+struct Post {
+  #[schema(id, unique)]
+  #[serde(rename = &quot;_id&quot;)]
+  id: ObjectId,
+
+  #[schema(many_to_one = &quot;User&quot;)]
+  #[serde(skip_serializing)]
+  author: Option&lt;User&gt;,
+
+  title: String,
+}
+
+impl Post {
+	pub fn new(title: &amp;str, author: &amp;User) -&gt; Self {
+		Self {
+			id: ObjectId::new(),
+			author: Some(author.clone()),
+			author_id: author.id,
+			title: String::from(title),
+		}
+	}
+}
+
+#[cfg_attr(feature = &quot;tokio-runtime&quot;, async_trait::async_trait)]
+impl SchemaBefore for Post {}
+
+#[schema_relations]
+#[derive(Clone, Debug, Deserialize, Schema, Serialize)]
+struct PostComment {
+	#[schema(id, unique)]
+	#[serde(rename = &quot;_id&quot;)]
+	id: ObjectId,
+
+	#[schema(many_to_one = &quot;User&quot;)]
+	#[serde(skip_serializing)]
+	author: Option&lt;User&gt;,
+
+	#[schema(many_to_one = &quot;Post&quot;)]
+	#[serde(skip_serializing)]
+	post: Option&lt;Post&gt;,
+
+	message: String,
+}
+  
+impl PostComment {
+	pub fn new(message: &amp;str, post: &amp;Post, author: &amp;User) -&gt; Self {
+		Self {
+			id: ObjectId::new(),
+			author: Some(author.clone()),
+			author_id: author.id,
+			post: Some(post.clone()),
+			post_id: post.id,
+			message: String::from(message),
+		}
+	}
+}
+
+#[cfg_attr(feature = &quot;tokio-runtime&quot;, async_trait::async_trait)]
+impl SchemaBefore for PostComment {}
+
+#[derive(Debug)]
+struct SearchResult {
+	posts_with_comments: Vec&lt;String&gt;,
+	users_with_comments: Vec&lt;String&gt;,
+}
+
+impl From&lt;Document&gt; for SearchResult {
+	fn from(document: Document) -&gt; Self {
+		Self {
+			posts_with_comments: document
+				.get_array(&quot;posts_with_comments&quot;)
+				.unwrap_or(&amp;Vec::new())
+				.iter()
+				.map(|d| d.as_str())
+				.filter(|d| d.is_some())
+				.map(|d| String::from(d.unwrap()))
+				.collect(),
+			users_with_comments: document
+				.get_array(&quot;users_with_comments&quot;)
+				.unwrap_or(&amp;Vec::new())
+				.iter()
+				.map(|d| d.as_str())
+				.filter(|d| d.is_some())
+				.map(|d| String::from(d.unwrap()))
+				.collect(),
+		}
+	}
+}
+
+#[cfg(test)]
+fn get_instance() -&gt; Nongoose {
+	// Get database url.
+	let url = match std::env::var(&quot;DATABASE_URL&quot;) {
+		Ok(url) =&gt; url,
+		Err(_) =&gt; {
+			panic!(&quot;Cannot find `DATABASE_URL` on the environment variables.&quot;);
+		}
+	};
+
+	// Get MongoDB connection.
+	let client = match Client::with_uri_str(&amp;url) {
+		Ok(client) =&gt; client,
+		Err(e) =&gt; {
+			panic!(&quot;Error connecting to the database: {}&quot;, e);
+		}
+	};
+
+	Nongoose::builder(client.database(&quot;nongoose&quot;))
+		.add_schema::&lt;User&gt;()
+		.add_schema::&lt;Post&gt;()
+		.add_schema::&lt;PostComment&gt;()
+		.build()
+}
+
+#[cfg(feature = &quot;tokio-runtime&quot;)]
+#[cfg_attr(feature = &quot;tokio-runtime&quot;, tokio::test)]
+async fn aggregate() {
+	let nongoose = get_instance();
+
+	// Create default users.
+	let daniel = User::new(&quot;daniel&quot;, &quot;Daniel Solarte&quot;, 19).save().await;
+	assert!(daniel.is_ok());
+
+	let robert = User::new(&quot;robert&quot;, &quot;Robert&quot;, 25).save().await;
+	assert!(robert.is_ok());
+
+	let daniel = daniel.unwrap();
+	let robert = robert.unwrap();
+
+	// Create default posts.
+	let nongoose_released = Post::new(&quot;Nongoose v0.1.0 released!&quot;, &amp;robert).save().await;
+	assert!(nongoose_released.is_ok());
+
+	let nongoose_released = nongoose_released.unwrap();
+
+	// Create default post comments.
+	let comment1 = PostComment::new(&quot;Hello! First comment&quot;, &amp;nongoose_released, &amp;daniel)
+		.save()
+		.await;
+	assert!(comment1.is_ok());
+
+	let comment2 = PostComment::new(&quot;OMG, aggregations finally! :)&quot;, &amp;nongoose_released, &amp;robert)
+		.save()
+		.await;
+	assert!(comment2.is_ok());
+
+	// Aggregation
+	let result = nongoose
+		.aggregate::&lt;PostComment, SearchResult&gt;(
+			vec![
+				doc! {
+					&quot;$match&quot;: {
+						&quot;message&quot;: Regex { pattern: String::from(&quot; &quot;), options: String::new() },
+					},
+				},
+				doc! {
+					&quot;$lookup&quot;: {
+						&quot;from&quot;: User::collection_name(),
+						&quot;localField&quot;: &quot;author_id&quot;,
+						&quot;foreignField&quot;: &quot;_id&quot;,
+						&quot;as&quot;: &quot;users&quot;,
+					}
+				},
+				doc! {
+					&quot;$lookup&quot;: {
+						&quot;from&quot;: Post::collection_name(),
+						&quot;localField&quot;: &quot;post_id&quot;,
+						&quot;foreignField&quot;: &quot;_id&quot;,
+						&quot;as&quot;: &quot;posts&quot;,
+					},
+				},
+				doc! {
+					&quot;$group&quot;: {
+						&quot;_id&quot;: &quot;1&quot;,
+						&quot;posts_with_comments&quot;: { &quot;$addToSet&quot;: { &quot;$first&quot;: &quot;$posts.title&quot; } },
+						&quot;users_with_comments&quot;: { &quot;$addToSet&quot;: { &quot;$first&quot;: &quot;$users.realname&quot; } },
+					},
+				},
+			],
+			None,
+		)
+		.await;
+	assert!(result.is_ok());
+
+	let result = result.unwrap();
+	assert_eq!(result.len(), 1);
+
+	let result_0 = result.get(0).unwrap();
+	assert_eq!(result_0.posts_with_comments.len(), 1);
+	assert_eq!(result_0.users_with_comments.len(), 2);
+}
+  
+#[cfg(feature = &quot;sync&quot;)]
+#[cfg_attr(feature = &quot;sync&quot;, test)]
+fn aggregate() {
+	let nongoose = get_instance();
+
+	// Create default users.
+	let daniel = User::new(&quot;daniel&quot;, &quot;Daniel Solarte&quot;, 19).save();
+	assert!(daniel.is_ok());
+
+	let robert = User::new(&quot;robert&quot;, &quot;Robert&quot;, 25).save();
+	assert!(robert.is_ok());
+
+	let daniel = daniel.unwrap();
+	let robert = robert.unwrap();
+
+	// Create default posts.
+	let nongoose_released = Post::new(&quot;Nongoose v0.1.0 released!&quot;, &amp;robert).save();
+	assert!(nongoose_released.is_ok());
+
+	let nongoose_released = nongoose_released.unwrap();
+
+	// Create default post comments.
+	let comment1 = PostComment::new(&quot;Hello! First comment&quot;, &amp;nongoose_released, &amp;daniel).save();
+	assert!(comment1.is_ok());
+
+	let comment2 = PostComment::new(&quot;OMG, aggregations finally! :)&quot;, &amp;nongoose_released, &amp;robert).save();
+	assert!(comment2.is_ok());
+
+	// Aggregation
+	let result = nongoose
+	  	.aggregate::&lt;PostComment, SearchResult&gt;(
+			vec![
+				doc! {
+					&quot;$match&quot;: {
+						&quot;message&quot;: Regex { pattern: String::from(&quot; &quot;), options: String::new() },
+					},
+				},
+				doc! {
+					&quot;$lookup&quot;: {
+						&quot;from&quot;: User::collection_name(),
+						&quot;localField&quot;: &quot;author_id&quot;,
+						&quot;foreignField&quot;: &quot;_id&quot;,
+						&quot;as&quot;: &quot;users&quot;,
+					}
+				},
+				doc! {
+					&quot;$lookup&quot;: {
+						&quot;from&quot;: Post::collection_name(),
+						&quot;localField&quot;: &quot;post_id&quot;,
+						&quot;foreignField&quot;: &quot;_id&quot;,
+						&quot;as&quot;: &quot;posts&quot;,
+					},
+				},
+				doc! {
+					&quot;$group&quot;: {
+						&quot;_id&quot;: &quot;1&quot;,
+						&quot;posts_with_comments&quot;: { &quot;$addToSet&quot;: { &quot;$first&quot;: &quot;$posts.title&quot; } },
+						&quot;users_with_comments&quot;: { &quot;$addToSet&quot;: { &quot;$first&quot;: &quot;$users.realname&quot; } },
+					},
+				},
+			],
+			None,
+	  	);
+	assert!(result.is_ok());
+
+	let result = result.unwrap();
+	assert_eq!(result.len(), 1);
+
+	let result_0 = result.get(0).unwrap();
+	assert_eq!(result_0.posts_with_comments.len(), 1);
+	assert_eq!(result_0.users_with_comments.len(), 2);
+}
+<span class="boring">}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="one-to-many-relation"><a class="header" href="#one-to-many-relation">One to Many relation</a></h1>
+<pre><pre class="playground"><code class="language-rust edition2018">use nongoose::{
+  schema_relations, bson::{doc, oid::ObjectId}, Client, Nongoose, Schema, SchemaBefore
+};
+use serde::{Deserialize, Serialize};
+
+#[schema_relations]
+#[derive(Clone, Debug, Deserialize, Schema, Serialize)]
+struct Author {
+  #[schema(id, unique)]
+  #[serde(rename = &quot;_id&quot;)]
+  pub id: ObjectId,
+
+  #[schema(unique)]
+  pub username: String,
+
+  #[schema(one_to_many = &quot;Post&quot;)]
+  #[serde(default, skip_serializing)]
+  pub posts: Vec&lt;Post&gt;,
+}
+
+impl Author {
+  pub fn new(username: &amp;str) -&gt; Self {
+    Self {
+      id: ObjectId::new(),
+      username: String::from(username),
+      posts: Vec::new(),
+    }
+  }
+}
+
+#[cfg_attr(feature = &quot;tokio-runtime&quot;, async_trait::async_trait)]
+impl SchemaBefore for Author {}
+
+#[schema_relations]
+#[derive(Clone, Debug, Deserialize, Schema, Serialize)]
+struct Post {
+  #[schema(id, unique)]
+  #[serde(rename = &quot;_id&quot;)]
+  pub id: ObjectId,
+
+  pub title: String,
+
+  #[schema(many_to_one = &quot;Author&quot;, optional)]
+  #[serde(skip_serializing)]
+  pub author: Option&lt;Author&gt;,
+}
+
+impl Post {
+  pub fn new(title: &amp;str) -&gt; Self {
+    Self {
+      id: ObjectId::new(),
+      title: String::from(title),
+      author_id: None,
+      author: None,
+    }
+  }
+
+  pub fn new_with_author(title: &amp;str, author: &amp;Author) -&gt; Self {
+    Self {
+      id: ObjectId::new(),
+      title: String::from(title),
+      author: Some(author.clone()),
+      author_id: Some(author.id),
+    }
+  }
+}
+
+#[cfg_attr(feature = &quot;tokio-runtime&quot;, async_trait::async_trait)]
+impl SchemaBefore for Post {}
+
+fn get_instance() -&gt; Nongoose {
+  // Get database url.
+  let url = match std::env::var(&quot;DATABASE_URL&quot;) {
+    Ok(url) =&gt; url,
+    Err(_) =&gt; {
+      panic!(&quot;Cannot find `DATABASE_URL` on the environment variables.&quot;);
+    }
+  };
+
+  // Get MongoDB connection.
+  let client = match Client::with_uri_str(&amp;url) {
+    Ok(client) =&gt; client,
+    Err(e) =&gt; {
+      panic!(&quot;Error connecting to the database: {}&quot;, e);
+    }
+  };
+
+  Nongoose::build(client.database(&quot;nongoose&quot;))
+    .add_schema::&lt;Author&gt;()
+    .add_schema::&lt;Post&gt;()
+    .finish()
+}
+
+#[cfg(feature = &quot;sync&quot;)]
+fn main() -&gt; nongoose::Result&lt;()&gt; {
+  let nongoose = get_instance();
+
+  if let Some(author) = nongoose.find_one::&lt;Author&gt;(doc! { &quot;username&quot;: &quot;nongoose&quot; }, None)? {
+    // Get author posts.
+    let author = author.populate(&quot;posts&quot;)?;
+    println!(&quot;Author posts: {:?}&quot;, author.posts);
+  } else {
+    // Authors
+    let author = Author::new(&quot;nongoose&quot;).save()?;
+
+    // Posts
+    Post::new(&quot;Nongoose example 1&quot;).save()?;
+    Post::new_with_author(&quot;Nongoose example 2&quot;, &amp;author).save()?;
+    Post::new_with_author(&quot;Nongoose example 3&quot;, &amp;author).save()?;
+    Post::new_with_author(&quot;Nongoose example 4&quot;, &amp;author).save()?;
+
+    // Get author posts
+    let author = author.populate(&quot;posts&quot;)?;
+    println!(&quot;Author posts: {:?}&quot;, author.posts);
+  }
+
+  Ok(())
+}
+
+#[cfg(feature = &quot;tokio-runtime&quot;)]
+#[cfg_attr(feature = &quot;tokio-runtime&quot;, tokio::main)]
+async fn main() -&gt; nongoose::Result&lt;()&gt; {
+  let nongoose = get_instance();
+
+  if let Some(author) = nongoose
+    .find_one::&lt;Author&gt;(doc! { &quot;username&quot;: &quot;nongoose&quot; }, None)
+    .await?
+  {
+    // Get author posts.
+    let author = author.populate(&quot;posts&quot;).await?;
+    println!(&quot;Author posts: {:?}&quot;, author.posts);
+  } else {
+    // Authors
+    let author = Author::new(&quot;nongoose&quot;).save().await?;
+
+    // Posts
+    Post::new(&quot;Nongoose example 1&quot;).save().await?;
+    Post::new_with_author(&quot;Nongoose example 2&quot;, &amp;author)
+      .save()
+      .await?;
+    Post::new_with_author(&quot;Nongoose example 3&quot;, &amp;author)
+      .save()
+      .await?;
+    Post::new_with_author(&quot;Nongoose example 4&quot;, &amp;author)
+      .save()
+      .await?;
+
+    // Get author posts
+    let author = author.populate(&quot;posts&quot;).await?;
+    println!(&quot;Author posts: {:?}&quot;, author.posts);
+  }
+
+  Ok(())
+}</code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="many-to-one-relation"><a class="header" href="#many-to-one-relation">Many to One relation</a></h1>
+<pre><pre class="playground"><code class="language-rust edition2018">use nongoose::{
+  schema_relations, bson::oid::ObjectId,
+  Client, Nongoose, Schema, SchemaBefore,
+};
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, Deserialize, Schema, Serialize)]
+struct User {
+  #[schema(id)]
+  #[serde(rename = &quot;_id&quot;)]
+  pub id: ObjectId,
+
+  #[schema(unique)]
+  pub username: String,
+}
+
+impl User {
+  pub fn new(username: &amp;str) -&gt; Self {
+    Self {
+      id: ObjectId::new(),
+      username: String::from(username),
+    }
+  }
+}
+
+#[cfg_attr(feature = &quot;tokio-runtime&quot;, async_trait::async_trait)]
+impl SchemaBefore for User {}
+
+#[schema_relations]
+#[derive(Clone, Debug, Deserialize, Schema, Serialize)]
+struct UserFriend {
+  #[schema(id)]
+  #[serde(rename = &quot;_id&quot;)]
+  pub id: ObjectId,
+
+  #[schema(many_to_one = &quot;User&quot;)]
+  #[serde(skip_serializing)]
+  pub from: Option&lt;User&gt;,
+
+  #[schema(many_to_one = &quot;User&quot;)]
+  #[serde(skip_serializing)]
+  pub to: Option&lt;User&gt;,
+}
+
+#[cfg_attr(feature = &quot;tokio-runtime&quot;, async_trait::async_trait)]
+impl SchemaBefore for UserFriend {}
+
+fn get_instance() -&gt; Nongoose {
+  // Get database url.
+  let url = match std::env::var(&quot;DATABASE_URL&quot;) {
+    Ok(url) =&gt; url,
+    Err(_) =&gt; {
+      panic!(&quot;Cannot find `DATABASE_URL` on the environment variables.&quot;);
+    }
+  };
+
+  // Get MongoDB connection.
+  let client = match Client::with_uri_str(&amp;url) {
+    Ok(client) =&gt; client,
+    Err(e) =&gt; {
+      panic!(&quot;Error connecting to the database: {}&quot;, e);
+    }
+  };
+
+  Nongoose::build(client.database(&quot;nongoose&quot;))
+    .add_schema::&lt;User&gt;()
+    .add_schema::&lt;UserFriend&gt;()
+    .finish()
+}
+
+#[cfg(feature = &quot;sync&quot;)]
+fn run_sync(nongoose: Nongoose, user_friend_id: &amp;ObjectId) -&gt; nongoose::Result&lt;UserFriend&gt; {
+  let user_friends = nongoose.find_by_id::&lt;UserFriend&gt;(user_friend_id);
+
+  match user_friends {
+    Ok(None) | Err(_) =&gt; {
+      let user_one = User::new(&quot;nongoose&quot;).save()?;
+      let user_two = User::new(&quot;nongoose2&quot;).save()?;
+
+      let user_friend = UserFriend {
+        id: *user_friend_id,
+        from: Some(user_one.clone()),
+        from_id: user_one.id,
+        to: Some(user_two.clone()),
+        to_id: user_two.id,
+      }
+      .save()?;
+
+      Ok(user_friend)
+    }
+    Ok(Some(user_friends)) =&gt; Ok(user_friends.populate(&quot;from&quot;)?.populate(&quot;to&quot;)?),
+  }
+}
+
+#[cfg(feature = &quot;tokio-runtime&quot;)]
+async fn run_async(
+  nongoose: Nongoose,
+  user_friend_id: &amp;ObjectId,
+) -&gt; nongoose::Result&lt;UserFriend&gt; {
+  let user_friends = nongoose.find_by_id::&lt;UserFriend&gt;(user_friend_id).await;
+
+  match user_friends {
+    Ok(None) | Err(_) =&gt; {
+      let user_one = User::new(&quot;nongoose&quot;).save().await?;
+      let user_two = User::new(&quot;nongoose2&quot;).save().await?;
+
+      let user_friend = UserFriend {
+        id: *user_friend_id,
+        from: Some(user_one.clone()),
+        from_id: user_one.id,
+        to: Some(user_two.clone()),
+        to_id: user_two.id,
+      }
+      .save()
+      .await?;
+
+      Ok(user_friend)
+    }
+    Ok(Some(user_friends)) =&gt; Ok(user_friends.populate(&quot;from&quot;).await?.populate(&quot;to&quot;).await?),
+  }
+}
+
+#[cfg(feature = &quot;sync&quot;)]
+fn main() -&gt; nongoose::Result&lt;()&gt; {
+  let user_friend_id = ObjectId::parse_str(&quot;616c91dc8cb70be8cc7d1f38&quot;).unwrap();
+  let nongoose = get_instance();
+
+  let data = run_sync(nongoose, &amp;user_friend_id)?;
+  println!(&quot;User friend: {:?}&quot;, data);
+
+  Ok(())
+}
+
+#[cfg(feature = &quot;tokio-runtime&quot;)]
+#[cfg_attr(feature = &quot;tokio-runtime&quot;, tokio::main)]
+async fn main() -&gt; nongoose::Result&lt;()&gt; {
+  let user_friend_id = ObjectId::parse_str(&quot;616c91dc8cb70be8cc7d1f38&quot;).unwrap();
+  let nongoose = get_instance();
+
+  let data = run_async(nongoose, &amp;user_friend_id).await?;
+  println!(&quot;User friend: {:?}&quot;, data);
+
+  Ok(())
+}</code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="feature-flags"><a class="header" href="#feature-flags">Feature flags</a></h1>
+<p>The <code>nongoose</code> crate defines some <a href="https://doc.rust-lang.org/cargo/reference/manifest.html#the-features-section">Cargo features</a> to enable using Nongoose in a variety of freestanding environments.</p>
+<h2 id="--feature-derive"><a class="header" href="#--feature-derive">--feature derive</a></h2>
+<p>Provide derive and attributes macros for the <code>Schema</code> trait.</p>
+<p>This is behind a feature because the derive macro implementation takes some extra time to compile.</p>
+<h2 id="--feature-sync"><a class="header" href="#--feature-sync">--feature sync</a></h2>
+<p>Expose the synchronous API. This flag cannot be used in conjuntion with either of the async runtime feature flags</p>
+<h2 id="--feature-tokio-runtime"><a class="header" href="#--feature-tokio-runtime">--feature tokio-runtime</a></h2>
+<p>Provide asynchronous functions in the <code>Schema</code> trait using <a href="https://tokio.rs">Tokio</a> runtime.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </body>
+</html>
