@@ -16,7 +16,7 @@ pub enum SchemaRelationType {
 
   /// One to many relationship.
   ///
-  /// React [One-to-many (Data model)](https://en.wikipedia.org/wiki/One-to-many_(data_model)) for more information.
+  /// Read [One-to-many (Data model)](https://en.wikipedia.org/wiki/One-to-many_(data_model)) for more information.
   OneToMany,
 
   /// Many to one relationship.

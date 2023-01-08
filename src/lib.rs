@@ -8,7 +8,7 @@
 //! - Rust 1.48+
 //! - MongoDB 3.6+
 //!
-//! ## Importing
+//! ## Importing
 //! The library is available on [crates.io](https://crates.io/crates/nongoose). To use it in
 //! your application, simply add it to your project's `Cargo.toml`.
 //! ```toml
@@ -36,9 +36,10 @@ mod schema;
 
 pub use crate::nongoose::{Nongoose, NongooseBuilder};
 pub use error::{Error, Result};
-pub use mongodb::bson;
-pub use mongodb::options;
-pub use mongodb::sync::{Client, Database};
+pub use mongodb::{
+  bson, options, results,
+  sync::{Client, Database},
+};
 #[cfg(feature = "derive")]
 pub use nongoose_derive::{schema_relations, Schema};
 pub use schema::{types, Schema, SchemaBefore};

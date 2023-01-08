@@ -1,5 +1,9 @@
 # Schema
 
+- [populate](#schemapopulate)
+- [remove](#schemaremove)
+- [save](#schemasave)
+
 ## `Schema.populate()`
 
 **Arguments**

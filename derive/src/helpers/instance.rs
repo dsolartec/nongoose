@@ -8,7 +8,7 @@ pub(crate) fn getter() -> TokenStream {
     fn __get_database(database: Option<#nongoose::Database>) -> &'static #nongoose::Database {
       use #nongoose::re_exports::OnceCell;
 
-      let collection_name = Self::__get_collection_name();
+      let collection_name = Self::collection_name();
 
       static DATABASE: OnceCell<#nongoose::Database> = OnceCell::new();
 
